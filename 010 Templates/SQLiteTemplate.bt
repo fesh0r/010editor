@@ -1,0 +1,36 @@
+//--------------------------------------
+//--- 010 Editor v3.0.5 Binary Template
+//
+// File: SQLiteTemplate.bt
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+BigEndian();
+
+typedef struct {
+    SetBackColor( cLtBlue );
+    char magic[16]; // 0-15
+    ushort page_size; // 16-17
+    ubyte write_version; // 18
+    ubyte read_version; // 19
+    ubyte unused_page_space; // 20
+    ubyte max_index_embed; // 21
+    ubyte min_index_embed; // 22
+    ubyte min_table_embed; // 23
+    uint change_count; // 24-27
+    uint reserved1; // 28-31
+    uint freelist_trunk_page; // 32-35
+    uint db_free_pages; // 36-39
+    uint schema_version; // 40-43
+    uint schema_file_format; // 44-47
+    uint page_cache_size; // 48-51
+    uint top_root_page; // 52-55
+    uint text_encoding; // 56-59
+    uint user_cookie; // 60-63
+    uint inc_vacuum; // 64-67
+    ubyte reserved2[32]; // 68-99
+} DB_HEADER;
+
+DB_HEADER db_h;

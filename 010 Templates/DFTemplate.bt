@@ -1,0 +1,60 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: DFTemplate.bt
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+string read_Filename(char &in) {
+	return in;
+}
+
+typedef struct {
+	local quad cur_pos;
+	uint Unknown;
+	uint Unknown;
+	uint Unknown;
+	uint Data_Size <format=decimal>;
+	string Filename;
+	uchar Padding[512 - Strlen(Filename) - 1];
+	uint Unknown;
+	uint Data_Offset;
+	uint Padding;
+	uint Padding;
+	uint Padding;
+
+	cur_pos = FTell();
+	FSeek(Data_Offset);
+	
+	SetBackColor(0xffc0c0);
+	uchar Data[Data_Size];
+	SetBackColor(0xc0ffc0);
+	
+	FSeek(cur_pos);
+} FILE <read=READ_FILE>;
+
+string READ_FILE(FILE &in) {
+	return in.Filename;
+}
+
+typedef struct {
+	uint File_Count <format=decimal>;
+	uint Data_Offset;
+	uint Padding;
+	uint Padding;
+} HEADER;
+
+DisplayFormatHex();
+LittleEndian();
+
+local int i;
+
+SetBackColor(0xe0e0e0);
+HEADER h;
+
+SetBackColor(0xc0ffc0);
+for (i = 0; i < h.File_Count; i++) {
+	FILE f;
+}

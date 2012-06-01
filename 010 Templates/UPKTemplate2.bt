@@ -1,0 +1,482 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: UPKTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.5
+// Purpose: UE3 package file
+//--------------------------------------
+
+DisplayFormatHex();
+LittleEndian();
+
+local ushort GlobalPackageVersion;
+local ushort GlobalLicenseePackageVersion;
+local uint GlobalEngineVersion;
+local uint GlobalCookerVersion;
+local int GlobalCompressionType;
+local uint GlobalNameOffset[50000];
+
+typedef struct {
+	uint Length;
+	string Data;
+} UT_STRING <read=UT_STRINGread>;
+
+string UT_STRINGread(UT_STRING &in) {
+	return in.Data;
+}
+
+typedef struct {
+	uint NameIndex <format=decimal>;
+} UT_NAME <read=UT_NAMEread>;
+
+string UT_NAMEread(UT_NAME &in) {
+	string out;
+	uint index;
+	index = in.NameIndex;
+	if (index > 0 && index < header.NameCount) {
+		SPrintf(out, "%s", ReadString(GlobalNameOffset[index]));
+	}
+
+	return out;
+}
+
+typedef struct {
+	uint Data;
+	uint Data;
+	uint Data;
+	uint Data;
+} GUID <read=GUIDread>;
+
+string GUIDread(GUID &in) {
+	string out;
+	SPrintf(out, "%08X%08X%08X%08X",
+		in.Data[0], in.Data[1], in.Data[2], in.Data[3]);
+	return out;
+}
+
+string PVread(ushort &in) {
+	string out;
+	string game;
+	switch(in) {
+		case 490:
+			game = "Gears Of War";
+			break;
+		case 491:
+			game = "Mass Effect";
+			break;
+		case 512:
+			game = "Unreal Tournament 3";
+			break;
+		case 536:
+			game = "Mirrors Edge";
+			break;
+		case 584:
+			game = "Borderlands";
+			break;
+		case 590:
+			game = "Shadow Complex";
+			break;
+		case 648:
+			game = "UDK";
+			break;
+		default:
+			game = "Unknown";
+			break;
+	}
+	SPrintf(out, "%s (%u)", game, in);
+	return out;
+}
+
+string LPVread(ushort &in) {
+	string out;
+	string game;
+	switch (in) {
+		case 0:
+		case 1:
+			game = "Multple";
+			break;
+		case 9:
+			game = "Gears Of War";
+			break;
+		case 43:
+			game = "Mirrors Edge";
+			break;
+		case 57:
+			game = "Borderlands";
+			break;
+		case 1008:
+			game = "Mass Effect";
+			break;
+		default:
+			game = "Unknown";
+			break;
+	}
+	SPrintf(out, "%s (%u)", game, in);
+	return out;
+}
+
+string EVread(uint &in) {
+	string out;
+	string game;
+	switch (in) {
+		case 3240:
+			game = "Mass Effect";
+			break;
+		case 3329:
+			game = "Gears Of War";
+			break;
+		case 3487:
+		case 3543:
+			game = "Unreal Tournament 3";
+			break;
+		case 3716:
+			game = "Mirrors Edge";
+			break;
+		case 5246:
+			game = "Shadow Complex";
+			break;
+		case 5860:
+			game = "UDK";
+			break;
+		case 70405:
+			game = "Borderlands";
+			break;
+		default:
+			game = "Unknown";
+			break;
+	}
+	SPrintf(out, "%s (%u)", game, in);
+	return out;
+}
+
+string CVread(uint &in) {
+	string out;
+	string game;
+	switch (in) {
+		case 0:
+			game = "Uncooked";
+			break;
+		case 46:
+			game = "Gears Of War";
+			break;
+		case 47:
+			game = "Mass Effect";
+			break;
+		case 57:
+			game = "Unreal Tournament 3";
+			break;
+		case 60:
+			game = "Mirrors Edge";
+			break;
+		case 87:
+			//game = "Borderlands";
+			game = "Multiple";
+			break;
+		default:
+			game = "Unknown";
+			break;
+	}
+	SPrintf(out, "%s (%u)", game, in);
+	return out;
+}
+
+typedef struct {
+	local int i;
+	local quad cur_offset;
+
+	uint Signature;
+
+	if (IsBigEndian()) {
+		ushort LicenseePackageVersion <format=decimal,read=LPVread>;
+		GlobalLicenseePackageVersion = LicenseePackageVersion;
+
+		ushort PackageVersion <format=decimal,read=PVread>;
+		GlobalPackageVersion = PackageVersion;
+	}
+	else {
+		ushort PackageVersion <format=decimal,read=PVread>;
+		GlobalPackageVersion = PackageVersion;
+
+		ushort LicenseePackageVersion <format=decimal,read=LPVread>;
+		GlobalLicenseePackageVersion = LicenseePackageVersion;
+	}
+
+	uint DataOffset;
+	UT_STRING Path;
+	uint PackageFlags;
+
+	uint NameCount <format=decimal>;
+	uint NameOffset;
+	uint ExportCount <format=decimal>;
+	uint ExportOffset;
+	uint ImportCount <format=decimal>;
+	uint ImportOffset;
+	uint EmptyOffset;
+
+	if (GlobalPackageVersion > 491) {
+		if (GlobalPackageVersion != 512 && GlobalPackageVersion != 536) {
+			uint UnknownOffset;
+		}
+
+		if (GlobalPackageVersion > 590) {
+			uint Unknown;
+			uint Unknown;
+			uint UnknownOffset;
+		}
+	}
+
+	GUID Guid;
+	
+	uint GenerationCount <format=decimal>;
+	
+	for (i = 0; i < GenerationCount; i++) {
+		struct {
+			uint ExportCount <format=decimal>;
+			uint NamesCount <format=decimal>;
+			uint ObjectCount <format=decimal>;
+		} Generation;
+	}
+
+	uint EngineVersion <format=decimal,read=EVread>;
+	GlobalEngineVersion = EngineVersion;
+	uint CookerVersion <format=decimal,read=CVread>;
+	GlobalCookerVersion = CookerVersion;
+
+	if (PackageVersion == 491) {
+		uint Unknown;
+		uint Unknown;
+		uint Unknown;
+		uint Unknown;
+		uint Unknown;
+		uint Unknown;
+		uint Unknown;
+	}
+
+	enum <uint> { NONE, ZLIB, LZO, LZX=4} CompressionType;
+	GlobalCompressionType = CompressionType;
+
+	uint ChunkCount <format=decimal>;
+	for (i = 0; i < ChunkCount; i++) {
+		struct {
+			uint UncompressedOffset;
+			uint UncompressedSize;
+			uint CompressedOffset;
+			uint CompressedSize;
+			
+			switch (CompressionType) {
+				case LZO:
+				case LZX:
+					cur_offset = FTell();
+
+					FSeek(CompressedOffset);
+
+					SetBackColor(0xc0ffff);
+					struct {
+						local int j;
+						local uint num_blocks;
+						local quad block_offset;
+
+						uint Signature;
+						if (Signature != 0x9E2A83C1) {
+							Warning("Invalid signature in compressed block");
+						}
+						uint BlockSize;
+						uint CompressedSize;
+						uint UncompressedSize;
+
+						num_blocks = (uint)Ceil((double)UncompressedSize / (double)BlockSize);
+						
+						block_offset = CompressedOffset + 16 + num_blocks * 8;
+						for (j = 0; j < num_blocks; j++) {
+							FSeek(CompressedOffset + 16 + j * 8);
+							struct {
+								local quad cur_offset2;
+								uint CompressedSize2;
+								uint UncompressedSize2;
+
+								cur_offset2 = FTell();
+								FSeek(block_offset);
+								SetBackColor(0xffc0ff);
+								ubyte Data[CompressedSize2];
+								SetBackColor(0xc0ffff);
+								FSeek(cur_offset2);
+								block_offset += CompressedSize2;
+							} Block;
+						}
+					} Chunk;
+				}
+		} CompressedChunk;
+	}
+
+	uint Unknown;
+	if (GlobalPackageVersion > 490) {
+		if (GlobalPackageVersion != 512) {
+			uint UnknownCount <format=decimal>;
+
+			if (UnknownCount > 0) {
+				SetBackColor(0xc0c0c0);
+				for (i = 0; i < UnknownCount; i++) {
+					UT_STRING UnknownString;
+				}
+				SetBackColor(0xe0e0e0);
+			}
+		}
+	}
+} UPK_HEADER;
+
+
+typedef struct {
+	UT_STRING Name;
+	quad Flags;
+} NAME_ENTRY <read=NAME_ENTRYread>;
+
+string NAME_ENTRYread(NAME_ENTRY &in) {
+	return in.Name.Data;
+}
+
+
+typedef struct {
+	local int i;
+	local quad cur_offset;
+
+	int ImportIndex <format=decimal>;
+	int ParentIndex <format=decimal>;
+	int OuterIndex <format=decimal>;
+	UT_NAME NameIndex;
+	UT_NAME SuffixNameIndex;
+	uint Archetype;
+	quad Flags;
+	uint Size;
+	uint Offset;
+	uint ComponentMapCount <format=decimal>;
+	for (i = 0; i < ComponentMapCount; i++) {
+		UT_NAME CompNameIndex;
+		uint Unknown;
+		uint CompClassIndex;
+	}
+	uint ExportFlags;
+	uint NetObjectsCount <format=decimal>;
+	if (NetObjectsCount > 0) {
+		uint Object;
+	}
+	else {
+		if (GlobalPackageVersion < 584) {
+			uint Unknown;
+		}
+	}
+	GUID PkgGuid;
+	if (NetObjectsCount > 0) {
+		if (GlobalPackageVersion < 584) {
+			uint Unknown;
+		}
+	}
+
+	if (Size > 0) {
+		cur_offset = FTell();
+	
+		FSeek(Offset);
+		
+		SetBackColor(0xc0ffff);
+		ubyte Data[Size];
+		SetBackColor(0xc0ffc0);
+	
+		FSeek(cur_offset);
+	}
+} EXPORT_ENTRY <read=EXPORT_ENTRYread>;
+
+string EXPORT_ENTRYread(EXPORT_ENTRY &in) {
+	string out;
+	if (in.NameIndex.NameIndex > 0 && in.NameIndex.NameIndex < header.NameCount) {
+		out = ReadString(GlobalNameOffset[in.NameIndex.NameIndex]);
+		if (in.SuffixNameIndex.NameIndex > 0) {
+			if (in.SuffixNameIndex.NameIndex < header.NameCount) {
+				SPrintf(out, "%s_%s", out, ReadString(GlobalNameOffset[in.SuffixNameIndex.NameIndex]));
+			}
+		}
+	}
+	
+	return out;
+}
+
+
+typedef struct {
+	quad ClassPackageIndex <format=decimal>;
+	quad ClassNameIndex <format=decimal>;
+	int Outer <format=decimal>;
+	UT_NAME NameIndex;
+	uint Flags;
+} IMPORT_ENTRY <read=IMPORT_ENTRYread>;
+
+string IMPORT_ENTRYread(IMPORT_ENTRY &in) {
+	string out;
+	if (in.NameIndex.NameIndex > 0 && in.NameIndex.NameIndex < header.NameCount) {
+		out = ReadString(GlobalNameOffset[in.NameIndex.NameIndex]);
+	}
+	
+	return out;
+}
+
+
+typedef struct {
+	local int i;
+
+	for (i = 0; i < header.NameCount; i++) {
+		GlobalNameOffset[i] = FTell() + 4;
+		NAME_ENTRY Name;
+	}
+} NAME_TABLE;
+
+
+typedef struct {
+	local int i;
+	for (i = 0; i < header.ExportCount; i++) {
+		EXPORT_ENTRY Export;
+	}
+} EXPORT_TABLE;
+
+
+typedef struct {
+	local int i;
+	for (i = 0; i < header.ImportCount; i++) {
+		IMPORT_ENTRY Import;
+	}
+} IMPORT_TABLE;
+
+
+local uint sig;
+sig = ReadInt(0);
+
+if (sig == 0x9E2A83C1) {
+	LittleEndian();
+}
+else if (sig == 0xC1832A9E) {
+	Warning("BigEndian");
+	BigEndian();
+}
+else {
+	Warning("Invalid signature");
+	Exit(-1);
+}
+FSeek(0);
+
+SetBackColor(0xe0e0e0);
+UPK_HEADER header;
+
+if (GlobalCompressionType == 0) {
+	FSeek(header.NameOffset);
+	SetBackColor(0xffc0c0);
+	NAME_TABLE NameTable;
+
+	if (header.ImportCount > 0) {
+		FSeek(header.ImportOffset);
+		SetBackColor(0xc0c0ff);
+		IMPORT_TABLE ImportTable;	
+	}
+
+	if (header.ExportCount > 0) {
+		FSeek(header.ExportOffset);
+		SetBackColor(0xc0ffc0);
+		EXPORT_TABLE ExportTable;	
+	}
+}

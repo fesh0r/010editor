@@ -1,0 +1,47 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: GWTemplate.bt
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+DisplayFormatHex();
+BigEndian();
+
+typedef struct {
+	string s;
+} ENTRY <read=ENTRY_read>;
+
+string ENTRY_read(ENTRY &in) {
+	return in.s;
+}
+
+SetBackColor(0xe0e0e0);
+CHAR Signature[4];
+UINT32 FileSize;
+
+CHAR Signature2[4];
+UINT32 DataOffset;
+
+SetBackColor(0xffc0c0);
+while (FTell() < DataOffset) {
+	ENTRY e;
+}
+
+FSeek(DataOffset+8);
+
+SetBackColor(0xc0c0ff);
+CHAR Signature3[4];
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;

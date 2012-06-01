@@ -1,0 +1,133 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: RDTemplate.bt
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+DisplayFormatHex();
+LittleEndian();
+
+local int64 cur_pos;
+local int64 temp_pos;
+local int64 extinfo_pos;
+local char cur_filename[10];
+local int extinfo_found;
+
+typedef struct {
+	ushort value;
+	ubyte size <format=decimal>;
+	ubyte id;
+
+	if (size > 0) {
+		SetBackColor(0xffffc0);
+		ubyte data[size];
+		SetBackColor(0xffffe0);
+	}
+} EXTINFO <read=EXTINFO_read>;
+
+string EXTINFO_read(EXTINFO &in) {
+	string out;
+	switch (in.id) {
+		case 1:
+			SPrintf(out, "%02x%02x-%02x-%02x", in.data[3], in.data[2], in.data[1], in.data[0]);
+			break;
+		case 2:
+			SPrintf(out, "V: %x", in.value);
+			break;
+		case 3:
+			SPrintf(out, "\"%s\"", in.data);
+			break;
+		case 0x7f:
+			SPrintf(out, "<null>");
+			break;
+		default:
+			SPrintf(out, "(%02x) %04x", in.id, in.value);
+			break;
+	}
+	return out;
+}
+
+typedef struct {
+	char filename[10];
+	ushort extinfosize <format=decimal>;
+	uint filesize <format=decimal>;
+
+	temp_pos = FTell();
+
+	if (extinfosize > 0) {
+		FSeek(extinfo_pos);
+
+		do {
+			SetBackColor(0xffffe0);
+			EXTINFO e;
+			SetBackColor(0xe0e0e0);
+		} while (FTell() < (extinfo_pos + extinfosize));
+
+		extinfo_pos += extinfosize;
+	}
+
+	FSeek(cur_pos);
+
+	if (filename != "ROMDIR" && filename != "EXTINFO") {
+		SetBackColor(0xc0ffc0);
+	}
+	else {
+		SetBackColor(cNone);
+	}
+	ubyte data[filesize];
+	SetBackColor(0xe0e0e0);
+
+	if ((filesize % 0x10) == 0) {
+		cur_pos += filesize;
+	}
+	else {
+		cur_pos += (filesize + 0x10) & 0xfffffff0;
+	}
+
+	FSeek(temp_pos);
+} ROMDIR <read=ROMDIR_read>;
+
+string ROMDIR_read(ROMDIR & in) {
+	return in.filename;
+}
+
+
+cur_pos = 0;
+do {
+	ReadBytes(cur_filename, cur_pos, 10);
+
+	if (cur_filename == "RESET") break;
+
+	cur_pos += 16;
+} while (cur_pos < 512*1024);
+
+if (cur_pos >= 512*1024) {
+	Warning("ROMDIR not found");
+	Exit(-1);
+}
+
+FSeek(cur_pos);
+
+temp_pos = 0;
+do {
+	ReadBytes(cur_filename, cur_pos, 10);
+
+	if (cur_filename == "EXTINFO") {
+		extinfo_pos = temp_pos;
+		break;
+	}
+
+	temp_pos += ReadInt(cur_pos + 0xc);
+
+	cur_pos += 16;
+} while (ReadByte(cur_pos) != 0);
+
+cur_pos = 0;
+do {
+	SetBackColor(0xe0e0e0);
+	ROMDIR d;
+	SetBackColor(cNone);
+} while (ReadByte(FTell()) != 0);

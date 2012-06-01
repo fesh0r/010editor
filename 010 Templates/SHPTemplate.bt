@@ -1,0 +1,87 @@
+//--------------------------------------
+//--- 010 Editor v2.1.3 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+typedef struct point_s {double X; double Y;} POINT;
+
+string GetByteSize(int wordSize)
+{
+string s;
+SPrintf(s, "%d", 2*wordSize);
+return s;
+}
+
+struct ESRI_SHAPE {
+	SetBackColor(cLtGreen);
+	struct HEADER {
+		BigEndian();
+		int	fileCode;
+		int	unused[5];
+		int	fileLength <read=GetByteSize>;
+		LittleEndian();
+		int	version;
+		enum ShapeEnum {
+			NullShape,
+			Point,
+			PolyLine=3,
+			Polygon=5,
+			MultiPoint=5,
+			PointZ=11,
+			PolyLineZ=13,
+			PolygonZ=15} shapeType;
+		double	Xmin;
+		double	Ymin;
+		double	Xmax;
+		double	Ymax;
+		double	Zmin;
+		double	Zmax;
+		double	Mmin;
+		double	Mmax;
+	} header;
+	SetBackColor(cLtGray);
+	struct RECORD {
+		BigEndian();
+		int	recordNumber;
+		int	contentLength <read=GetByteSize>;
+		LittleEndian();
+		enum ShapeTypeEnum {
+			NullShapeType,
+			PointType,
+			PolyLineType=3,
+			PolygonType=5,
+			MultiPointType=8,
+			PointZType=11,
+			PolyLineZType=13,
+			PolygonZType=15,
+			MultiPointZType=18,
+			PointMType=21,
+			PolyLineMType=23,
+			PolygonMType=25,
+			MultiPointMType=28,
+			MultiPatchType=31}	shapeType;
+		if (shapeType == 1)
+		{
+			POINT location;
+		}
+		else if (shapeType == 3)
+		{
+			double 	box[4];
+			int	numParts;
+			int	numPoints;
+			int	parts[numParts];
+			POINT   points[numPoints];
+		}
+		else if (shapeType == 5)
+		{
+			double	box[4];
+			int	numParts;
+			int	numPoints;
+			int	parts[numParts];
+			POINT	points[numPoints];
+		}
+	} record [10000] <optimize=false>;
+} esri_shape;

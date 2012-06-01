@@ -1,0 +1,27 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: DADMPTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: DA addon file
+//--------------------------------------
+
+DisplayFormatHex();
+LittleEndian();
+
+typedef struct {
+	uint Length;
+	char Data[Length];
+} DA_STRING <read=DA_STRINGread>;
+
+string DA_STRINGread(DA_STRING &in) {
+	return in.Data;
+}
+
+SetBackColor(0xe0e0e0);
+DA_STRING game;
+DA_STRING addon;
+DA_STRING version;
+DA_STRING filename;
+DA_STRING url;

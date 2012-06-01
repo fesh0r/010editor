@@ -1,0 +1,52 @@
+//--------------------------------------
+//--- 010 Editor v2.1.3 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+typedef struct point_s {double X; double Y;} POINT;
+
+string GetByteSize(int wordSize)
+{
+string s;
+SPrintf(s, "%d", 2*wordSize);
+return s;
+}
+
+struct ESRI_INDEX {
+	SetBackColor(cLtGreen);
+	struct HEADER {
+		BigEndian();
+		int	fileCode;
+		int	unused[5];
+		int	fileLength <read=GetByteSize>;
+		LittleEndian();
+		int	version;
+		enum ShapeEnum {
+			NullShape,
+			Point,
+			PolyLine=3,
+			Polygon=5,
+			MultiPoint=5,
+			PointZ=11,
+			PolyLineZ=13,
+			PolygonZ=15} shapeType;
+		double	Xmin;
+		double	Ymin;
+		double	Xmax;
+		double	Ymax;
+		double	Zmin;
+		double	Zmax;
+		double	Mmin;
+		double	Mmax;
+	} header;
+	SetBackColor(cLtGray);
+	struct INDEX_RECORD {
+		BigEndian();
+		int	offset <read=GetByteSize>;
+		int	contentLength <read=GetByteSize>;
+	} record [(FileSize() - 100)/8];
+		
+} esri_index;

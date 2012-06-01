@@ -1,0 +1,238 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: PIRSTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: XBOX LIVE/PIRS/CON files
+//--------------------------------------
+
+// UNICODE support
+// Thanks to Graeme Sweet for pointing this out!
+int CalcUnicodeLen() {
+	local quad pos = FTell();
+	local quad base = pos;
+	while ((ReadUShort(pos) != 0) && (pos - base < 65535)) {
+		pos += 2;
+	}
+	return (pos - base + 2) / 2;
+}
+
+typedef struct {
+	UINT16 s[CalcUnicodeLen()];
+} WCHAR <read=WCHAR_read>;
+
+string WCHAR_read(WCHAR &z) {
+	int len = sizeof(z.s) / 2;
+	char s[len];
+	ConvertUNICODEToASCIIW(len, z.s, s);
+	return s;
+}
+
+typedef struct {
+	UINT16 s[128];
+} WCHAR128 <read=WCHAR128_read>;
+
+string WCHAR128_read(WCHAR128 &z) {
+	int len = 128;
+	char s[len];
+	ConvertUNICODEToASCIIW(len, z.s, s);
+	return s;
+}
+
+typedef struct {
+	UINT16 s[64];
+} WCHAR64 <read=WCHAR64_read>;
+
+string WCHAR64_read(WCHAR64 &z) {
+	int len = 64;
+	char s[len];
+	ConvertUNICODEToASCIIW(len, z.s, s);
+	return s;
+}
+
+typedef struct {
+	UBYTE d[3];
+} UINT24 <read=UINT24_read>;
+
+string UINT24_read(UINT24 &in) {
+	string out;
+	int i;
+	for (i = 0; i < 2; i++) {
+		SPrintf(out, "%s%02X", out, in.d[i]);
+	}
+	SPrintf(out, "%sh", out);
+	return out;
+}
+
+typedef struct {
+	UBYTE d[5];
+} UINT40 <read=UINT40_read>;
+
+string UINT40_read(UINT40 &in) {
+	string out;
+	int i;
+	for (i = 0; i < 5; i++) {
+		SPrintf(out, "%s%02X", out, in.d[i]);
+	}
+	SPrintf(out, "%sh", out);
+	return out;
+}
+
+typedef struct {
+	UBYTE d[20];
+} SHA1HASH <read=SHA1_read>;
+
+string SHA1_read(struct SHA1HASH &in) {
+	string out;
+	int i;
+	for (i = 0; i < 20; i++) {
+		SPrintf(out, "%s%02X", out, in.d[i]);
+	}
+	SPrintf(out, "%sh", out);
+	return out;
+}
+
+typedef struct {
+	UINT64 Id;
+	UINT32 Int1;
+	UINT32 Int2;
+} LICENSE <read=LICENSE_read>;
+
+string LICENSE_read(struct LICENSE &in) {
+	string out;
+
+	SPrintf(out, "%016LXh", in.Id);
+	return out;
+}
+
+
+typedef struct {
+	local string csum;
+	local int i;
+
+	CHAR Sig[4];
+
+	if (Sig == "CON ") {
+		UBYTE Cert[0xA8];
+		UBYTE ConsoleSig[0x100];
+		UBYTE FileSig[0x80];
+	}
+	else {
+		UBYTE Signature[0x100];
+		UBYTE Unknown[0x128];
+	}
+	
+	for (i = 0; i < 0x10; i++) {
+		LICENSE l;
+	}
+
+	SHA1HASH ContentID;
+
+	UINT32 EntryID;
+	UINT32 ContentType;
+	UINT32 MetadataVersion;
+	UINT64 ContentSize;
+	UINT32 MediaID;
+	UINT32 Version;
+	UINT32 VersionBase;
+	UINT32 TitleID;
+	UBYTE Platform;
+	UBYTE ExecutableType;
+	UBYTE DiscNumber;
+	UBYTE DiscInSet;
+	UINT32 SaveGameID;
+	UINT40 SaveConsoleID;
+	UINT64 ProfileID;
+	UBYTE VolumeDescSize;
+	UBYTE Unknown;
+	UBYTE BlockSeperation;
+	LittleEndian();
+	UINT16 FileTableBlockCount;
+	BigEndian();
+	UINT24 FileTableBlockNumber;
+	SHA1HASH MasterHash;
+	UINT32 AllocCount;
+	UINT32 UnallocCount;
+	UINT32 DataFileCount;
+	UINT64 DataFileSize;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	if (MetadataVersion == 2) {
+		UBYTE SeriesID[0x10];
+		UBYTE SeasonID[0x10];
+		UINT16 SeasonNumber;
+		UINT16 EpisodeNumber;
+	}
+	else {
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+		UINT32 Unknown;
+	}
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	CHAR DeviceID[0x14];
+	for (i = 0; i < 9; i++) {
+		WCHAR128 Titles;
+	}
+	for (i = 0; i < 9; i++) {
+		WCHAR128 Descriptions;
+	}
+	WCHAR64 Publisher;
+	WCHAR64 Title;
+	UBYTE TransferFlags;
+	UINT32 PackageImageSize;
+	UINT32 ContentImageSize;
+	if (MetadataVersion == 2) {
+		UBYTE PackageImage[0x3D00];
+		for (i = 0; i < 3; i++) {
+			WCHAR128 Titles;
+		}
+		UBYTE ContentImage[0x3D00];
+		for (i = 0; i < 3; i++) {
+			WCHAR128 Descriptions;
+		}
+	}
+	else {
+		UBYTE PackageImage[0x4000];
+		UBYTE ContentImage[0x4000];
+	}
+} STFSHEADER <read=read_STFSHEADER>;
+
+string read_STFSHEADER(STFSHEADER &in) {
+    return WCHAR128_read(in.Titles[0]);
+//    string out;
+//    SPrintf(out, "%s %s", in.Sig, WCHAR128_read(in.Titles[0]));
+//    return out;
+}
+
+
+DisplayFormatHex();
+BigEndian();
+
+local uchar sig[4];
+ReadBytes(sig, 0, 4);
+
+if (sig == "CON " || sig == "LIVE" || sig == "PIRS") {
+}
+else {
+	Printf("Invalid signature\n");
+	Exit(-1);
+}
+
+SetBackColor(0xe0e0e0);
+STFSHEADER f;

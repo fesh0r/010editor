@@ -1,0 +1,661 @@
+//--------------------------------------
+//--- 010 Editor v2.0.2 Binary Template
+//
+// Author:    Peter Kankowski   http://smallcode.weblogs.us
+// File mask: *.obj
+// Purpose:   to display executable file headers.
+//            Supports DLLs, Windows CE and Win64 executables.
+//            Displays informative names for all flags and fields.
+//--------------------------------------
+// Recommended reading:
+// 1. Bernd Luevelsmeyer. The PE file format
+//    http://webster.cs.ucr.edu/Page_TechDocs/pe.txt
+// 2. DJ Delorie. MS DOS EXE format
+//    http://www.delorie.com/djgpp/doc/exe/
+// 3. Iczelion. PE tutorial
+//    http://spiff.tripnet.se/~iczelion/tutorials.html
+LittleEndian();
+
+typedef enum <WORD> {
+	IMAGE_FILE_MACHINE_UNKNOWN = 0,
+	IMAGE_FILE_MACHINE_I386 = 0x014c,
+	IMAGE_FILE_MACHINE_AMD64 = 0x8664,
+	IMAGE_FILE_MACHINE_ARM = 0x01c0,
+
+	IMAGE_FILE_MACHINE_R3000 = 0x0162, // Rarely used
+	IMAGE_FILE_MACHINE_R4000 = 0x0166,
+	IMAGE_FILE_MACHINE_R10000 = 0x0168,
+	IMAGE_FILE_MACHINE_WCEMIPSV2 = 0x0169,
+	IMAGE_FILE_MACHINE_ALPHA = 0x0184,
+	IMAGE_FILE_MACHINE_SH3 = 0x01a2,
+	IMAGE_FILE_MACHINE_SH3DSP = 0x01a3,
+	IMAGE_FILE_MACHINE_SH3E = 0x01a4,
+	IMAGE_FILE_MACHINE_SH4 = 0x01a6,
+	IMAGE_FILE_MACHINE_SH5 = 0x01a8,
+	IMAGE_FILE_MACHINE_THUMB = 0x01c2,
+	IMAGE_FILE_MACHINE_AM33 = 0x01d3,
+	IMAGE_FILE_MACHINE_POWERPC = 0x01F0,
+	IMAGE_FILE_MACHINE_POWERPCFP=0x01f1,
+	IMAGE_FILE_MACHINE_IA64 = 0x0200,
+	IMAGE_FILE_MACHINE_MIPS16 = 0x0266,
+	IMAGE_FILE_MACHINE_ALPHA64 = 0x0284,
+	IMAGE_FILE_MACHINE_MIPSFPU = 0x0366,
+	IMAGE_FILE_MACHINE_MIPSFPU16=0x0466,
+	IMAGE_FILE_MACHINE_TRICORE = 0x0520,
+	IMAGE_FILE_MACHINE_CEF = 0x0CEF,
+	IMAGE_FILE_MACHINE_EBC = 0x0EBC,
+	IMAGE_FILE_MACHINE_M32R = 0x9041,
+	IMAGE_FILE_MACHINE_CEE = 0xC0EE
+} MACHINE <format=hex>;
+
+typedef struct {
+	ushort RelocsStripped : 1;
+	ushort ExecutableImage : 1; // if not set, then OBJ
+	ushort LineNumsStripped : 1;
+	ushort LocalSymsStripped : 1;
+	ushort AggresiveWorksetTrim : 1;
+	ushort LargeAddressAware : 1; // Can hadle > 2Gb addresses
+	ushort Reserved : 1;
+	ushort BytesReversedLo: 1; // Reversed endianess
+	ushort _32bitMachine: 1;
+	ushort DebugStripped: 1;
+	ushort RemovableRunFromSwap: 1; // Should copy to swap file when run from removable media such as CD-ROM
+	ushort NetRunFromSwap: 1;
+	ushort System: 1; // File is a system driver
+	ushort DLL: 1;
+	ushort UPSystemOnly: 1; // If set, multiprocessor systems are not supported
+	ushort BytesReversedHi: 1;
+} CHARACTERISTICS <read=ReadCHARACTERISTICS>;
+
+string ReadCHARACTERISTICS(CHARACTERISTICS &flags) {
+	string s = "";
+
+	if (flags.AggresiveWorksetTrim) Strcat(s, "AggresiveWorksetTrim ");
+	if (flags.LargeAddressAware) Strcat(s, "LargeAddressAware ");
+	if (flags.RemovableRunFromSwap) Strcat(s, "RemovableRunFromSwap ");
+	if (flags.NetRunFromSwap) Strcat(s, "NetRunFromSwap ");
+	if (flags.System) Strcat(s, "SystemDriver ");
+	if (flags.DLL) Strcat(s, "DLL ");
+	if (flags.UPSystemOnly) Strcat(s, "UniprocessorSystemOnly ");
+	if (flags.BytesReversedLo) Strcat(s, "BytesReversedLo ");
+	if (flags.BytesReversedHi) Strcat(s, "BytesReversedHi ");
+	if (flags.DebugStripped) Strcat(s, "NoDebug ");
+	if (flags.RelocsStripped) Strcat(s, "NoRelocs ");
+	if (flags.LineNumsStripped) Strcat(s, "NoLineNums ");
+	if (flags.LocalSymsStripped) Strcat(s, "NoLocalSyms ");
+	if (flags._32bitMachine) Strcat(s, "32bit ");
+	if (flags.ExecutableImage) Strcat(s, "Executable ");
+
+	return s;
+}
+
+typedef struct {
+	MACHINE	Machine;
+	WORD	NumberOfSections;
+	time_t	TimeDateStamp;
+	DWORD	PointerToSymbolTable <format=hex>;
+	DWORD	NumberOfSymbols;
+	WORD	SizeOfOptionalHeader;
+	CHARACTERISTICS Characteristics;
+} IMAGE_FILE_HEADER;
+
+typedef enum <WORD> {
+	UNKNOWN = 0,
+	NATIVE = 1,
+	WINDOWS_GUI = 2,
+	WINDOWS_CONSOLE = 3,
+	OS2_CONSOLE = 5,
+	POSIX_CONSOLE = 7,
+	NATIVE_WIN9X_DRIVER = 8,
+	WINDOWS_CE_GUI = 9,
+	EFI_APPLICATION = 10,
+	EFI_BOOT_SERVICE_DRIVER = 11,
+	EFI_RUNTIME_DRIVER = 12,
+	EFI_ROM = 13,
+	XBOX = 14
+} SUBSYSTEM;
+
+typedef struct {
+	ushort NOTIFY_DLL_PROCESS_INIT: 1; // Not valid in modern OSes
+	ushort NOTIFY_DLL_PROCESS_TERM: 1; // Not valid in modern OSes
+	ushort NOTIFY_DLL_THREAD_TERM: 1; // Not valid in modern OSes
+	ushort NOTIFY_DLL_THREAD_TERM: 1; // Not valid in modern OSes
+	ushort Reserved:6;
+	ushort NO_SEH:1;
+	ushort NO_BIND:1;
+	ushort Reserved2: 1;
+	ushort WDM_DRIVER: 1;
+	ushort Reserved3: 1;
+	ushort TERMINAL_SERVER_AWARE: 1;
+} DLLCHARACTERISTICS;
+
+typedef struct {
+	DWORD	VirtualAddress <format=hex>;
+	DWORD	Size;
+} DATA_DIR <read=DATA_DIR_read>;
+
+string DATA_DIR_read(DATA_DIR &d) {
+	string s = "";
+
+	if (d.VirtualAddress && d.Size) {
+		SPrintf(s, "%Xh + %d", d.VirtualAddress, d.Size);
+	}
+
+	return s;
+}
+
+typedef struct {
+	local int len = OptionalHeader.NumberOfRvaAndSizes;
+	if (len > 16) {
+		len = 16;
+	}
+	if (len > 0) DATA_DIR Export;
+	if (len > 1) DATA_DIR Import;
+	if (len > 2) DATA_DIR Resource;
+	if (len > 3) DATA_DIR Exception;
+	if (len > 4) DATA_DIR Security;
+	if (len > 5) DATA_DIR BaseRelocationTable;
+	if (len > 6) DATA_DIR DebugDirectory;
+	if (len > 7) DATA_DIR CopyrightOrArchitectureSpecificData;
+	if (len > 8) DATA_DIR GlobalPtr;
+	if (len > 9) DATA_DIR TLSDirectory;
+	if (len > 10) DATA_DIR LoadConfigurationDirectory;
+	if (len > 11) DATA_DIR BoundImportDirectory;
+	if (len > 12) DATA_DIR ImportAddressTable;
+	if (len > 13) DATA_DIR DelayLoadImportDescriptors;
+	if (len > 14) DATA_DIR COMRuntimedescriptor;
+	if (len > 15) DATA_DIR Reserved;
+} IMAGE_DATA_DIRECTORIES;
+
+typedef struct {
+	// Standard fields.
+	WORD	Magic <format=hex>;
+	BYTE	MajorLinkerVersion;
+	BYTE	MinorLinkerVersion;
+	DWORD	SizeOfCode;
+	DWORD	SizeOfInitializedData;
+	DWORD	SizeOfUninitializedData;
+	DWORD	AddressOfEntryPoint <format=hex>;
+	DWORD	BaseOfCode <format=hex>;
+	DWORD	BaseOfData <format=hex>;
+
+	// NT additional fields.
+	DWORD	ImageBase <format=hex>;
+	DWORD	SectionAlignment;
+	DWORD	FileAlignment;
+	WORD	MajorOperatingSystemVersion;
+	WORD	MinorOperatingSystemVersion;
+	WORD	MajorImageVersion;
+	WORD	MinorImageVersion;
+	WORD	MajorSubsystemVersion;
+	WORD	MinorSubsystemVersion;
+	DWORD	Win32VersionValue;
+	DWORD	SizeOfImage;
+	DWORD	SizeOfHeaders;
+	DWORD	CheckSum <format=hex>;
+	SUBSYSTEM Subsystem;
+	DLLCHARACTERISTICS DllCharacteristics;
+	DWORD	SizeOfStackReserve;
+	DWORD	SizeOfStackCommit;
+	DWORD	SizeOfHeapReserve;
+	DWORD	SizeOfHeapCommit;
+	DWORD	LoaderFlags;
+	DWORD	NumberOfRvaAndSizes;
+	IMAGE_DATA_DIRECTORIES DataDirectory;
+} IMAGE_OPTIONAL_HEADER32;
+
+typedef struct {
+	WORD	Magic <format=hex>;
+	BYTE	MajorLinkerVersion;
+	BYTE	MinorLinkerVersion;
+	DWORD	SizeOfCode;
+	DWORD	SizeOfInitializedData;
+	DWORD	SizeOfUninitializedData;
+	DWORD	AddressOfEntryPoint <format=hex>;
+	DWORD	BaseOfCode <format=hex>;
+	quad	ImageBase <format=hex>;
+	DWORD	SectionAlignment;
+	DWORD	FileAlignment;
+	WORD	MajorOperatingSystemVersion;
+	WORD	MinorOperatingSystemVersion;
+	WORD	MajorImageVersion;
+	WORD	MinorImageVersion;
+	WORD	MajorSubsystemVersion;
+	WORD	MinorSubsystemVersion;
+	DWORD	Win32VersionValue;
+	DWORD	SizeOfImage;
+	DWORD	SizeOfHeaders;
+	DWORD	CheckSum <format=hex>;
+	SUBSYSTEM Subsystem;
+	DLLCHARACTERISTICS DllCharacteristics;
+	quad	SizeOfStackReserve;
+	quad	SizeOfStackCommit;
+	quad	SizeOfHeapReserve;
+	quad	SizeOfHeapCommit;
+	DWORD	LoaderFlags;
+	DWORD	NumberOfRvaAndSizes;
+	IMAGE_DATA_DIRECTORIES DataDirectory;
+} IMAGE_OPTIONAL_HEADER64;
+
+typedef struct {
+	IMAGE_FILE_HEADER FileHeader;
+	if (FileHeader.SizeOfOptionalHeader) {
+		local short OptionalHeaderMagic = ReadShort(FTell());
+		if (OptionalHeaderMagic == 0x10b) {
+			IMAGE_OPTIONAL_HEADER32 OptionalHeader;
+		}
+		else if (OptionalHeaderMagic == 0x20b) {
+			IMAGE_OPTIONAL_HEADER64 OptionalHeader;
+		}
+		else {
+			Warning("Not a valid PE file %x", OptionalHeaderMagic);
+			return 1;
+		}
+	}
+} IMAGE_NT_HEADERS;
+
+typedef struct {
+	DWORD Reserved : 5;
+	DWORD Code : 1;
+	DWORD InitializedData: 1;
+	DWORD UninitializedData : 1;
+	DWORD Reserved2: 1;
+	DWORD LinkerInfoOrComments: 1;
+	DWORD Reserved3: 1;
+	DWORD LinkerShouldRemove: 1;
+	DWORD CommonBlockData: 1;
+	DWORD Reserved4: 1;
+	DWORD NoDeferSpeculativeExceptions: 1;
+	DWORD FarData: 1;
+	DWORD Reserved5: 1;
+	DWORD PurgeableOr16Bit: 1;
+	DWORD Locked: 1;
+	DWORD PreLoad: 1;
+	DWORD Alignment: 4;
+	DWORD ExtendedRelocations: 1;
+	DWORD Discardable: 1;
+	DWORD NotCachable: 1;
+	DWORD NotPageable: 1;
+	DWORD Shareable: 1;
+	DWORD Executable: 1;
+	DWORD Readable: 1;
+	DWORD Writeable: 1;
+} SECTION_FLAGS <read=ReadSECTION_FLAGS>;
+
+string ReadSECTION_FLAGS(SECTION_FLAGS &flags) {
+	string s = "";
+	if (flags.Code) Strcat(s, "Code ");
+	if (flags.InitializedData) Strcat(s, "InitializedData ");
+	if (flags.UninitializedData) Strcat(s, "UninitializedData ");
+	if (flags.LinkerInfoOrComments) Strcat(s, "LinkerInfoOrComments ");
+	if (flags.LinkerShouldRemove) Strcat(s, "LinkerShouldRemove ");
+	if (flags.CommonBlockData) Strcat(s, "CommonBlockData ");
+	if (flags.NoDeferSpeculativeExceptions) Strcat(s, "NoDeferSpeculativeExceptions ");
+	if (flags.FarData) Strcat(s, "FarData ");
+	if (flags.PurgeableOr16Bit) Strcat(s, "PurgeableOr16Bit ");
+	if (flags.Locked) Strcat(s, "Locked ");
+	if (flags.PreLoad) Strcat(s, "PreLoad ");
+	if (flags.ExtendedRelocations) Strcat(s, "ExtendedRelocations ");
+	if (flags.Discardable) Strcat(s, "Discardable ");
+	if (flags.NotCachable) Strcat(s, "NotCachable ");
+	if (flags.NotPageable) Strcat(s, "NotPageable ");
+	if (flags.Shareable) Strcat(s, "Shareable ");
+	if (flags.Executable) Strcat(s, "Executable ");
+	if (flags.Readable) Strcat(s, "Readable ");
+	if (flags.Writeable) Strcat(s, "Writeable ");
+	if (flags.Alignment) {
+		string p;
+		SPrintf(p, "Alignment: %g", Pow(2, flags.Alignment - 1));
+		Strcat(s, p);
+	}
+	return s;
+}
+
+typedef struct {
+	BYTE	Name[8];
+	DWORD	VirtualSize;
+	DWORD	VirtualAddress <format=hex>;
+	DWORD	SizeOfRawData;
+	DWORD	PointerToRawData <format=hex>;
+	DWORD	PointerToRelocations <format=hex>;
+	DWORD	PointerToLinenumbers <format=hex>;
+	WORD	NumberOfRelocations;
+	WORD	NumberOfLinenumbers;
+	SECTION_FLAGS Characteristics;
+} IMAGE_SECTION_HEADER <read=ReadIMAGE_SECTION_HEADER>;
+
+string ReadIMAGE_SECTION_HEADER(IMAGE_SECTION_HEADER &sect) {
+	if (exists(sect.Name)) {
+		return sect.Name;
+	}
+	return "";
+}
+
+typedef struct (int p) {
+	local int virtual_offset = parentof(this).virtual_offset;
+	local int virtual_end = parentof(this).virtual_end;
+	local int file_offset = parentof(this).file_offset;
+	local int file_end = parentof(this).file_end;
+	local int print = p;
+
+	DWORD	d <format=hex>;
+} RVA <read=RVA_read,optimize=true>;
+
+string RVA_read(RVA &r) {
+	string s = "";
+
+	if (r.print && r.d >= r.virtual_offset && r.d < r.virtual_end) {
+		s = ReadString(r.d-r.virtual_offset+r.file_offset);
+
+		if (Strlen(s)) {
+			return s;
+		}
+	}
+
+	SPrintf(s, "%Xh", r.d);
+	return s;
+}
+
+typedef struct {
+	local int virtual_offset = parentof(this).virtual_offset;
+	local int virtual_end = parentof(this).virtual_end;
+	local int file_offset = parentof(this).file_offset;
+	local int file_end = parentof(this).file_end;
+
+	DWORD	ExportFlags;
+	time_t	TimeDateStamp;
+	WORD	MajorVersion;
+	WORD	MinorVersion;
+	RVA		NameRVA(1);
+	DWORD	OrdinalBase;
+	DWORD	AddressTableEntries;
+	DWORD	NamePointerEntries;
+	RVA		AddressTableRVA(0);
+	RVA		NamePointerRVA(0);
+	RVA		OrdinalTableRVA(0);
+} EXPORT_DIRECTORY_TABLE;
+
+typedef struct (int section) {
+	local int virtual_offset = sections_table[section].VirtualAddress;
+	local int virtual_end = virtual_offset + sections_table[section].VirtualSize;
+	local int file_offset = sections_table[section].PointerToRawData;
+	local int file_end = file_offset + sections_table[section].SizeOfRawData;
+
+	EXPORT_DIRECTORY_TABLE export_dir;
+
+	if (export_dir.AddressTableRVA.d && export_dir.AddressTableEntries) {
+		FSeek(export_dir.AddressTableRVA.d - virtual_offset + file_offset);
+
+		RVA address_table(1)[export_dir.AddressTableEntries] <format=hex>;
+	}
+
+	if (export_dir.NamePointerRVA.d && export_dir.NamePointerEntries) {
+		FSeek(export_dir.NamePointerRVA.d - virtual_offset + file_offset);
+
+		RVA name_pointer_table(1)[export_dir.NamePointerEntries] <format=hex>;
+	}
+
+	if (export_dir.OrdinalTableRVA.d && export_dir.NamePointerEntries) {
+		FSeek(export_dir.OrdinalTableRVA.d - virtual_offset + file_offset);
+
+		WORD ordinal_table[export_dir.NamePointerEntries];
+	}
+} EXPORT_SECTION;
+
+typedef struct {
+	local int virtual_offset = parentof(this).virtual_offset;
+	local int virtual_end = parentof(this).virtual_end;
+	local int file_offset = parentof(this).file_offset;
+	local int file_end = parentof(this).file_end;
+
+	DWORD	d <format=hex>;
+} IAT_ENTRY <read=IAT_ENTRY_read>;
+
+string IAT_ENTRY_read(IAT_ENTRY &i) {
+	string s = "";
+
+	if (i.d & 0x80000000) {
+		SPrintf(s, "ordinal %d", i.d & 0xffff);
+	}
+	else {
+		local int offset = (i.d & 0x7fffffff) - i.virtual_offset + i.file_offset;
+		local short hint = ReadUShort(offset);
+		if (hint) {
+			SPrintf(s, "%d %s", hint, ReadString(offset + 2));
+		}
+		else {
+			SPrintf(s, "%s", ReadString(offset + 2));
+		}
+	}
+
+	return s;
+}
+
+typedef struct {
+	local int virtual_offset = parentof(this).virtual_offset;
+	local int virtual_end = parentof(this).virtual_end;
+	local int file_offset = parentof(this).file_offset;
+	local int file_end = parentof(this).file_end;
+
+	while (ReadUInt(FTell())) {
+		IAT_ENTRY import_lookup_table;
+	}
+} IAT;
+
+typedef struct {
+	local int virtual_offset = parentof(this).virtual_offset;
+	local int virtual_end = parentof(this).virtual_end;
+	local int file_offset = parentof(this).file_offset;
+	local int file_end = parentof(this).file_end;
+	local quad cur_pos;
+
+	RVA		ImportLookupTableRVA(0);
+	time_t	TimeDateStamp;
+	DWORD	ForwarderChain;
+	RVA		NameRVA(1);
+	RVA		ImportAddressTableRVA(0);
+
+	if (ImportLookupTableRVA.d) {
+		cur_pos = FTell();
+		FSeek(ImportLookupTableRVA.d - virtual_offset + file_offset);
+		IAT lookup_table;
+		FSeek(cur_pos);
+	}
+
+	if (ImportAddressTableRVA.d) {
+		cur_pos = FTell();
+		FSeek(ImportAddressTableRVA.d - virtual_offset + file_offset);
+		IAT address_table;
+		FSeek(cur_pos);
+	}
+} IMPORT_DIRECTORY <read=IMPORT_DIR_read>;
+
+string IMPORT_DIR_read(IMPORT_DIRECTORY &id) {
+	if (id.NameRVA.d) {
+		return RVA_read(id.NameRVA);
+	}
+	return "";
+}
+
+typedef struct (int section) {
+	local int virtual_offset = sections_table[section].VirtualAddress;
+	local int virtual_end = virtual_offset + sections_table[section].VirtualSize;
+	local int file_offset = sections_table[section].PointerToRawData;
+	local int file_end = file_offset + sections_table[section].SizeOfRawData;
+	local int cur_name;
+
+	do {
+		cur_name = ReadUInt(FTell() + 12);
+
+		if (cur_name) {
+			IMPORT_DIRECTORY import_dir;
+		}
+	} while (cur_name);
+
+} IMPORT_SECTION;
+
+typedef enum <ushort> {
+	ABSOLUTE = 0,
+	HIGH,
+	LOW,
+	HIGHLOW,
+	HIGHADJ,
+	MIPS_JMPADDR,
+	MIPS_JMPADDR16 = 9,
+	DIR64
+} RELOC_TYPE;
+
+typedef struct {
+	ushort offset: 12 <format=hex>;
+	RELOC_TYPE type: 4 <format=hex>;
+} RELOC <read=RELOC_read>;
+
+string RELOC_read(RELOC &r) {
+	string s = "";
+	SPrintf(s, "%s %Xh", EnumToString(r.type), r.offset);
+	return s;
+}
+
+typedef struct {
+	local int virtual_offset = parentof(this).virtual_offset;
+	local int virtual_end = parentof(this).virtual_end;
+	local int file_offset = parentof(this).file_offset;
+	local int file_end = parentof(this).file_end;
+
+	DWORD	PageRVA <format=hex>;
+	DWORD	BlockSize;
+
+	local int reloc_count = (BlockSize - 8) / 2;
+
+	RELOC Reloc[reloc_count] <format=hex>;
+} RELOC_BLOCK <read=RELOC_BLOCK_read>;
+
+string RELOC_BLOCK_read(RELOC_BLOCK &b) {
+	string s = "";
+	SPrintf(s, "%Xh %d", b.PageRVA, b.reloc_count);
+	return s;
+}
+
+typedef struct (int section) {
+	local int virtual_offset = sections_table[section].VirtualAddress;
+	local int virtual_end = virtual_offset + sections_table[section].VirtualSize;
+	local int file_offset = sections_table[section].PointerToRawData;
+	local int file_end = file_offset + sections_table[section].SizeOfRawData;
+	local int cur_offset = 0;
+
+	while (cur_offset < nt_headers.OptionalHeader.DataDirectory.BaseRelocationTable.Size) {
+		RELOC_BLOCK RelocBlock;
+
+		cur_offset = FTell() - file_offset;
+	}
+
+} RELOC_SECTION;
+
+typedef struct (int section_index) {
+	local int i = section_index;
+	SetBackColor(0xd0d0d0);
+	if (0 == Strcmp(sections_table[i].Name, ".text")) {
+		SetBackColor(0xffd0d0);
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, "CODE") || 0 == Strcmp(sections_table[i].Name, ".code")) {
+		SetBackColor(0xffd0d0);
+		// Borland's CODE section; ".code" is used by some other linkers
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".data")) {
+		SetBackColor(0xd0ffd0);
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, "DATA")) {
+		SetBackColor(0xd0ffd0);
+		// Borland's DATA section
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".rsrc")) {
+		SetBackColor(0xffffd0);
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".rdata")) {
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".pdata")) {
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".reloc")) {
+		SetBackColor(0xd0ffff);
+		//BYTE relocsection[sections_table[i].SizeOfRawData] <format=hex>;
+		RELOC_SECTION sectiondata(i);
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".idata")) {
+		SetBackColor(0xd0d0ff);
+		//BYTE idatasection[sections_table[i].SizeOfRawData] <format=hex>;
+		IMPORT_SECTION sectiondata(i);
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".edata")) {
+		SetBackColor(0xffd0ff);
+		// Borland's export data
+		//BYTE edatasection[sections_table[i].SizeOfRawData] <format=hex>;
+		EXPORT_SECTION sectiondata(i);
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".tls")) {
+		// Borland's tls section
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, "UPX0")) {
+		// UPX compressor
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, "UPX1")) {
+		// UPX compressor
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".flat")) {
+		// Flat Assembler's section
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else if (0 == Strcmp(sections_table[i].Name, ".aspack")) {
+		// Alexey Solodovnikov's packer
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	else {
+		BYTE sectiondata[sections_table[i].SizeOfRawData] <format=hex>;
+	}
+	SetBackColor(cNone);
+} SECTION <read=SECTION_read>;
+
+
+SetBackColor(0xe7e7e7);
+IMAGE_NT_HEADERS nt_headers;
+SetBackColor(cNone);
+
+SetBackColor(0xe7e7e7);
+IMAGE_SECTION_HEADER sections_table[nt_headers.FileHeader.NumberOfSections];
+SetBackColor(cNone);
+
+local int sectend = FTell();
+
+local int i, max = 0;
+
+for (i = 0; i < nt_headers.FileHeader.NumberOfSections; ++i) {
+	if (sections_table[i].PointerToRawData && sections_table[i].SizeOfRawData) {
+		FSeek(sections_table[i].PointerToRawData);
+
+		SECTION section(i);
+
+		if (sections_table[i].PointerToRawData + sections_table[i].SizeOfRawData > max) {
+			max = sections_table[i].PointerToRawData + sections_table[i].SizeOfRawData;
+		}
+	}
+}
+
+if (max < FileSize()) {
+	BYTE Overlay[FileSize()-max];
+}
+
+string SECTION_read(SECTION &d) {
+	if (exists(sections_table[d.i].Name)) {
+		return sections_table[d.i].Name;
+	}
+	return "";
+}

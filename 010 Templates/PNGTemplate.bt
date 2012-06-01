@@ -1,0 +1,69 @@
+//--------------------------------------
+//--- 010 Editor v2.0.1 Binary Template
+//
+//    File: PNGTemplate.bt
+//  Author: Kevin O. Grover <kogrover@yahoo.com>
+// Purpose: A template for parsing PNG (Portable Network Graphics) files.
+//    Date: 2005-05-11
+// History:
+// 2005-05-11  KOG  Initial version
+//
+// This template was written to the PNG 1.2 Specification.
+// Note however, then it does not check nor parse chunk subdata, so it
+// should work with all future PNG specifications.
+//
+// Also, a possible caveat: PNG encourages the type of chunks to be
+// mapped to string of "[a-zA-Z]{4}".  However, it's not a requirement.
+//
+// A PNG file consists of an 8 byte ID followed by a series of chunks.
+//--------------------------------------
+
+BigEndian();                  // PNG files are in Network Byte order
+
+const uint64 PNGMAGIC = 0x89504E470D0A1A0AL;
+
+// Chunk Type
+typedef union {
+  uint32  ctype <format=hex>; // Chunk Type
+  char    cname[4];           // character representation
+} CTYPE <read=readCTYPE>;
+
+string readCTYPE(local CTYPE &t) {
+  return t.cname;
+}
+
+// Chunks
+typedef struct {
+  uint32  length;             // Number of data bytes (not including length,type, or crc)
+  CTYPE   type;               // Type of chunk
+  ubyte   data[length];       // Data (or not present)
+  uint32  crc <format=hex>;   // CRC type and data (not including length or crc)
+} CHUNK <read=readCHUNK>;
+
+// Chunks can be in any order: HOWEVER, IHDR must be first, IEND must be last
+// Bit 5s in chunk type bytes are used to flag some things:
+//    Ancillary bit: bit 5 of 1st byte: 0=Critical, 1=Ancillary
+//      Private bit: bit 5 of 2nd byte: 0=Public, 1=Private
+//     Reserved bit: bit 5 of 3rd byte: MUST be 0
+// Safe to Copy bit: bit 5 of 4th byte: 0=Unsafe to Copy, 1=Safe to Copy
+string readCHUNK(local CHUNK &c) {
+  local string s;
+  s=readCTYPE(c.type)+"  (";
+  s += (c.type.cname[0] & 0x20) ? "Ancillary, "      : "Critical, "; 
+  s += (c.type.cname[1] & 0x20) ? "Private, "        : "Public, ";
+  s += (c.type.cname[2] & 0x20) ? "ERROR_RESERVED, " : "";
+  s += (c.type.cname[3] & 0x20) ? "Safe to Copy)"    : "Unsafe to Copy)";
+  return s;
+}
+
+// ---------------------------------------------------------------------------
+// MAIN  --  Here's where we really allocate the data
+// ---------------------------------------------------------------------------
+
+uint64 pngid <format=hex>;
+if (pngid != PNGMAGIC) {
+  Warning("Invalid PNG File: Bad Magic Number"); return -1;
+}
+while(!FEof()) {
+  CHUNK chunk;
+}

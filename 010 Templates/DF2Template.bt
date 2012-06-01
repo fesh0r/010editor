@@ -1,0 +1,47 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: DF2Template.bt
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+DisplayFormatHex();
+LittleEndian();
+
+string read_Filename(char &in) {
+	return in;
+}
+
+typedef struct {
+	local quad cur_pos;
+
+	char filename[32];
+	uint file_offset;
+	uint file_size <format=decimal>;
+
+	cur_pos = FTell();
+	FSeek(file_offset);
+
+/*
+	SetBackColor(0xc0ffc0);
+	ubyte data[file_size];
+	SetBackColor(0xe0e0e0);
+*/
+	
+	FSeek(cur_pos);
+} DIR <read=READ_DIR>;
+
+string READ_DIR(DIR &in) {
+	return in.filename;
+}
+
+local int i;
+
+uint num_files <format=decimal>;
+
+SetBackColor(0xe0e0e0);
+for (i = 0; i < num_files; i++) {
+	DIR d;
+}

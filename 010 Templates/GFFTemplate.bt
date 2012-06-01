@@ -1,0 +1,119 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: GFFTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Aurora GFF file
+//--------------------------------------
+
+// UNICODE support
+// Thanks to Graeme Sweet for pointing this out!
+int CalcUnicodeLen() {
+	local quad pos = FTell();
+	local quad base = pos;
+	while ((ReadUShort(pos) != 0) && (pos - base < 65535))
+		pos += 2;
+	return (pos - base + 2)/2;
+}
+
+typedef struct {
+	ushort str[CalcUnicodeLen()];
+} zstringw <read=ReadUNICODE>;
+
+string ReadUNICODE(zstringw &z) {
+	local int len = sizeof(z.str) / 2;
+	char s[len];
+	ConvertUNICODEToASCIIW(len, z.str, s);
+	return s;
+}
+
+typedef enum <ushort> {
+	T_UINT8, T_INT8, T_UINT16, T_INT16, T_UINT32, T_INT32, T_UINT64, T_INT64, 
+	T_FLOAT32, T_FLOAT64, T_Vector3f, T_Vector4f = 12, T_Quaternionf, T_ECString,
+	T_Color4f, T_Matrix4x4f, T_TlkString, T_Generic = 0xffff
+} FieldType;
+
+typedef struct {
+	ushort : 13;
+	ushort Ref_Flag : 1;
+	ushort Struct_Flag : 1;
+	ushort List_Flag : 1;
+} FieldFlags <read=ReadFieldFlags>;
+
+string ReadFieldFlags(FieldFlags &in) {
+	local string out = "";
+	if (in.List_Flag) out += "List ";
+	if (in.Struct_Flag) out += "Struct ";
+	if (in.Ref_Flag) out += "Ref ";
+	return out;
+}
+
+typedef struct {
+	uint Label <format=decimal>;
+	FieldType TypeID;
+	FieldFlags Flags;
+//	ushort Flags <format=binary>;
+	uint Index <format=decimal>;
+} FIELD;
+
+typedef struct {
+	local int i;
+	local quad pos;
+
+	char StructType[4];
+	uint FieldCount <format=decimal>;
+	uint FieldOffset;
+	uint StructSize;
+
+	pos = FTell();
+	FSeek(FieldOffset);
+
+	SetBackColor(0xc0ffff);
+	for (i = 0; i < FieldCount; i++) {
+		FIELD f;
+	}
+	SetBackColor(0xc0ffc0);
+	
+	FSeek(pos);
+} STRUCT <read=ReadSTRUCT>;
+
+string ReadSTRUCT(STRUCT &in) {
+	return in.StructType;
+}
+
+typedef struct {
+	local int i;
+
+	char GFFMagicNumber[4];
+	if (GFFMagicNumber != "GFF ") {
+		Warning("Invalid signature");
+		Exit(-1);
+	}
+	char GFFVersion[4];
+	if (GFFVersion != "V4.0") {
+		Warning("Unknown version");
+		Exit(-1);
+	}
+	char TargetPlatform[4];
+	if (TargetPlatform != "PC  " && TargetPlatform != "PS3 " && TargetPlatform != "X360") {
+		Warning("Unknown platform");
+		Exit(-1);
+	}
+	char FileType[4];
+	char FileVersion[4];
+	uint StructCount <format=decimal>;
+	uint DataOffset;
+
+	SetBackColor(0xc0ffc0);
+	for (i = 0; i < StructCount; i++) {
+		STRUCT s;
+	}
+	SetBackColor(0xe0e0e0);
+} HEADER;
+
+DisplayFormatHex();
+LittleEndian();
+
+SetBackColor(0xe0e0e0);
+HEADER h;

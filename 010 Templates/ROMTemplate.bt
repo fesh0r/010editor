@@ -1,0 +1,469 @@
+//--------------------------------------
+//--- 010 Editor v3.1.2 Binary Template
+//
+// File: ROMTemplate.bt
+// Author: Andrew McRae
+// Revision: 01
+// Purpose: Option ROM parser
+//--------------------------------------
+
+int block_type(int64 block_pos) {
+	local ubyte cur_block[512];
+	local int i;
+	local int empty_block;
+
+	if (block_pos >= FileSize())
+		return -1;
+
+	ReadBytes(cur_block, block_pos, 512);
+
+	if (cur_block[0] == 0x55 && cur_block[1] == 0xAA) {
+		if (cur_block[0x1E] == 0x49 && cur_block[0x1F] == 0x42 && cur_block[0x20] == 0x4D)
+			return 3;
+
+		if (cur_block[4] == 0xF1 && cur_block[5] == 0x0E) 
+			return 4;
+
+		return 2;
+	}
+
+	if (cur_block[0] == 0x4D && cur_block[1] == 0x43 && cur_block[2] == 0x75 && cur_block[3] == 0x43)
+		return 5;
+
+	empty_block = 0;
+
+	if (cur_block[0] == 0xff || cur_block[0] == 0x00) {
+		empty_block = 1;
+
+		for (i = 0; i < 512; i++) {
+			if (cur_block[i] != cur_block[0]) {
+				empty_block = 0;
+				break;
+			}
+		}
+	}
+
+	if (empty_block)
+		return 0;
+
+	return 1;
+}
+
+
+typedef struct {
+	local int64 rom_start = parentof(this).block_start;
+	local int64 block_start = FTell();
+	local int64 block_end;
+
+	char PCISignature[4];
+	ushort VendorID;
+	ushort DeviceID;
+	ushort VPDPtr;
+	ushort Length;
+	ubyte PCIRevision;
+	ubyte ClassIFType;
+	ubyte ClassSubType;
+	ubyte ClassType;
+	ushort ImageLength;
+	ushort Revision;
+	ubyte CodeType;
+	ubyte Indicator;
+	SetBackColor(0xffffd0);
+	ushort r2 <hidden=true>;
+	SetBackColor(0xffff90);
+
+	block_end = FTell();
+
+	if (Length > 0x18) {
+		SetBackColor(0xffffd0);
+		ubyte r3[Length - (block_end - block_start)] <hidden=true>;
+		SetBackColor(0xffff90);
+	}
+
+	//Printf("PCIR: %06Lxh+%06xh %02x\n", block_start, Length, checksum);
+} PCI_header;
+
+
+typedef struct {
+	ubyte Display: 1;
+	ubyte Input : 1;
+	ubyte IPL : 1;
+	ubyte Reserved : 1;
+	ubyte Boot : 1;
+	ubyte Cache : 1;
+	ubyte Shadow : 1;
+	ubyte DDI : 1;
+} PnPDevIndicators <read=read_PnPDevIndicators>;
+
+string read_PnPDevIndicators(PnPDevIndicators &flags) {
+	string s = "";
+
+	if (flags.Display) Strcat(s, "Display ");
+	if (flags.Input) Strcat(s, "Input ");
+	if (flags.IPL) Strcat(s, "IPL ");
+	if (flags.Reserved) Strcat(s, "Reserved ");
+	if (flags.Boot) Strcat(s, "Boot ");
+	if (flags.Cache) Strcat(s, "Cache ");
+	if (flags.Shadow) Strcat(s, "Shadow ");
+	if (flags.DDI) Strcat(s, "DDI ");
+
+	return s;
+}
+
+typedef struct {
+	local int64 rom_start = parentof(this).block_start;
+	local int64 block_start = FTell();
+	local int64 block_end;
+	local ubyte checksum;
+	local char temp_sig[4];
+
+	char PnPSignature[4];
+	ubyte Revision;
+	ubyte Length;
+	ushort NextHeader;
+	SetBackColor(0xffd0ff);
+	ubyte r1 <hidden=true>;
+	SetBackColor(0xff90ff);
+	ubyte ChecksumFix;
+	ushort VendorID;
+	ushort DeviceID;
+	ushort ManufacturerPtr;
+	
+	if (Length > 1) {
+		ushort ProductNamePtr;
+		ubyte DeviceType;
+		ubyte DeviceSubType;
+		ubyte DeviceIFType;
+		PnPDevIndicators DeviceIndicators;
+		ushort BootConnectionVector;
+		ushort DisconnectVector;
+		ushort BootstrapEntry;
+		SetBackColor(0xffd0ff);
+		ushort r2 <hidden=true>;
+		SetBackColor(0xff90ff);
+		ushort StaticResourceInformationVector;
+	}
+
+	block_end = FTell();
+
+	if (ManufacturerPtr) {
+		FSeek(rom_start + ManufacturerPtr);
+
+		SetBackColor(0xc0c0c0);		
+		string Manufacturer;
+		SetBackColor(0xff90ff);
+	}
+
+	if (Length > 1) {
+		if (ProductNamePtr) {
+			FSeek(rom_start + ProductNamePtr);
+			
+			SetBackColor(0xc0c0c0);		
+			string ProductName;
+			SetBackColor(0xff90ff);
+		}
+	}
+
+	if (NextHeader) {
+		ReadBytes(temp_sig, rom_start + PnPHeader, 4);
+		
+		if (temp_sig == "$PnP") {
+			FSeek(block_start + PnPHeader);
+
+			Warning("Nested $PnP Block");
+		}
+	}
+
+	FSeek(block_end);
+
+	checksum = Checksum(CHECKSUM_BYTE, block_start, (Length*16));
+
+	//Printf("$PnP: %06Lxh+%06xh %02x\n", block_start, (Length*16), checksum);
+} PnP_header <read=read_PnP_header>;
+
+string read_PnP_header(PnP_header &in) {
+	string out;
+	SPrintf(out, "%02Xh", in.checksum);
+	return out;
+}
+
+
+typedef struct {
+	local int64 block_start = FTell();
+	local int64 data_start;
+	local int64 block_end;
+	local ubyte checksum;
+	local char temp_sig[4];
+
+	ushort Signature;
+	ubyte ROMLength;
+	ubyte InitEntryCode[3];
+	SetBackColor(0xd0d0ff);
+	ubyte r1[0x12] <hidden=true>;
+	SetBackColor(0x9090ff);
+	ushort PCIRHeader;
+	ushort PnPHeader;
+
+	data_start = FTell();
+	
+	SetBackColor(0xd0d0ff);
+	ubyte data[(ROMLength*512) - (data_start - block_start)];
+	SetBackColor(0x9090ff);
+
+	block_end = FTell();
+
+	if (PCIRHeader) {
+		ReadBytes(temp_sig, block_start + PCIRHeader, 4);
+
+		if (temp_sig == "PCIR") {
+			FSeek(block_start + PCIRHeader);
+
+			SetBackColor(0xffff90);
+			PCI_header h;
+			SetBackColor(0x9090ff);
+		}
+	}
+
+	if (PnPHeader) {
+		ReadBytes(temp_sig, block_start + PnPHeader, 4);
+
+		if (temp_sig == "$PnP") {
+			FSeek(block_start + PnPHeader);
+
+			SetBackColor(0xff90ff);
+			PnP_header h;
+			SetBackColor(0x9090ff);
+		}
+	}
+
+	FSeek(block_end);
+
+	checksum = Checksum(CHECKSUM_BYTE, block_start, (ROMLength*512));
+
+	//Printf("OPTROM: %06Lxh+%06xh %02x\n", block_start, (ROMLength*512), checksum);
+} OPTROM <read=read_OPTROM>;
+
+string read_OPTROM(OPTROM &in) {
+	string out;
+	SPrintf(out, "%02Xh", in.checksum);
+	return out;
+}
+
+typedef struct {
+	local int64 block_start = FTell();
+	local int64 data_start;
+	local int64 block_end;
+	local ubyte checksum;
+	local char temp_sig[4];
+
+	ushort Signature;
+	ubyte ROMLength;
+	ubyte InitEntryCode[3];
+	SetBackColor(0xffd0d0);
+	ubyte r1[0x12] <hidden=true>;
+	SetBackColor(0xff9090);
+	ushort PCIRHeader;
+	SetBackColor(0xffd0d0);
+	ubyte r2[4] <hidden=true>;
+	SetBackColor(0xff9090);
+	char VideoSignature[3];
+
+	data_start = FTell();
+
+	SetBackColor(0xffd0d0);
+	ubyte data[(ROMLength*512) - (data_start - block_start)];
+	SetBackColor(0xff9090);
+
+	block_end = FTell();
+
+	if (PCIRHeader) {
+		ReadBytes(temp_sig, block_start + PCIRHeader, 4);
+
+		if (temp_sig == "PCIR") {
+			FSeek(block_start + PCIRHeader);
+
+			SetBackColor(0xffff90);
+			PCI_header h;
+			SetBackColor(0xff9090);
+		}
+	}
+
+	FSeek(block_end);
+
+	checksum = Checksum(CHECKSUM_BYTE, block_start, (ROMLength*512));
+
+	//Printf("VIDROM: %06Lxh+%06xh %02x\n", block_start, (ROMLength*512), checksum);
+} VIDROM <read=read_VIDROM>;
+
+string read_VIDROM(VIDROM &in) {
+	string out;
+	SPrintf(out, "%02Xh", in.checksum);
+	return out;
+}
+
+typedef struct {
+	local int64 block_start = FTell();
+	local int64 data_start;
+	local int64 block_end;
+	local ubyte checksum;
+	local char temp_sig[4];
+
+	ushort Signature;
+	ushort ROMLength;
+	ushort EFISignature;
+	SetBackColor(0xd0ffd0);
+	ubyte r1[0x12] <hidden=true>;
+	SetBackColor(0x90ff90);
+	ushort PCIRHeader;
+	SetBackColor(0xd0ffd0);
+	ubyte r2[2] <hidden=true>;
+	SetBackColor(0x90ff90);
+
+	data_start = FTell();
+
+	SetBackColor(0xd0ffd0);
+	ubyte data[(ROMLength*512) - (data_start - block_start)];
+	SetBackColor(0x90ff90);
+
+	block_end = FTell();
+
+	if (PCIRHeader) {
+		ReadBytes(temp_sig, block_start + PCIRHeader, 4);
+
+		if (temp_sig == "PCIR") {
+			FSeek(block_start + PCIRHeader);
+
+			SetBackColor(0xffff90);
+			PCI_header h;
+			SetBackColor(0x90ff90);
+		}
+	}
+
+	FSeek(block_end);
+
+	checksum = Checksum(CHECKSUM_BYTE, block_start, (ROMLength*512));
+
+	//Printf("EFIROM: %06Lxh+%06xh %02x\n", block_start, (ROMLength*512), checksum);
+} EFIROM <read=read_EFIROM>;
+
+string read_EFIROM(EFIROM &in) {
+	string out;
+	SPrintf(out, "%02Xh", in.checksum);
+	return out;
+}
+
+typedef struct {
+	local int64 block_start = FTell();
+	local int64 data_start;
+	local int64 block_end;
+	local int ROMLength;
+
+	char Signature[4];
+
+	data_start = FTell();
+
+	ROMLength = 1;
+	while (block_type(block_start + (ROMLength*512)) == 1) ROMLength++;
+
+	SetBackColor(0xd0ffff);
+	ubyte data[(ROMLength*512) - (data_start - block_start)];
+	SetBackColor(0x90ffff);
+
+	block_end = FTell();
+
+	FSeek(block_end);
+
+	//Printf("MCCROM: %06Lxh+%06xh\n", block_start, (ROMLength*512));
+} MCCROM;
+
+typedef struct {
+	local int64 block_start = FTell();
+	local int64 data_start;
+	local int64 block_end;
+	local int ROMLength;
+
+	data_start = FTell();
+
+	ROMLength = 1;
+	while (block_type(block_start + (ROMLength*512)) == 1) ROMLength++;
+
+	ubyte data[(ROMLength*512) - (data_start - block_start)];
+
+	block_end = FTell();
+
+	FSeek(block_end);
+
+	//Printf("RAWROM: %06Lxh+%06xh\n", block_start, (ROMLength*512));
+} RAWROM;
+
+typedef struct {
+	local int64 block_start = FTell();
+	local int64 data_start;
+	local int64 block_end;
+	local int ROMLength;
+
+	data_start = FTell();
+
+	ROMLength = 1;
+	while (block_type(block_start + (ROMLength*512)) == 0) ROMLength++;
+
+	ubyte data[(ROMLength*512) - (data_start - block_start)];
+
+	block_end = FTell();
+
+	FSeek(block_end);
+
+	//Printf("BLANK : %06Lxh+%06xh\n", block_start, (ROMLength*512));
+} BLANK;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+local int cur_block_type;
+
+if (ReadUShort(0) == 0xAA55) {
+	do {
+		cur_block_type = block_type(FTell());
+	
+		switch (cur_block_type) {
+			case 0:
+				BLANK d;
+				break;
+	
+			case 1:
+				SetBackColor(0xd0d0d0);		
+				RAWROM d;
+				SetBackColor(cNone);
+				break;
+			
+			case 2:
+				SetBackColor(0x9090ff);		
+				OPTROM d;
+				SetBackColor(cNone);
+				break;
+	
+			case 3:
+				SetBackColor(0xff9090);		
+				VIDROM d;
+				SetBackColor(cNone);
+				break;
+	
+			case 4:
+				SetBackColor(0x90ff90);		
+				EFIROM d;
+				SetBackColor(cNone);
+				break;
+	
+			case 5:
+				SetBackColor(0x90ffff);		
+				MCCROM d;
+				SetBackColor(cNone);
+				break;
+	
+			default:
+				Assert(0, "Unknown block");
+				break;
+		}
+	} while ((cur_block_type != -1) && !FEof());
+}

@@ -1,0 +1,27 @@
+//--------------------------------------
+//--- 010 Editor v3.2.2 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+typedef struct {
+	uint hash;
+	uint offset;
+	uint packed;
+	uint unpacked;
+} FILE_ENTRY;
+
+typedef struct {
+	uchar signature[4];
+	uint filecount;
+	FILE_ENTRY f[filecount];
+} HEADER;
+
+DisplayFormatHex();
+LittleEndian();
+
+SetBackColor(0xe0e0e0);
+HEADER h;

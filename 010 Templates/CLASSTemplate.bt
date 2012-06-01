@@ -1,0 +1,774 @@
+//-------------------------------------------------------------------------
+//--- 010 Editor v2.1 Binary Template
+//
+// $Id: CLASSTemplate.bt 65 2007-03-08 16:22:35Z kogrover $
+//
+//    File: CLASSTemplate.bt
+//  Author: Kevin O. Grover <kevin@kevingrover.net>
+// Purpose: A template for parsing Java Class (JVM) Files
+// Version: $Rev: 65 $
+// History:
+// 2007-02-26  kogrover   Original Version
+//
+// This template was written to the "The Java Virtual Machine Specification",
+// Second Edition, by Tim Lindholm, Frank Yellin.
+//
+// The details used to write this Template came mainly from Chapter 4:
+// "The <code>class</code> File Format".
+//
+// You can get the document from the Sun Java Pages
+//  JVM Spec (all Editions): http://java.sun.com/docs/books/jvms/
+//  JVM Spec (2nd Edition):
+//     http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html
+//-------------------------------------------------------------------------
+
+BigEndian();
+BitfieldRightToLeft();
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+
+typedef float u4f;
+typedef double u8f;
+
+typedef struct {
+	u2 A_PUBLIC:1;
+	u2 A_PRIVATE:1;
+	u2 A_PROTECTED:1;
+	u2 A_STATIC:1;
+	u2 A_FINAL:1;
+	u2 A_SUPER:1;
+	u2 A_VOLATILE:1;
+	u2 A_TRANSIENT:1;
+	u2 A_NATIVE:1;
+	u2 A_INTERFACE:1;
+	u2 A_ABSTRACT:1;
+	u2 A_STRICT:1;
+	u2 A_SYNTHETIC:1;
+	u2 A_ANNOTATION:1;
+	u2 A_ENUM:1;
+	u2 A_RESERVED:1;
+} ACCESS_FLAGS <read=read_ACCESS_FLAGS>;
+
+string read_ACCESS_FLAGS(ACCESS_FLAGS &af) {
+	local string s = "";
+
+	if (af.A_PUBLIC) Strcat(s, "public ");
+	if (af.A_PRIVATE) Strcat(s, "private ");
+	if (af.A_PROTECTED) Strcat(s, "protected ");
+	if (af.A_STATIC) Strcat(s, "static ");
+	if (af.A_FINAL) Strcat(s, "final ");
+	if (af.A_SUPER) Strcat(s, "super ");
+	if (af.A_VOLATILE) Strcat(s, "volatile ");
+	if (af.A_TRANSIENT) Strcat(s, "transient ");
+	if (af.A_NATIVE) Strcat(s, "native ");
+	if (af.A_INTERFACE) Strcat(s, "interface ");
+	if (af.A_ABSTRACT) Strcat(s, "abstract ");
+	if (af.A_STRICT) Strcat(s, "strict ");
+	if (af.A_SYNTHETIC) Strcat(s, "synthetic ");
+	if (af.A_ANNOTATION) Strcat(s, "annotation ");
+	if (af.A_ENUM) Strcat(s, "enum ");
+	if (af.A_RESERVED) Strcat(s, "reserved ");
+
+	return s;
+}
+
+
+typedef struct {
+	u2 A_PUBLIC:1;
+	u2 A_PRIVATE:1;
+	u2 A_PROTECTED:1;
+	u2 A_STATIC:1;
+	u2 A_FINAL:1;
+	u2 A_SYNCHRONIZED:1;
+	u2 A_BRIDGE:1;
+	u2 A_VARARGS:1;
+	u2 A_NATIVE:1;
+	u2 A_INTERFACE:1;
+	u2 A_ABSTRACT:1;
+	u2 A_STRICT:1;
+	u2 A_SYNTHETIC:1;
+	u2 A_ANNOTATION:1;
+	u2 A_ENUM:1;
+	u2 A_RESERVED:1;
+} m_ACCESS_FLAGS <read=read_m_ACCESS_FLAGS>;
+
+string read_m_ACCESS_FLAGS(m_ACCESS_FLAGS &af) {
+	local string s = "";
+
+	if (af.A_PUBLIC) Strcat(s, "public ");
+	if (af.A_PRIVATE) Strcat(s, "private ");
+	if (af.A_PROTECTED) Strcat(s, "protected ");
+	if (af.A_STATIC) Strcat(s, "static ");
+	if (af.A_FINAL) Strcat(s, "final ");
+	if (af.A_SYNCHRONIZED) Strcat(s, "synchronized ");
+	if (af.A_BRIDGE) Strcat(s, "bridge ");
+	if (af.A_VARARGS) Strcat(s, "varargs ");
+	if (af.A_NATIVE) Strcat(s, "native ");
+	if (af.A_INTERFACE) Strcat(s, "interface ");
+	if (af.A_ABSTRACT) Strcat(s, "abstract ");
+	if (af.A_STRICT) Strcat(s, "strict ");
+	if (af.A_SYNTHETIC) Strcat(s, "synthetic ");
+	if (af.A_ANNOTATION) Strcat(s, "annotation ");
+	if (af.A_ENUM) Strcat(s, "enum ");
+	if (af.A_RESERVED) Strcat(s, "reserved ");
+
+	return s;
+}
+
+
+typedef enum <u1> eCP_CONST {
+	C_Utf8 =       1,
+	C_Integer =    3,
+	C_Float =      4,
+	C_Long =       5,
+	C_Double =     6,
+	C_Class =      7,
+	C_String =     8,
+	C_Fieldref =   9,
+	C_Methodref =  10,
+	C_InterfaceMethodref = 11,
+	C_NameAndType = 12,
+} CP_CONST;
+
+
+typedef struct {
+	SetBackColor(cLtGray);
+	CP_CONST tag <hidden=true>;
+
+	SetBackColor(cSilver);
+	switch (tag) {
+		case C_Utf8:
+			SetBackColor(cLtPurple);
+			u2 length;
+			if (length) {
+				SetBackColor(cLtAqua);
+				char bytes[length];
+			}
+			break;
+
+		case C_Integer:
+			SetBackColor(cLtGreen);
+			u4 bytes <format=hex>;
+			break;
+
+		case C_Float:
+			SetBackColor(cLtGreen);
+			u4f bytes;
+			break;
+
+		case C_Long:
+			SetBackColor(cLtGreen);
+			u8 bytes <format=hex>;
+			break;
+
+		case C_Double:
+			SetBackColor(cLtGreen);
+			u8f bytes;
+			break;
+
+		case C_Class:
+			u2 name_index;
+			break;
+
+		case C_String:
+			u2 string_index;
+			break;
+
+		case C_Fieldref:
+		case C_Methodref:
+		case C_InterfaceMethodref:
+			u2 class_index;
+			u2 name_and_type_index;
+			break;
+
+		case C_NameAndType:
+			u2 name_index;
+			u2 descriptor_index;
+			break;
+
+		default:
+			SetBackColor(cRed);
+			local string s;
+			SPrintf(s, "Unknown 'constant_pool' tag: %d", tag);
+			Warning(s);
+			return -3;
+	}
+
+	SetBackColor(cNone);
+} cp_info <read=read_full_cp_info,optimize=false>;
+
+string read_cp_info(local cp_info &i) {
+	local string s = "!!!";
+
+	switch (i.tag) {
+		case C_Utf8:
+			if (i.length) {
+				s = i.bytes;
+			}
+            else {
+                s = "";
+            }
+			break;
+
+		case C_Integer:
+			SPrintf(s, "0x%X", i.bytes);
+			break;
+
+        case C_Float:
+            SPrintf(s, "%0.ff", i.bytes);
+            break;
+
+		case C_Long:
+			SPrintf(s, "0x%LXL", i.bytes);
+			break;
+
+        case C_Double:
+            SPrintf(s, "%0.lfd", i.bytes);
+            break;
+
+        case C_Class:
+            if (get_tag_index(i.name_index) == C_Utf8) {
+                SPrintf(s, "%s", read_cp_info_index(i.name_index));
+            }
+            break;
+    
+        case C_String:
+            if (get_tag_index(i.string_index) == C_Utf8) {
+                s = read_cp_info_index(i.string_index);
+            }
+            break;
+
+		case C_Methodref:
+		case C_Fieldref:
+		case C_InterfaceMethodref:
+            if ((get_tag_index(i.class_index) == C_Class) && (get_tag_index(i.name_and_type_index) == C_NameAndType)) {
+                SPrintf(s, "%s %s", read_cp_info_index(i.class_index), read_cp_info_index(i.name_and_type_index));
+            }
+            break;
+
+        case C_NameAndType:
+            if ((get_tag_index(i.name_index) == C_Utf8) && (get_tag_index(i.descriptor_index) == C_Utf8)) {
+                SPrintf(s, "%s %s", read_cp_info_index(i.name_index), read_cp_info_index(i.descriptor_index));
+            }
+            break;
+	}
+
+	return s;
+}
+
+string read_full_cp_info(local cp_info &i) {
+    switch (i.tag) {
+		case C_Integer:
+        case C_Float:
+		case C_Long:
+        case C_Double:
+            return EnumToString(i.tag) + " " + read_cp_info(i);
+
+		case C_Utf8:
+        case C_String:
+            return EnumToString(i.tag) + " '" + read_cp_info(i) + "'";
+
+        default:
+            return EnumToString(i.tag) + " " + read_cp_info(i);
+    }
+}
+
+string read_full_cp_info_index(local u2 &i) {
+	return read_full_cp_info(c.cpl.constant_pool[i - 1]);
+}
+
+string read_cp_info_index(local u2 &i) {
+	return read_cp_info(c.cpl.constant_pool[i - 1]);
+}
+
+int get_tag_index(local u2 &i) {
+	return c.cpl.constant_pool[i - 1].tag;
+}
+
+string read_name_index(local u2 &i) {
+	if (i < 1) {
+		return "0";
+	}
+    else if (get_tag_index(i) == C_Utf8) {
+        return read_cp_info_index(i);
+    }
+    else {
+        return "!!!";
+    }
+}
+
+string read_class_index(local u2 &i) {
+    if (i == 0) {
+        return "Object";
+    }
+    else if (get_tag_index(i) == C_Class) {
+        return read_cp_info_index(i);
+    }
+    else {
+        return "!!!";
+    }
+}
+
+
+typedef struct {
+} cp_null <optimize=false>;
+
+
+typedef struct {
+	u2 start_pc;
+	u2 end_pc;
+	u2 handler_pc;
+	u2 catch_type <read=read_class_index>;
+} a_exception_table <read=read_a_exception_table>;
+
+string read_a_exception_table(local a_exception_table &i) {
+	return read_class_index(i.catch_type);
+}
+
+
+typedef struct {
+	u2 inner_class_info_index <read=read_class_index>;
+	u2 outer_class_info_index <read=read_class_index>;
+	u2 inner_name_index <read=read_name_index>;
+	m_ACCESS_FLAGS inner_class_access_flags;
+} a_inner_class <read=read_a_inner_class>;
+
+string read_a_inner_class(local a_inner_class &i) {
+	return read_name_index(i.inner_name_index);
+}
+
+
+typedef struct {
+	u2 start_pc;
+	u2 line_number;
+} a_line_number_table <read=read_a_line_number_table>;
+
+string read_a_line_number_table(local a_line_number_table &i) {
+	local string s;
+	SPrintf(s, "line %d: %d", i.line_number, i.start_pc);
+	return s;
+}
+
+
+typedef struct {
+	u2 start_pc;
+	u2 length;
+	u2 name_index <read=read_name_index>;
+	u2 descriptor_index <read=read_name_index>;
+	u2 index;
+} a_local_variable_table <read=read_a_local_variable_table>;
+
+string read_a_local_variable_table(local a_local_variable_table &i) {
+	local string s;
+	SPrintf(s, "%s %s", read_name_index(i.name_index), read_name_index(i.descriptor_index));
+	return s;
+}
+
+
+typedef struct {
+	u2 start_pc;
+	u2 length;
+	u2 name_index <read=read_name_index>;
+	u2 signature_index <read=read_name_index>;
+	u2 index;
+} a_local_variable_type_table <read=read_a_local_variable_type_table>;
+
+string read_a_local_variable_type_table(local a_local_variable_type_table &i) {
+	local string s;
+	SPrintf(s, "%s %s", read_name_index(i.name_index), read_name_index(i.signature_index));
+	return s;
+}
+
+
+struct attribute_info;
+typedef struct {
+	local int i;
+	local string attrib_type;
+
+	u2 attribute_name_index <read=read_name_index,hidden=true>;
+	u4 attribute_length <hidden=true>;
+
+	attrib_type = read_name_index(attribute_name_index);
+
+	switch (attrib_type) {
+		case "ConstantValue":
+			if (attribute_length == 2) {
+				u2 info <read=read_cp_info_index>;
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "SourceFile":
+			if (attribute_length == 2) {
+				u2 info <read=read_name_index>;
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "Code":
+			if (attribute_length >= 12) {
+				u2 max_stack;
+				u2 max_locals;
+				u4 code_length <hidden=true>;
+				if (code_length) {
+					u1 code[code_length];
+				}
+				u2 exception_table_length <hidden=true>;
+				if (exception_table_length) {
+					a_exception_table exception_table[exception_table_length];
+				}
+				u2 attributes_count <hidden=true>;
+				for (i = 0; i < attributes_count; i++) {
+					attribute_info attributes;
+				}
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+		
+		case "Exceptions":
+			if (attribute_length >= 2) {
+				u2 number_of_exceptions <hidden=true>;
+				for (i = 0; i < number_of_exceptions; i++) {
+					u2 exception_index_table <read=read_class_index>;
+				}
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "InnerClasses":
+			if (attribute_length >= 2) {
+				u2 number_of_classes <hidden=true>;
+				for (i = 0; i < number_of_classes; i++) {
+					a_inner_class classes;
+				}
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "Synthetic":
+			if (attribute_length == 0) {
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "LineNumberTable":
+			if (attribute_length >= 2) {
+				u2 line_number_table_length <hidden=true>;
+				for (i = 0; i < line_number_table_length; i++) {
+					a_line_number_table line_number_table;
+				}
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "LocalVariableTable":
+			if (attribute_length >= 2) {
+				u2 local_variable_table_length <hidden=true>;
+				for (i = 0; i < local_variable_table_length; i++) {
+					a_local_variable_table local_variable_table;
+				}
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "Deprecated":
+			if (attribute_length == 0) {
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "StackMapTable":
+			u1 info[attribute_length];
+			break;
+
+		case "EnclosingMethod":
+			if (attribute_length == 4) {
+				u2 class_index <read=read_class_index>;
+				u2 method_index <read=read_cp_info_index>;
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "Signature":
+			if (attribute_length == 2) {
+				u2 signature_index <read=read_name_index>;
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		case "LocalVariableTypeTable":
+			if (attribute_length >= 2) {
+				u2 local_variable_type_table_length <hidden=true>;
+				for (i = 0; i < local_variable_type_table_length; i++) {
+					a_local_variable_type_table local_variable_type_table;
+				}
+			}
+			else {
+				u1 info[attribute_length];
+			}
+			break;
+
+		default:
+			u1 info[attribute_length];
+			break;
+	}
+} attribute_info <read=read_attribute_info,optimize=false>;
+
+string read_attribute_info(local attribute_info &i) {
+    local string attrib_type = i.attrib_type;
+    
+    switch (attrib_type) {
+        case "ConstantValue":
+			return attrib_type + " " + read_cp_info_index(i.info);
+
+        case "SourceFile":
+			return attrib_type + " " + read_name_index(i.info);
+
+        default:
+            return attrib_type;
+    }
+}
+
+
+typedef struct {
+	local int i;
+	ACCESS_FLAGS access_flags;
+	u2 name_index <read=read_name_index>;
+	u2 descriptor_index <read=read_name_index>;
+	u2 attributes_count <hidden=true>;
+	
+	for (i = 0; i < attributes_count; i++) {
+		attribute_info attributes;
+	}
+} field_info <read=read_field_info,optimize=false>;
+
+
+string read_field_info(local field_info &i) {
+    return read_ACCESS_FLAGS(i.access_flags) + read_name_index(i.descriptor_index) + " " + read_name_index(i.name_index);
+}
+
+
+typedef struct {
+	local int i;
+	m_ACCESS_FLAGS access_flags;
+	u2 name_index <read=read_name_index>;
+	u2 descriptor_index <read=read_name_index>;
+	u2 attributes_count <hidden=true>;
+
+	for (i = 0; i < attributes_count; i++) {
+		attribute_info attributes;
+	}
+} method_info <read=read_method_info,optimize=false>;
+
+string read_method_info(local method_info &i) {
+    return read_m_ACCESS_FLAGS(i.access_flags) + read_name_index(i.name_index) + " " + read_name_index(i.descriptor_index);
+}
+
+
+typedef struct {
+	SetBackColor(cLtGray);
+	u2 constant_pool_count <hidden=true>;
+	for (i = 0; i < constant_pool_count - 1; i++) {
+		SetBackColor(cLtGray);
+		cp_info constant_pool;
+		if (constant_pool.tag == C_Long || constant_pool.tag == C_Double) {
+            cp_null constant_pool;
+			i++;
+		}
+	};
+} cp_list <read=read_cp_list,optimize=false>;
+
+string read_cp_list(local cp_list &i) {
+	local string s;
+	SPrintf(s, "%i", i.constant_pool_count);
+	return s;
+}
+
+
+typedef struct {
+	local int i;
+
+	SetBackColor(cLtGreen);
+	u2 interfaces_count <hidden=true>;
+
+	for (i = 0; i < interfaces_count; i++) {
+		u2 interfaces <read=read_class_index>;
+	}
+} i_list <read=read_i_list,optimize=false>;
+
+string read_i_list(local i_list &i) {
+	local string s;
+	SPrintf(s, "%i", i.interfaces_count);
+	return s;
+}
+
+
+typedef struct {
+	local int i;
+	SetBackColor(cLtYellow);
+	u2 fields_count <hidden=true>;
+	for (i = 0; i < fields_count; i++) {
+		SetBackColor(cLtYellow);
+		field_info fields;
+	}
+} f_list <read=read_f_list,optimize=false>;
+
+string read_f_list(local f_list &i) {
+	local string s;
+	SPrintf(s, "%i", i.fields_count);
+	return s;
+}
+
+
+typedef struct {
+	local int i;
+	SetBackColor(cLtRed);
+	u2 methods_count <hidden=true>;
+	for (i = 0; i < methods_count; i++) {
+		SetBackColor(cLtRed);
+		method_info methods;
+	}
+} m_list <read=read_m_list,optimize=false>;
+
+string read_m_list(local m_list &i) {
+	local string s;
+	SPrintf(s, "%i", i.methods_count);
+	return s;
+}
+
+
+typedef struct {
+	local int i;
+	SetBackColor(cLtAqua);
+	u2 attributes_count <hidden=true>;
+	for (i = 0; i < attributes_count; i++) {
+		SetBackColor(cLtAqua);
+		attribute_info attributes;
+	}
+} a_list <read=read_a_list,optimize=false>;
+
+string read_a_list(local a_list &i) {
+	local string s;
+	SPrintf(s, "%i", i.attributes_count);
+	return s;
+}
+
+
+typedef struct {
+	local int i = 0;
+	SetBackColor(cLtBlue);
+	u4 magic <format=hex>;
+	if (magic != 0xCAFEBABE) {
+		Warning("Incorrect Magic Number.  This is not a JVM Class.  Template Terminated.");
+		return -1;
+	}
+
+	u2 minor_version;
+	u2 major_version;
+
+	cp_list cpl;
+
+	SetBackColor(cLtBlue);
+	ACCESS_FLAGS access_flags;
+
+	SetBackColor(cLtBlue);
+	u2 this_class <read=read_class_index>;
+
+	SetBackColor(cLtBlue);
+	u2 super_class <read=read_class_index>;
+
+	i_list il;
+
+	f_list fl;
+
+	m_list ml;
+
+	a_list al;
+
+	SetBackColor(cNone);
+} ClassFile <read=read_ClassFile,optimize=false>;
+
+string read_ClassFile(ClassFile &j) {
+	local string s;
+	SPrintf(s, "JVM class v%d.%d", j.major_version, j.minor_version);
+
+	local string jre_v = "";
+	local int ma = 1;
+	local int mi = 0;
+
+	switch(j.major_version) {
+		case 45:
+			if (j.minor_version > 3) {
+				mi = 1;
+			}
+			break;
+
+		case 46:
+			mi = 2;
+			break;
+
+		case 47:
+			mi = 3;
+			break;
+
+		case 48:
+			mi = 4;
+			break;
+
+		case 49:
+			mi = 5;
+			break;
+
+		case 50:
+			mi = 6;
+			break;
+
+		case 51:
+			mi = 7;
+			break;
+
+		default:
+			ma = 0;
+			mi = 0;
+	}
+
+	if (ma || mi) {
+		SPrintf(jre_v, " (Java %d.%d)", ma, mi);
+		s += jre_v;
+	}
+
+	return s;
+}
+
+
+struct ClassFile c;
+
+if (!FEof()) {
+	byte trailing_bytes[FileSize()-FTell()];
+	Warning("Trailing bytes in file.");
+}

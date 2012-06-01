@@ -1,0 +1,195 @@
+//--------------------------------------
+//--- 010 Editor v3.1.3 Binary Template
+//
+// File: XWBTemplate
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse XACT wave bank
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    u4 region_offset;
+    u4 region_size;
+} XWB_Region <read=read_XWB_Region>;
+
+string read_XWB_Region(XWB_Region &in) {
+    string out;
+    SPrintf(out, "%Xh+%Xh", in.region_offset, in.region_size);
+    return out;
+}
+
+
+typedef struct {
+	SetBackColor(0xb8b8b8);
+
+	char signature[4];
+
+    u4 version <format=decimal>;
+    global_version = version;
+
+    if (global_version <= 3) {
+        Warning("Nonhandled version");
+        Printf("Nonhandled version\n");
+        return -1;
+    }
+    
+    if (global_version >= 42) {
+        u4 header_size;
+    }
+
+    XWB_Region r[5];
+} XWB_Header;
+
+
+typedef struct (int size) {
+	SetBackColor(0xb0ffb0);
+
+    local quad start_pos = FTell();
+
+    u4 flags;
+
+    u4 entries;
+    global_entries = entries;
+
+    char bank_name[64];
+
+    u4 entry_metadata_element_size;
+    u4 entry_name_element_size;
+    u4 alignment;
+
+    u4 compact_flags;
+    FILETIME build_time;
+
+    if ((FTell() - start_pos) != size) {
+        Warning("BankData size incorrect");
+        Printf("BankData size incorrect\n");
+    }
+} XWB_BankData <optimize=false>;
+
+
+typedef struct (int size) {
+	SetBackColor(0xffb0b0);
+
+    local quad start_pos = FTell();
+    
+    u4 flags;
+    u4 format;
+
+    XWB_Region wave_data;
+
+	SetBackColor(0xffb0b0);
+    XWB_Region loop_region;
+
+    if ((FTell() - start_pos) != size) {
+        Warning("EntryMetadata size incorrect");
+        Printf("EntryMetadata size incorrect\n");
+    }
+} EntryMetadata <optimize=false>;
+
+
+typedef struct (int size) {
+	SetBackColor(0xffb0b0);
+
+    if ((bd.entry_metadata_element_size * global_entries) != size) {
+        Warning("EntryMetadata size != size*entries");
+        Printf("EntryMetadata size != size*entries\n");
+    }
+
+    local quad start_pos = FTell();
+
+    if (global_entries > 0) {
+        EntryMetadata em(bd.entry_metadata_element_size)[global_entries];
+    }
+} XWB_EntryMetadata <optimize=false>;
+
+
+typedef struct (int size) {
+	SetBackColor(0xb0b0ff);	
+
+    u4 unknown;
+} XWB_SeekTable <optimize=false>;
+
+
+typedef struct (int size) {
+	SetBackColor(0xb0ffff);	
+
+    u4 unknown;
+} XWB_EntryName <optimize=false>;
+
+
+typedef struct (int size) {
+    u1 d[size];
+} Data <optimize=false>;
+
+
+typedef struct (int size) {
+	SetBackColor(0xffb0ff);
+
+    local int start_pos = h.r[4].region_offset;
+
+    local int i;
+    for (i = 0; i < global_entries; i++) {
+        FSeek(start_pos + em.em[i].wave_data.region_offset);
+    	SetBackColor(0xffb0ff);	
+        Data wavedata(em.em[i].wave_data.region_size);
+    }
+} XWB_EntryWaveData <optimize=false>;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+local u4 global_version;
+local u4 global_entries;
+
+local int sig;
+sig = ReadInt(0);
+
+if (sig == 0x57424E44) {
+	Warning("BigEndian");
+	BigEndian();
+	sig = ReadInt(0);
+}
+
+if (sig != 0x444E4257) {
+	Printf("Incorrect signature\n");
+	Warning("Incorrect signature");
+	return -1;
+}
+
+XWB_Header h;
+
+if (h.r[0].region_offset > 0 && h.r[0].region_size > 0) {
+    FSeek(h.r[0].region_offset);
+    XWB_BankData bd(h.r[0].region_size);
+}
+
+if (h.r[1].region_offset > 0 && h.r[1].region_size > 0) {
+    FSeek(h.r[1].region_offset);
+    XWB_EntryMetadata em(h.r[1].region_size);
+}
+
+if (h.r[2].region_offset > 0 && h.r[2].region_size > 0) {
+    FSeek(h.r[2].region_offset);
+    XWB_SeekTable st(h.r[2].region_size);
+}
+
+if (h.r[3].region_offset > 0 && h.r[3].region_size > 0) {
+    FSeek(h.r[3].region_offset);
+    XWB_EntryName en(h.r[3].region_size);
+}
+
+if (h.r[4].region_offset > 0 && h.r[4].region_size > 0) {
+    FSeek(h.r[4].region_offset);
+    XWB_EntryWaveData wd(h.r[4].region_size);
+}

@@ -1,0 +1,2213 @@
+/*************************************************************
+ * 010 Editor v3.0 Binary Template
+ *
+ * File: SWFTemplate.bt
+ * Author: Josh Zelonis <zelonis@gmail.com>
+ * Revision: 1.1
+ * Purpose: Defines a template for parsing SWF files based on
+ * the file format specification for Flash 9. This is most
+ * compatible with Actionscript 1 and 2 as the Actionscript
+ * Byte Code has not been templated in.
+ * Changes: 1.1 - Updated email address 
+ *************************************************************/
+
+
+
+/***************
+ * Action Tags *
+ ***************/
+
+local quad ActionTagEnd;
+
+typedef struct {
+	ubyte Register;
+	string ParamName;
+} REGISTERPARAM;
+
+typedef struct {
+	string value;
+} CONSTANTPOOL;
+
+typedef struct {
+	string value;
+} PARAMS;
+
+typedef struct {
+		ubyte Type;
+		switch (Type) {
+			case 0:
+				string String;
+				break;
+			case 1:
+				float Float;
+				break;
+			case 4:
+				ubyte RegisterNumber;
+				break;
+			case 5:
+				ubyte Boolean;
+				break;
+			case 6:
+				double Double;
+				break;
+			case 7:
+				int Integer;
+				break;
+			case 8:
+				ubyte Constant8;
+				break;
+			case 9:
+				ushort Constant16;
+				break;
+			default:
+				Warning("Unexpected Value detected.");
+		}
+} TYPECONST;
+
+typedef struct {
+	local int i;
+
+	ubyte ActionCode;
+	if (ActionCode >=0x80) {
+		ushort Length;
+		ActionTagEnd = FTell() + Length;
+	}
+
+	switch (ActionCode) {
+		/************************
+		 *  SWF 3 Action Model	*
+		 ************************/ 
+		case 0x81:		/* ActionGotoFrame */
+			if (Length != 2) {
+				Warning("ActionGotoFrame: Length must be 2.");
+			}
+			ushort Frame;
+			break;
+		case 0x83:		/* ActionGetURL */
+			string UrlString;
+			string TargetString;
+			break;
+		case 0x04:		/* ActionNextFrame */
+		case 0x05:		/* ActionPreviousFrame */
+		case 0x06:		/* ActionPlay */
+		case 0x07:		/* ActionStop */
+		case 0x08:		/* ActionToggleQuality */
+		case 0x09:		/* ActionStopSounds */
+			break;
+		case 0x8a:		/* ActionWaitForFrame */
+			if (Length != 3) {
+				Warning("ActionWaitForFrame: Length must be 3.");
+			}
+			ushort Frame;
+			ubyte SkipCount;
+			break;
+		case 0x8b:		/* ActionSetTarget */
+			string TargetName;
+			break;
+		case 0x8c:		/* ActionGoToLabel */
+			string Label;
+			break;
+
+		/************************
+		 *  SWF 4 Action Model	*
+		 ************************/ 
+		case 0x96:		/* ActionPush */
+			do {
+				TYPECONST TypeConst;
+			} while (FTell() < ActionTagEnd);
+			break;
+		case 0x17:		/* ActionPop */
+		case 0x0a:		/* ActionAdd */
+		case 0x0b:		/* ActionSubtract */
+		case 0x0c:		/* ActionMultiply */
+		case 0x0d:		/* ActionDivide */
+		case 0x0e:		/* ActionEquals */
+		case 0x0f:		/* ActionLess */
+		case 0x10:		/* ActionAnd */
+		case 0x11:		/* ActionOr */
+		case 0x12:		/* ActionNot */
+		case 0x13:		/* ActionStringEquals */
+		case 0x14:		/* ActionStringLength */
+		case 0x21:		/* ActionStringAdd */
+		case 0x15:		/* ActionStringExtract */
+		case 0x29:		/* ActionStringLess */
+		case 0x31:		/* ActionMBStringLength */
+		case 0x35:		/* ActionMBStringExtract */
+		case 0x18:		/* ActionToInteger */
+		case 0x32:		/* ActionCharToAscii */
+		case 0x33:		/* ActionAsciiToChar */
+		case 0x36:		/* ActionMBCharToAscii */
+		case 0x37:		/* ActionMBAsciiToChar */
+			break;
+		case 0x99:		/* ActionJump */
+			short BranchOffset;
+			break;
+		case 0x9d:		/* ActionIf */
+			short BranchOffset;
+			break;
+		case 0x9e:		/* ActionCall */
+		case 0x1c:		/* ActionGetVariable */
+		case 0x1d:		/* ActionSetVariable */
+			break;
+		case 0x9a:		/* ActionGetURL2 */
+			ubyte SendVarsMethod		: 2;
+			ubyte Reserved			: 4;
+			ubyte LoadTargetFlag		: 1;
+			ubyte LoadVariablesFlag		: 1;
+			break;
+		case 0x9f:		/* ActionGotoFrame2 */
+			ubyte Reserved			: 6;
+			ubyte SceneBiasFlag		: 1;
+			ubyte PlayFlag			: 1;
+			if (SceneBiasFlag == 1) {
+				ushort SceneBias;
+			}
+			break;
+		case 0x20:		/* ActionSetTarget2 */
+		case 0x22:		/* ActionGetProperty */
+		case 0x23:		/* ActionSetProperty */
+		case 0x24:		/* ActionCloneSprite */
+		case 0x25:		/* ActionRemoveSprite */
+		case 0x27:		/* ActionStartDrag */
+		case 0x28:		/* ActionEndDrag */
+			break;
+		case 0x8d:		/* ActionWaitForFrame2 */
+			ubyte SkipCount;
+			break;
+		case 0x26:		/* ActionTrace */
+		case 0x34:		/* ActionGetTime */
+		case 0x30:		/* ActionRandomNumber */
+			break;
+
+		/************************
+		 *  SWF 5 Action Model	*
+		 ************************/ 
+		case 0x3d:		/* ActionCallFunction */
+		case 0x52:		/* ActionCallMethod */
+			break;
+		case 0x88:		/* ActionConstantPool */
+			ushort Count;
+			for (i=0; i<Count; i++) {
+				CONSTANTPOOL Constant;
+			}
+			break;
+		case 0x9b:		/* ActionDefineFunction */
+			string FunctionName;
+			ushort NumParams;
+			for (i=0; i<NumParams; i++) {
+				PARAMS Param;
+			}
+			ushort codeSize;
+			break;
+		case 0x3c:		/* ActionDefineLocal */
+		case 0x41:		/* ActionDefineLocal2 */
+		case 0x3a:		/* ActionDelete */
+		case 0x3b:		/* ActionDelete2 */
+		case 0x46:		/* ActionEnumerate */
+		case 0x49:		/* ActionEquals2 */
+		case 0x4e:		/* ActionGetMember */
+		case 0x42:		/* ActionInitArray */
+		case 0x43:		/* ActionInitObject */
+		case 0x53:		/* ActionNewMethod */
+		case 0x40:		/* ActionNewObject */
+		case 0x4f:		/* ActionSetMember */
+		case 0x45:		/* ActionTargetPath */
+			break;
+		case 0x94:		/* ActionWith */
+			ushort Size;
+			break;
+		case 0x4a:		/* ActionToNumber */
+		case 0x4b:		/* ActionToString */
+		case 0x44:		/* ActionTypeOf */
+		case 0x47:		/* ActionAdd2 */
+		case 0x48:		/* ActionLess2 */
+		case 0x3f:		/* ActionModulo */
+		case 0x60:		/* ActionBitAnd */
+		case 0x63:		/* ActionBitLShift */
+		case 0x61:		/* ActionBitOr */
+		case 0x64:		/* ActionBitRShift */
+		case 0x65:		/* ActionBitURShift */
+		case 0x62:		/* ActionBitXor */
+		case 0x51:		/* ActionDecrement */
+		case 0x50:		/* ActionIncrement */
+		case 0x4c:		/* ActionPushDuplicate */
+		case 0x3e:		/* ActionReturn */
+		case 0x4d:		/* ActionStackSwap */
+			break;
+		case 0x87:		/* ActionStoreRegister */
+			ubyte RegisterNumber;
+			break;
+
+		/************************
+		 *  SWF 6 Action Model	*
+		 ************************/ 
+		case 0x55:		/* ActionEnumerate2 */
+		case 0x66:		/* ActionStrictEquals */
+		case 0x67:		/* ActionGreater */
+		case 0x68:		/* ActionStringGreater */
+			break;
+
+		/************************
+		 *  SWF 7 Action Model	*
+		 ************************/ 
+		case 0x8e:		/* ActionDefineFunction2 */
+			string FunctionName;
+			ushort NumParams;
+			ubyte RegisterCount;
+			ubyte PreloadParentFlag		: 1;
+			ubyte PreloadRootFlag		: 1;
+			ubyte SuppressSuperFlag		: 1;
+			ubyte PreloadSuperFlag		: 1;
+			ubyte SuppressArgumentsFlag	: 1;
+			ubyte PreloadArgumentsFlag	: 1;
+			ubyte SuppressThisFlag		: 1;
+			ubyte PreloadThisFlag		: 1;
+			ubyte Reserved			: 7;
+			ubyte PreloadGlobalFlag		: 1;
+
+			for (i=0; i<NumParams; i++) {
+				REGISTERPARAM Parameter;
+			}
+			ushort codeSize;
+			break;
+		case 0x69:		/* ActionExtends */
+		case 0x2b:		/* ActionCastOp */
+		case 0x2c:		/* ActionImplementsOp */
+			break;
+		case 0x8f:		/* ActionTry */
+			ubyte Reserved			: 5;
+			ubyte CatchInRegisterFlag	: 1;
+			ubyte FinallyBlockFlag		: 1;
+			ubyte CatchBlockFlag		: 1;
+			ushort TrySize;
+			ushort CatchSize;
+			ushort FinallySize;
+			if (CatchInRegisterFlag == 0) {
+				string CatchName;
+			}
+			else {
+				ubyte CatchRegister;
+			}
+			if (TrySize) ubyte TryBody[TrySize];
+			if (CatchSize) ubyte CatchBody[CatchSize];
+			if (FinallySize) ubyte FinallyBody[FinallySize]; 
+			break;
+		case 0x2a:		/* ActionThrow */
+			break;
+
+		/************************
+		 *  SWF 9 Action Model	*
+		 ************************/ 
+
+		default:		/* Undefined Behavior */
+			if (ActionCode>=0x80) {
+				ubyte Padding[ActionTagEnd - FTell()];
+			}
+			break;
+	}
+
+
+	/*****************************************
+	 * This is a fixup for files that aren't
+	 * parsing correctly. This may be due to
+	 * my code, obfuscation techniques or
+	 * other unknown circumstances.
+	 *****************************************/ 
+	if (ActionCode>=0x80) {
+		if (ActionTagEnd>FTell()) {
+			ubyte Padding[ActionTagEnd-FTell()];
+			Printf("WARNING: ActionTag padded to 0x%LXh\n", FTell());
+		}
+		else if (ActionTagEnd<FTell()-1) {
+			Printf("WARNING: ActionTag overrun to 0x%LXh, expected end at 0x%LXh\n", FTell(), ActionTagEnd);
+		}
+	}
+
+} ACTIONRECORD <read=GetActionType>;
+
+string GetActionType(ACTIONRECORD &ActionTag)
+{
+	string action;
+	ubyte ActionType = ActionTag.ActionCode;
+
+	switch (ActionType)
+	{
+		case 0x81:		return "ActionGotoFrame";
+		case 0x83:		return "ActionGetURL";
+		case 0x04:		return "ActionNextFrame";
+		case 0x05:		return "ActionPreviousFrame";
+		case 0x06:		return "ActionPlay";
+		case 0x07:		return "ActionStop";
+		case 0x08:		return "ActionToggleQuality";
+		case 0x09:		return "ActionStopSounds";
+		case 0x8a:		return "ActionWaitForFrame";
+		case 0x8b:		return "ActionSetTarget";
+		case 0x8c:		return "ActionGoToLabel";
+		case 0x96:		return "ActionPush";
+		case 0x17:		return "ActionPop";
+		case 0x0a:		return "ActionAdd";
+		case 0x0b:		return "ActionSubtract";
+		case 0x0c:		return "ActionMultiply";
+		case 0x0d:		return "ActionDivide";
+		case 0x0e:		return "ActionEquals";
+		case 0x0f:		return "ActionLess";
+		case 0x10:		return "ActionAnd";
+		case 0x11:		return "ActionOr";
+		case 0x12:		return "ActionNot";
+		case 0x13:		return "ActionStringEquals";
+		case 0x14:		return "ActionStringLength";
+		case 0x21:		return "ActionStringAdd";
+		case 0x15:		return "ActionStringExtract";
+		case 0x29:		return "ActionStringLess";
+		case 0x31:		return "ActionMBStringLength";
+		case 0x35:		return "ActionMBStringExtract";
+		case 0x18:		return "ActionToInteger";
+		case 0x32:		return "ActionCharToAscii";
+		case 0x33:		return "ActionAsciiToChar";
+		case 0x36:		return "ActionMBCharToAscii";
+		case 0x37:		return "ActionMBAsciiToChar";
+		case 0x99:		return "ActionJump";
+		case 0x9d:		return "ActionIf";
+		case 0x9e:		return "ActionCall";
+		case 0x1c:		return "ActionGetVariable";
+		case 0x1d:		return "ActionSetVariable";
+		case 0x9a:		return "ActionGetURL2";
+		case 0x9f:		return "ActionGotoFrame2";
+		case 0x20:		return "ActionSetTarget2";
+		case 0x22:		return "ActionGetProperty";
+		case 0x23:		return "ActionSetProperty";
+		case 0x24:		return "ActionCloneSprite";
+		case 0x25:		return "ActionRemoveSprite";
+		case 0x27:		return "ActionStartDrag";
+		case 0x28:		return "ActionEndDrag";
+		case 0x8d:		return "ActionWaitForFrame2";
+		case 0x26:		return "ActionTrace";
+		case 0x34:		return "ActionGetTime";
+		case 0x30:		return "ActionRandomNumber";
+		case 0x3d:		return "ActionCallFunction";
+		case 0x52:		return "ActionCallMethod";
+		case 0x88:		return "ActionConstantPool";
+		case 0x9b:		return "ActionDefineFunction";
+		case 0x3c:		return "ActionDefineLocal";
+		case 0x41:		return "ActionDefineLocal2";
+		case 0x3a:		return "ActionDelete";
+		case 0x3b:		return "ActionDelete2";
+		case 0x46:		return "ActionEnumerate";
+		case 0x49:		return "ActionEquals2";
+		case 0x4e:		return "ActionGetMember";
+		case 0x42:		return "ActionInitArray";
+		case 0x43:		return "ActionInitObject";
+		case 0x53:		return "ActionNewMethod";
+		case 0x40:		return "ActionNewObject";
+		case 0x4f:		return "ActionSetMember";
+		case 0x45:		return "ActionTargetPath";
+		case 0x94:		return "ActionWith";
+		case 0x4a:		return "ActionToNumber";
+		case 0x4b:		return "ActionToString";
+		case 0x44:		return "ActionTypeOf";
+		case 0x47:		return "ActionAdd2";
+		case 0x48:		return "ActionLess2";
+		case 0x3f:		return "ActionModulo";
+		case 0x60:		return "ActionBitAnd";
+		case 0x63:		return "ActionBitLShift";
+		case 0x61:		return "ActionBitOr";
+		case 0x64:		return "ActionBitRShift";
+		case 0x65:		return "ActionBitURShift";
+		case 0x62:		return "ActionBitXor";
+		case 0x51:		return "ActionDecrement";
+		case 0x50:		return "ActionIncrement";
+		case 0x4c:		return "ActionPushDuplicate";
+		case 0x3e:		return "ActionReturn";
+		case 0x4d:		return "ActionStackSwap";
+		case 0x87:		return "ActionStoreRegister";
+		case 0x55:		return "ActionEnumerate2";
+		case 0x66:		return "ActionStrictEquals";
+		case 0x67:		return "ActionGreater";
+		case 0x68:		return "ActionStringGreater";
+		case 0x8e:		return "ActionDefineFunction2";
+		case 0x69:		return "ActionExtends";
+		case 0x2b:		return "ActionCastOp";
+		case 0x2c:		return "ActionImplementsOp";
+		case 0x8f:		return "ActionTry";
+		case 0x2a:		return "ActionThrow";
+
+		case 0x00:		return "END";
+		default:		SPrintf(action, "%02Xh", ActionType);
+					
+	}
+	return action;
+}
+
+
+/**************
+ * Data Types *
+ **************/
+
+local quad SWFTagEnd;
+local ushort CurrentTag;
+
+typedef struct {
+	byte value;
+} SI8;
+
+typedef struct {
+	short value;
+} SI16;
+
+typedef struct {
+	int value;
+} SI32;
+
+typedef struct {
+	ubyte value;
+} UI8;
+
+typedef struct {
+	ushort value;
+} UI16;
+
+typedef struct {
+	uint value;
+} UI32;
+
+typedef struct {
+	quad value;
+} UI64;
+
+typedef struct {
+	int whole			: 16;
+	int decimal			: 16;
+} FIXED;
+
+typedef struct {
+	short whole			: 8;
+	short decimal			: 8;
+} FIXED8;
+
+typedef struct {
+	ushort sign 			: 1;
+	ushort exponent			: 5;
+	ushort mantissa			: 10;
+} FLOAT16;
+
+typedef struct {
+	BigEndian();
+	local int i=0;
+	do {
+		byte next		: 1;
+		byte value		: 7;
+		i++;
+	} while (i<5 & next);
+} EncodedU32;
+
+typedef struct {
+	do {
+		char character;
+	} while (character != 0x00);
+} STRING;
+
+typedef struct {
+	ubyte LanguageCode;
+} LANGCODE;
+
+typedef struct {
+	ubyte Red;
+	ubyte Green;
+	ubyte Blue;
+} RGB;
+
+typedef struct {
+	ubyte Red;
+	ubyte Green;
+	ubyte Blue;
+	ubyte Alpha;
+} RGBA;
+
+typedef struct {
+	ubyte Alpha;
+	ubyte Red;
+	ubyte Green;
+	ubyte Blue;
+} ARGB;
+
+/***********************************************
+ * The min values in this are going to look
+ * wrong because there isn't any pretty way
+ * for 010 to print an Nbits-bit signed number.
+ * The key is that the max values match expected
+ * values and because there isn't any variation
+ * on how the numbers are being calculated and
+ * no bit padding, we can assume these are
+ * correct.
+ ***********************************************/
+typedef struct {
+	ubyte Nbits			: 5;
+	BitfieldDisablePadding();
+	int Xmin			: Nbits;
+	int Xmax			: Nbits;
+	int Ymin			: Nbits;
+	int Ymax			: Nbits;
+	BitfieldEnablePadding();
+} RECT;
+
+typedef struct {
+	BitfieldEnablePadding();
+	BitfieldLeftToRight();
+	ubyte HasScale			: 1;
+	if (HasScale) {
+		ubyte NScaleBits	: 5;
+		BitfieldDisablePadding();
+		int ScaleX		: NScaleBits;
+		int ScaleY		: NScaleBits;
+	}
+	ubyte HasRotate			: 1;
+	if (HasRotate) {
+		ubyte NRotateBits	: 5;
+		BitfieldDisablePadding();
+		int RotateSkew0		: NRotateBits;
+		int RotateSkew1		: NRotateBits;
+	}
+	ubyte NTranslateBits		: 5;
+	BitfieldDisablePadding();
+	int TranslateX			: NTranslateBits;
+	int TranslateY			: NTranslateBits;
+	BitfieldEnablePadding();
+} MATRIX;
+
+typedef struct {
+	ushort Tag;
+	string Name;
+} ASSETS;
+
+typedef struct {
+	EncodedU32 Offset;
+	string Name;
+} OFFSETANDNAME;
+
+typedef struct {
+	BitfieldEnablePadding();
+	ubyte HasAddTerms		: 1;
+	ubyte HasMultTerms		: 1;
+	ubyte Nbits			: 4;
+	BitfieldDisablePadding();
+	if (HasMultTerms) {
+		short RedMultTerm	: Nbits;
+		short GreenMultTerm	: Nbits;
+		short BlueMultTerm	: Nbits;
+	}
+	if (HasAddTerms) {
+		short RedAddTerm	: Nbits;
+		short GreenAddTerm	: Nbits;
+		short BlueAddTerm	: Nbits;
+	}
+	BitfieldEnablePadding();
+} CXFORM;
+
+typedef struct {
+	BitfieldEnablePadding();
+	ubyte HasAddTerms		: 1;
+	ubyte HasMultTerms		: 1;
+	ubyte Nbits			: 4;
+	BitfieldDisablePadding();
+	if (HasMultTerms) {
+		short RedMultTerm	: Nbits;
+		short GreenMultTerm	: Nbits;
+		short BlueMultTerm	: Nbits;
+		short AlphaMultTerm	: Nbits;
+	}
+	if (HasAddTerms) {
+		short RedAddTerm	: Nbits;
+		short GreenAddTerm	: Nbits;
+		short BlueAddTerm	: Nbits;
+		short AlphaAddTerm	: Nbits;
+	}
+	BitfieldEnablePadding();
+} CXFORMWITHALPHA;
+
+typedef struct {
+	ushort ClipEventKeyUp			: 1;
+	ushort ClipEventKeyDown			: 1;
+	ushort ClipEventMouseUp			: 1;
+	ushort ClipEventMouseDown		: 1;
+	ushort ClipEventMouseMove		: 1;
+	ushort ClipEventUnload			: 1;
+	ushort ClipEventEnterFrame		: 1;
+	ushort ClipEventLoad			: 1;
+	ushort ClipEventDragOver		: 1;
+	ushort ClipEventRollOut			: 1;
+	ushort ClipEventRollOver		: 1;
+	ushort ClipEventReleaseOutside		: 1;
+	ushort ClipEventRelease			: 1;
+	ushort ClipEventPress			: 1;
+	ushort ClipEventInitialize		: 1;
+	ushort ClipEventData			: 1;
+	if (File.Header.Version >= 6) {
+		ushort Reserved			: 5;
+		ushort ClipEventConstruct	: 1;
+		ushort ClipEventKeyPress	: 1;
+		ushort ClipEventDragout		: 1;
+		ushort Reserved			: 8;
+	}
+} CLIPEVENTFLAGS;
+
+typedef struct {
+	CLIPEVENTFLAGS EventFlags;
+	uint ActionRecordSize;
+	if ((File.Header.Version>5) && EventFlags.ClipEventKeyPress) {
+		ubyte KeyCode;
+	}
+	do {
+		ACTIONRECORD Action;
+	} while (Action.ActionCode!=0x00);
+} CLIPACTIONRECORD;
+
+
+typedef struct {
+	local uint clips;
+	ushort Reserved;
+	CLIPEVENTFLAGS AllEventFlags;
+	do {
+		CLIPACTIONRECORD ClipActionRecord;
+	} while ((SWFTagEnd-FTell())>9); /* min bytes in CLIPACTIONRECORD */
+	if (File.Header.Version>5) {
+		uint ClipActionEndFlag;
+	}
+	else {
+		ushort ClipActionEndFlag;
+	}
+} CLIPACTIONS;
+
+typedef struct {
+	float Matrix[20];
+} COLORMATRIXFILTER;
+
+typedef struct {
+	ubyte MatrixX;
+	ubyte MatrixY;
+	float Divisor;
+	float Bias;
+	float Matrix[MatrixX * MatrixY];
+	RGBA DefaultColor;
+	ubyte Reserved          	: 6;
+	ubyte Clamp             	: 1;
+	ubyte PreserveAlpha     	: 1;
+} CONVOLUTIONFILTER;
+
+typedef struct {
+	FIXED BlurX;
+	FIXED BlurY;
+	ubyte Passes 		        : 5;
+	ubyte Reserved          	: 3;
+} BLURFILTER;
+
+typedef struct {
+	RGBA DropShadowColor;
+	FIXED BlurX;
+	FIXED BlurY;
+	FIXED Angle;
+	FIXED Distance;
+	FIXED8 Strength;
+	ubyte InnerShadow       	: 1;
+	ubyte Knockout          	: 1;
+	ubyte CompositeSource   	: 1;
+	ubyte Passes            	: 5;
+} DROPSHADOWFILTER;
+
+typedef struct {
+	RGBA GlowColor;
+	FIXED BlurX;
+	FIXED BlurY;
+	FIXED8 Strength;
+	ubyte InnerShadow       	: 1;
+	ubyte Knockout          	: 1;
+	ubyte CompositeSource   	: 1;
+	ubyte Passes            	: 5;
+} GLOWFILTER;   
+
+typedef struct {
+	RGBA ShadowColor;
+	RGBA HighlightColor;
+	FIXED BlurX;
+	FIXED BlurY;
+	FIXED Angle;
+	FIXED Distance;
+	FIXED8 Strength;
+	ubyte InnerShadow       	: 1;
+	ubyte Knockout          	: 1;
+	ubyte CompositeSource   	: 1;
+	ubyte OnTop			: 1;
+	ubyte Passes            	: 4;
+} BEVELFILTER;
+
+typedef struct {
+	ubyte Ratio;
+	if ((CurrentTag == 2)		/* DefineShape 	*/ 
+	|| (CurrentTag == 22)) { 	/* DefineShape2 */
+		RGB Color;
+	}
+	else {				/* DefineShape3 */	
+		RGBA Color;
+	}
+} GRADRECORD;
+
+typedef struct {
+	local short i;
+	ubyte SpreadMode		: 2;
+	ubyte InterpolationMode		: 2;
+	ubyte NumGradients		: 4;
+	for (i=0; i<NumGradients; i++) {
+		GRADRECORD GradientRecord;
+	}
+} GRADIENT;
+
+typedef struct {
+	local short i;
+	ubyte SpreadMode		: 2;
+	ubyte InterpolationMode		: 2;
+	ubyte NumGradients		: 4;
+	for (i=0; i<NumGradients; i++) {
+		GRADRECORD GradientRecord;
+	}
+	FIXED8 FocalPoint;
+} FOCALGRADIENT;
+
+typedef struct {
+	ubyte NumColors;
+	RGBA GradientColors[NumColors];
+	ubyte GradientRatio[NumColors];
+	FIXED BlurX;
+	FIXED BlurY;
+	FIXED Angle;
+	FIXED Distance;
+	FIXED8 Strength;
+	ubyte InnerShadow       	: 1;
+	ubyte Knockout          	: 1;
+	ubyte CompositeSource   	: 1;
+	ubyte OnTop			: 1;
+	ubyte Passes            	: 4;
+} GRADIENTGLOWFILTER;
+
+typedef struct {
+	ubyte NumColors;
+	RGBA GradientColors[NumColors];
+	ubyte GradientRatio[NumColors];
+	FIXED BlurX;
+	FIXED BlurY;
+	FIXED Angle;
+	FIXED Distance;
+	FIXED8 Strength;
+	ubyte InnerShadow       	: 1;
+	ubyte Knockout          	: 1;
+	ubyte CompositeSource   	: 1;
+	ubyte OnTop			: 1;
+	ubyte Passes            	: 4;
+} GRADIENTBEVELFILTER;
+
+
+
+typedef struct {
+	ushort FilterId;
+	switch (FilterId) {
+		case 0: 
+			DROPSHADOWFILTER DropShadowFilter;
+			break;
+		case 1:
+			BLURFILTER BlurFilter;
+			break;
+		case 2:
+			GLOWFILTER GlowFilter;
+			break;
+		case 3:
+			BEVELFILTER BevelFilter;
+			break;
+		case 4:
+			GRADIENTGLOWFILTER GradientGlowFilter;
+			break;
+		case 5:
+			CONVOLUTIONFILTER ConvolutionFilter;
+			break;
+		case 6:
+			COLORMATRIXFILTER ColorMatrixFilter;
+			break;
+		case 7:
+			GRADIENTBEVELFILTER GradientBevelFilter;
+			break;
+	}
+} FILTER;
+
+typedef struct {
+	local ushort i;
+	ubyte NumberOfFilters;
+	for (i=0; i<NumberOfFilters; i++) {
+		FILTER Filter;
+	}
+} FILTERLIST;
+
+typedef struct {
+	ubyte FillStyleType;
+	switch (FillStyleType) {
+		case 0x00:
+			if ((CurrentTag == 2) 		/* DefineShape  */
+			|| (CurrentTag == 22)) { 	/* DefineShape2 */  
+				RGB Color;
+			}
+			else {				/* DefineShape3 */
+				RGBA Color;
+			}
+			break;
+		case 0x10:
+		case 0x12:
+			MATRIX GradientMatrix;
+			GRADIENT Gradient;
+			break;
+		case 0x13:
+			FOCALGRADIENT Gradient;
+			break;
+		case 0x40:
+		case 0x41:
+		case 0x42:
+		case 0x43:
+			ushort BitmapId;
+			MATRIX BitmapMatrix;
+			break;
+		default:
+			break;
+	}
+} FILLSTYLE;
+
+typedef struct {
+	local ushort i;
+	ubyte FillStyleCount;
+	if (FillStyleCount == 0xff) {
+		UI16 FillStyleCountExtended;
+		for (i=0; i<FillStyleCount; i++) {
+			FILLSTYLE FillStyle;
+		}
+	}
+	else {
+		for (i=0; i<FillStyleCount; i++) {
+			FILLSTYLE FillStyle;
+		}
+	}
+} FILLSTYLEARRAY;
+
+typedef struct {
+	ushort Width;
+	if ((CurrentTag == 2)		/* DefineShape  */ 
+	|| (CurrentTag == 22)) { 	/* DefineShape2 */
+		RGB Color;
+	}
+	else {				/* DefineShape3 */
+		RGBA Color;
+	}
+} LINESTYLE;
+
+typedef struct {
+	ushort Width;
+	ubyte StartCapStyle		: 2;
+	ubyte JoinStyle			: 2;
+	ubyte HasFillFlag		: 1;
+	ubyte NoHScaleFlag		: 1;
+	ubyte NoVScaleFlag		: 1;
+	ubyte PixelHintingFlag		: 1;
+	ubyte Reserved			: 5;
+	ubyte NoClose			: 1;
+	ubyte EndCapStyle		: 2;
+	if (JoinStyle == 2) {
+		ushort MiterLimitFactor;
+	}
+	if (HasFillFlag) {
+		FILLSTYLE FillType;
+	}
+	else {
+		RGBA Color;
+	}
+} LINESTYLE2;
+
+typedef struct {
+	local ushort i;
+	BitfieldDisablePadding();
+	ubyte LineStyleCount;
+	if (LineStyleCount == 0xff) {
+		UI16 LineStyleCountExtended;
+		for (i=0; i<LineStyleCountExtended; i++) {
+			if ((CurrentTag == 2)		/* DefineShape  */ 
+			|| (CurrentTag == 22) 		/* DefineShape2 */
+			|| (CurrentTag == 32)) {	/* DefineShape3 */ 
+				LINESTYLE LineStyle;
+			}
+			else if (CurrentTag == 83) {	/* DefineShape4 */
+				LINESTYLE2 LineStyle;
+			}	
+		}
+	}
+	else {
+		for (i=0; i<LineStyleCount; i++) {
+			if ((CurrentTag == 2)		/* DefineShape  */ 
+			|| (CurrentTag == 22) 		/* DefineShape2 */
+			|| (CurrentTag == 32)) {	/* DefineShape3 */ 
+				LINESTYLE LineStyle;
+			}
+			else if (CurrentTag == 83) {	/* DefineShape4 */
+				LINESTYLE2 LineStyle;
+			}
+		}
+	}
+	BitfieldEnablePadding();
+} LINESTYLEARRAY;
+
+typedef struct {
+	BitfieldDisablePadding();
+	ubyte TypeFlag					: 1;
+	if (TypeFlag) {
+		ubyte StraightFlag			: 1;
+		if (StraightFlag) {		/* StraightEdgeRecord */
+			ubyte NumBits			: 4;
+			ubyte GeneralLineFlag		: 1;
+			if (GeneralLineFlag) {
+				int DeltaX		: NumBits+2;
+				int DeltaY		: NumBits+2;
+			}
+			else { 
+				ubyte VertLineFlag	: 1;
+				if (VertLineFlag) {
+					int DeltaY	: NumBits+2;
+				}
+				else {
+					int DeltaX	: NumBits+2;
+				}
+			}
+		}
+		else {				/* CurvedEdgeRecord */
+			ubyte NumBits		: 4;	
+			int ControlDeltaX	: NumBits+2;
+			int ControlDeltaY	: NumBits+2;
+			int AnchorDeltaX	: NumBits+2;
+			int AnchorDeltaY	: NumBits+2;
+		}	
+	}
+	else {				/* StyleChangeRecord & EndShapeRecord */
+		ubyte StateNewStyles		: 1;
+		ubyte StateLineStyle		: 1;
+		ubyte StateFillStyle1		: 1;
+		ubyte StateFillStyle0		: 1;
+		ubyte StateMoveTo		: 1;
+		if (StateMoveTo) {
+			ubyte MoveBits		: 5;
+			int MoveDeltaX		: MoveBits;
+			int MoveDeltaY		: MoveBits;
+		}
+		if (StateFillStyle0) {
+			int FillStyle0		: FillBits;
+		}
+		if (StateFillStyle1) {
+			int FillStyle1		: FillBits;
+		}
+		if (StateLineStyle) {
+			int LineStyle		: LineBits;
+		}
+		if ((CurrentTag == 22 || CurrentTag == 32) && StateNewStyles) { 
+			FILLSTYLEARRAY FillStyles;
+			LINESTYLEARRAY LineStyles;
+			ubyte NumFillBits	: 4;
+			ubyte NumLineBits	: 4;
+			FillBits = NumFillBits;
+			LineBits = NumLineBits;
+		}
+	}
+/***************************************
+ * Warnings that occur on the next line
+ * regarding an 'Empty structure' may
+ * safely be ignored. Sweetsoft has been
+ * notified of the issue which has to
+ * do with them generating this error
+ * if a structure is not at least one
+ * byte in length. This particular
+ * structure is an unpadded 6 bits in 
+ * length when generating an
+ * EndShapeRecord.
+ ***************************************/
+} SHAPERECORD <read=GetShapeRecordType>; 
+
+string GetShapeRecordType(SHAPERECORD &ShapeRecord)
+{
+	if (ShapeRecord.TypeFlag) {
+		if (ShapeRecord.StraightFlag) {	
+			return "StraightEdgeRecord";
+		}
+		else {
+			return "CurvedEdgeRecord";
+		}	
+	}
+	else if (ShapeRecord.TypeFlag 
+		|| ShapeRecord.StateNewStyles
+		|| ShapeRecord.StateLineStyle
+		|| ShapeRecord.StateFillStyle1
+		|| ShapeRecord.StateFillStyle0
+		|| ShapeRecord.StateMoveTo) {
+		return "StyleChangeRecord";
+	}
+	else {
+		return "EndShapeRecord";
+	}
+	
+}
+
+typedef struct {
+	BitfieldEnablePadding();
+	ubyte NumFillBits		: 4;
+	ubyte NumLineBits		: 4;
+	local ubyte FillBits = NumFillBits;
+	local ubyte LineBits = NumLineBits;
+	BitfieldDisablePadding();
+ 	do {
+		SHAPERECORD ShapeRecord; 
+	} while (ShapeRecord.TypeFlag 
+		|| ShapeRecord.StateNewStyles
+		|| ShapeRecord.StateLineStyle
+		|| ShapeRecord.StateFillStyle1
+		|| ShapeRecord.StateFillStyle0
+		|| ShapeRecord.StateMoveTo);
+	BitfieldEnablePadding();
+} SHAPE;
+
+typedef struct {
+	BitfieldEnablePadding();
+	FILLSTYLEARRAY FillStyles;
+	LINESTYLEARRAY LineStyles;
+	ubyte NumFillBits		: 4;
+	ubyte NumLineBits		: 4;
+	local ubyte FillBits = NumFillBits;
+	local ubyte LineBits = NumLineBits;
+	BitfieldDisablePadding();
+	do {
+		SHAPERECORD ShapeRecord; 
+	} while (ShapeRecord.TypeFlag 
+		|| ShapeRecord.StateNewStyles
+		|| ShapeRecord.StateLineStyle
+		|| ShapeRecord.StateFillStyle1
+		|| ShapeRecord.StateFillStyle0
+		|| ShapeRecord.StateMoveTo);
+	BitfieldEnablePadding();
+} SHAPEWITHSTYLE;
+
+typedef struct {
+	ubyte StartRatio;
+	RGBA StartColor;
+	ubyte EndRatio;
+	RGBA EndColor;
+} MORPHGRADRECORD;
+
+typedef struct {
+	local ushort i;
+	ubyte NumGradients;
+	for (i=0; i<NumGradients; i++) {
+		MORPHGRADRECORD GradientRecords;
+	}
+} MORPHGRADIENT;
+
+typedef struct {
+	ubyte FillStyleType;
+	switch (FillStyleType) {
+		case 0x00:
+			RGBA StartColor;
+			RGBA EndColor;
+			break;
+		case 0x10:
+		case 0x12:
+			MATRIX StartGradientMatrix;
+			MATRIX EndGradientMatrix;
+			MORPHGRADIENT Gradient;
+			break;
+		case 0x40:
+		case 0x41:
+		case 0x42:
+		case 0x43:
+			MATRIX StartBitmapMatrix;
+			MATRIX EndBitmapMatrix;
+			break;
+		default:
+			break;
+	}
+} MORPHFILLSTYLE;
+
+typedef struct {
+	ushort StartWidth;
+	ushort EndWidth;
+	ubyte StartCapStyle	: 2;
+	ubyte JoinStyle		: 2;
+	ubyte HasFillFlag	: 1;
+	ubyte NoHScaleFlag	: 1;
+	ubyte NoVScaleFlag	: 1;
+	ubyte PixelHintingFlag	: 1;
+	ubyte NoClose		: 1;
+	ubyte EndCapStyle	: 2;
+	if (JoinStyle == 2) {
+		ushort MiterLimitFactor;
+	}
+	if (HasFillFlag == 0) {
+		RGBA StartColor;
+		RGBA EndColor;
+	}
+	else {
+		MORPHFILLSTYLE FillType;
+	}
+} MORPHLINESTYLE2;
+
+typedef struct {
+	ushort StartWidth;
+	ushort EndWidth;
+	RGBA StartColor;
+	RGBA EndColor;
+} MORPHLINESTYLE;
+
+typedef struct {
+	ubyte LineStyleCount;
+	if (LineStyleCount == 0xff) {
+		ushort LineStyleCountExtended;
+		for (i=0; i<LineStyleCountExtended; i++) {
+			if (CurrentTag == 46) {		/* DefineMorphShape */
+				MORPHLINESTYLE LineStyle;
+			}
+			else if (CurrentTag == 84) {	/* DefineMorphShape2 */
+				MORPHLINESTYLE2 LineStyle;
+			}
+		}
+	}
+	else {
+		for (i=0; i<LineStyleCount; i++) {
+			if (CurrentTag == 46) {		/* DefineMorphShape */
+				MORPHLINESTYLE LineStyle;
+			}
+			else if (CurrentTag == 84) {	/* DefineMorphShape2 */
+				MORPHLINESTYLE2 LineStyle;
+			}
+		}
+	}
+} MORPHLINESTYLES;
+
+typedef struct {
+	local ushort i;
+	ubyte FillStyleCount;
+	if (FillStyleCount == 0xFF) {
+		for (i=0; i<FillStyleCountExtended; i++) {
+			MORPHFILLSTYLE FillStyle;
+		}
+	}
+	else {
+		for (i=0; i<FillStyleCount; i++) {
+			MORPHFILLSTYLE FillStyle;
+		}
+	}
+} MORPHFILLSTYLEARRAY;
+		
+typedef struct {
+	ubyte Pix15Reserved		: 1;
+	ubyte Pix15Red			: 5;
+	ubyte Pix15Green		: 5;
+	ubyte Pix15Blue			: 5;
+} PIX15;
+
+typedef struct {
+	ubyte Pix24Reserved;
+	ubyte Pix24Red;
+	ubyte Pix24Green;
+	ubyte Pix24Blue;
+} PIX24;
+
+typedef struct {
+	RGB ColorTableRGB[(BitmapColorTableSize+1)];
+	ubyte ColormapPixelData[(BitmapWidth*BitmapHeight)];
+} COLORMAPDATA;
+
+typedef struct {
+	if (BitmapFormat == 4) {
+		PIX15 BitmapPixelData[(BitmapWidth*BitmapHeight)];
+	}
+	else if (BitmapFormat == 5) {
+		PIX24 BitmapPixelData[(BitmapWidth*BitmapHeight)];
+	}
+} BITMAPDATA;
+
+typedef struct {
+	RGBA ColorTableRGB[(BitmapColorTableSize+1)];
+	ubyte ColormapPixelData[(4-(BitmapWidth&3))*BitmapHeight];
+} ALPHACOLORMAPDATA;
+
+typedef struct {
+	ARGB BitmapPixelData[(BitmapWidth*BitmapHeight)];
+} ALPHABITMAPDATA;
+
+typedef struct {
+	ubyte ButtonReserved		: 2;
+	ubyte ButtonHasBlendMode	: 1;
+	ubyte ButtonHasFilterList	: 1;
+	ubyte ButtonStateHitTest	: 1;
+	ubyte ButtonStateDown		: 1;
+	ubyte ButtonStateOver		: 1;
+	ubyte ButtonStateUp		: 1;
+
+	if (Character.ButtonReserved
+	|| Character.ButtonHasBlendMode
+	|| Character.ButtonHasFilterList
+	|| Character.ButtonStateHitTest
+	|| Character.ButtonStateDown
+	|| Character.ButtonStateOver
+	|| Character.ButtonStateUp) {
+		ushort CharacterID;
+		ushort PlaceDepth;
+		MATRIX PlaceMatrix;
+		if (CurrentTag == 34) {		/* DefineButton2 */
+			CXFORMWITHALPHA ColorTransform;
+			if (ButtonHasFilterList) {
+				FILTERLIST FilterList;
+			}
+			if (ButtonHasBlendMode) {
+				ubyte BlendMode;
+			}
+		}
+	}
+} BUTTONRECORD;
+
+typedef struct {
+	ushort CondActionSize;
+	ubyte CondIdleToOverDown	: 1;
+	ubyte CondOutDownToIdle		: 1;
+	ubyte CondOutDownToOverDown	: 1;
+	ubyte CondOverDownToOutDown	: 1;
+	ubyte CondOverDownToOverUp	: 1;
+	ubyte CondOverUpToOverDown	: 1;
+	ubyte CondOverUpToIdle		: 1;
+	ubyte CondIdleToOverUp		: 1;
+	ubyte CondKeyPress		: 7;
+	ubyte CondOverDownToIdle	: 1;
+	do {
+		ACTIONRECORD Action;
+	} while (Action.ActionCode!=0x00);
+} BUTTONCONDACTION;
+
+typedef struct {
+	uint Pos44;
+	ushort LeftLevel;
+	ushort RightLevel;
+} SOUNDENVELOPE;
+
+typedef struct {
+	ubyte Reserved		: 2;
+	ubyte SyncStop		: 1;
+	ubyte SyncNoMultiple	: 1;
+	ubyte HasEnvelope	: 1;
+	ubyte HasLoops		: 1;
+	ubyte HasOutPoint	: 1;
+	ubyte HasInPoint	: 1;
+	if (HasInPoint) {
+		uint InPoint;
+	}
+	if (HasOutPoint) {
+		uint OutPoint;
+	}
+	if (HasLoops) {
+		ushort LoopCount;
+	}
+	if (HasEnvelope) {
+		ubyte EnvPoints;
+		SOUNDENVELOPE EnvelopeRecords[EnvPoints];
+	}
+} SOUNDINFO;
+
+typedef struct {
+	if (FontFlagsWideCodes) {
+		ushort FontKerningCode1;
+		ushort FontKerningCode2;
+	}
+	else {
+		ubyte FontKerningCode1;
+		ubyte FontKerningCode2;
+	}
+	BigEndian();
+	short FontKerningAdjustment;
+	LittleEndian();
+} KERNINGRECORD;
+
+
+
+
+/************
+ * SWF Tags *
+ ************/
+
+typedef struct {
+	BitfieldEnablePadding();
+	ushort TagType		: 10;
+	ushort TagLength	: 6;
+	if (TagLength==0x3F) {
+		int Length;
+	}
+} RECORDHEADER;
+
+typedef struct {
+	local int i;
+	BitfieldLeftToRight();
+
+	RECORDHEADER Header;
+	CurrentTag = Header.TagType;
+
+	if (Header.TagLength < 0x3f) {
+		SWFTagEnd = FTell() + Header.TagLength;
+	}
+	else {
+		SWFTagEnd = FTell() + Header.Length;
+	}
+
+	switch (Header.TagType) {
+		/************************
+		 *    DoAction Tags	*
+		 ************************/ 
+		case 59:			/* DoInitAction */
+			ushort SpriteID;
+		case 12:			/* DoAction */
+			do {
+				ACTIONRECORD ActionTag;
+			} while (ActionTag.ActionCode!=0x00);
+			break;
+		case 82:			/* DoABC */
+			ubyte ByteCode[SWFTagEnd - FTell()];
+			break;
+			
+
+		/************************
+		 *  Display List Tags	*
+		 ************************/ 
+		case 4:				/* PlaceObject */
+			ushort CharacterId;
+			ushort Depth;
+			MATRIX Matrix;
+			if (Header.TagLength == 0x3f) {
+				if (Header.Length < (sizeof(Matrix)+4)) {
+					CXFORM ColorTransform;
+				}
+			}
+			else if (Header.TagLength < (sizeof(Matrix)+4)) {
+					CXFORM ColorTransform;
+			}
+			break;
+		case 26:			/* PlaceObject2 */
+			ubyte PlaceFlagHasClipActions		: 1;
+			ubyte PlaceFlagHasClipDepth		: 1;
+			ubyte PlaceFlagHasName			: 1;
+			ubyte PlaceFlagHasRatio			: 1;
+			ubyte PlaceFlagHasColorTransform	: 1;
+			ubyte PlaceFlagHasMatrix		: 1;
+			ubyte PlaceFlagHasCharacter		: 1;
+			ubyte PlaceFlagMove			: 1;
+			ushort Depth;
+			if (PlaceFlagHasCharacter) ushort CharacterId;
+			if (PlaceFlagHasMatrix) MATRIX Matrix;
+			if (PlaceFlagHasColorTransform) CXFORMWITHALPHA ColorTransform;
+			if (PlaceFlagHasRatio) ushort Ratio;
+			if (PlaceFlagHasName) string Name;
+			if (PlaceFlagHasClipDepth) ushort ClipDepth;
+			if (PlaceFlagHasClipActions) CLIPACTIONS ClipActions;
+			break;
+		case 70:			/* PlaceObject3 */
+			ubyte PlaceFlagHasClipActions		: 1;
+			ubyte PlaceFlagHasClipDepth		: 1;
+			ubyte PlaceFlagHasName			: 1;
+			ubyte PlaceFlagHasRatio			: 1;
+			ubyte PlaceFlagHasColorTransform	: 1;
+			ubyte PlaceFlagHasMatrix		: 1;
+			ubyte PlaceFlagHasCharacter		: 1;
+			ubyte PlaceFlagMove			: 1;
+			ubyte Reserved				: 3;
+			ubyte PlaceFlagHasImage			: 1;
+			ubyte PlaceFlagHasClassName		: 1;
+			ubyte PlaceFlagHasCacheAsBitmap		: 1;
+			ubyte PlaceFlagHasBlendMode		: 1;
+			ubyte PlaceFlagHasFilterList		: 1;
+			ushort Depth;
+			if (PlaceFlagHasClassName 
+			|| (PlaceFlagHasImage && PlaceFlagHasCharacter)) {
+				string ClassName;
+			}
+			if (PlaceFlagHasCharacter) {
+				ushort CharacterId;
+			}
+			if (PlaceFlagHasMatrix) {
+				MATRIX Matrix;
+			}
+			if (PlaceFlagHasColorTransform) {
+				CXFORMWITHALPHA ColorTransform;
+			}
+			if (PlaceFlagHasRatio) {
+				ushort Ratio;
+			}
+			if (PlaceFlagHasName) {
+				string Name;
+			}
+			if (PlaceFlagHasFilterList) {
+				FILTERLIST SurfaceFilterList;
+			}
+			if (PlaceFlagHasBlendMode) {
+				ubyte BlendMode;
+			}
+			if (PlaceFlagHasClipActions) {
+				CLIPACTIONS ClipActions;
+			}
+			break;
+		case 5:				/* RemoveObject */
+			ushort CharacterId;
+			ushort Depth;
+			break;
+		case 28:			/* RemoveObject2 */
+			ushort Depth;
+			break;
+		case 1:				/* ShowFrame */
+			break;
+
+
+		/************************
+		 *     Control Tags	*
+		 ************************/ 
+		case 9:				/* SetBackgroundColor */
+			RGB BackgroundColor;
+			break;
+		case 43:			/* FrameLabel */
+			string Name;
+			if ((File.Header.Version>=6) && (SWFTagEnd>FTell())) {
+				ubyte NamedAnchor;
+			}
+			break;
+		case 24:			/* Protect */
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte Password[SWFTagEnd-FTell()];
+			}
+			break;
+		case 0:				/* End */
+			break;
+		case 56:			/* ExportAssets */
+			ushort Count;
+			for (i=0; i<Count; i++) {
+				ASSETS Asset;
+			}
+			break;
+		case 57:			/* ImportAssets */
+			string URL;
+			ushort Count;
+			for (i=0; i<Count; i++) {
+				ASSETS Asset;
+			}
+			break;
+		case 58:			/* EnableDebugger */
+			string Password;
+			break;
+		case 64:			/* EnableDebugger2 */
+			ushort Reserved;
+			string Password;
+			break;
+		case 65:			/* ScriptLimits */
+			ushort MaxRecursionDepth;
+			ushort ScriptTimeoutSeconds;
+			break;
+		case 66:			/* SetTabIndex */
+			ushort Depth;
+			ushort TabIndex;
+			break;
+		case 69:			/* FileAttributes */
+			uint Reserved		: 3;
+			uint HasMetadata	: 1;
+			uint ActionScript3	: 1;
+			uint Reserved2		: 2;
+			uint UseNetwork		: 1;
+			uint Reserved3		: 24;
+			break;
+		case 71:			/* ImportAsset2 */
+			string URL;
+			ubyte Reserved;
+			ubyte Reserved2;
+			ushort Count;
+			for (i=0; i<Count; i++) {
+				ASSETS Asset;
+			}
+			break;
+		case 76:			/* SymbolClass */
+			ushort NumSymbols;
+			for (i=0; i<NumSymbols; i++) {
+				ASSETS Symbol;
+			}
+			break;
+		case 77:			/* Metadata */
+			string Metadata;
+			break;
+		case 78:			/* DefineScalingGrid */
+			ushort CharacterId;
+			RECT Splitter;
+			break;
+		case 86:			/* DefineSceneAndFrameLabelData */
+			EncodedU32 SceneCount;
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte SceneAndFrameData[SWFTagEnd-FTell()];
+			}
+			break;
+
+
+		/************************
+		 *     Shape Tags	*
+		 ************************/ 
+		case 2:				/* DefineShape */
+			ushort ShapeId;
+			RECT ShapeBounds;
+			SHAPEWITHSTYLE Shapes;
+			break;
+		case 22:			/* DefineShape2 */
+			ushort ShapeId;
+			RECT ShapeBounds;
+			SHAPEWITHSTYLE Shapes;
+			break;
+		case 32:			/* DefineShape3 */
+			ushort ShapeId;
+			RECT ShapeBounds;
+			SHAPEWITHSTYLE Shapes;
+			break;
+		case 83:			/* DefineShape4 */
+			ushort ShapeId;
+			RECT ShapeBounds;
+			RECT EdgeBounds;
+			ubyte Reserved			: 6;
+			ubyte UsesNonScalingStrokes	: 1;
+			ubyte UsesScalingStrokes	: 1;
+			SHAPEWITHSTYLE Shapes;
+			break;
+
+
+		/************************
+		 *     Bitmap Tags	*
+		 ************************/ 
+		case 6:				/* DefineBits */
+			ushort CharacterId;
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte JPEGData[SWFTagEnd-FTell()];
+			}
+			break;
+		case 8:				/* JPEGTables */
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte JPEGData[SWFTagEnd-FTell()];
+			}
+			break;
+		case 21:			/* DefineBitsJPEG2 */
+			ushort CharacterId;
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte JPEGData[SWFTagEnd-FTell()];
+			}
+			break;
+		case 35:			/* DefineBitsJPEG3 */
+			ushort CharacterID;
+			uint AlphaDataOffset;
+			if (AlphaDataOffset) {
+				ubyte JPEGData[AlphaDataOffset];
+			}
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte BitmapAlphaData[SWFTagEnd-FTell()];
+			}
+			break;
+		case 20:			/* DefineBitsLossless */
+			ushort CharacterID;
+			ubyte BitmapFormat;
+			ushort BitmapWidth;
+			ushort BitmapHeight;
+			if (BitmapFormat == 3) {
+				ubyte BitmapColorTableSize;
+				ubyte ZlibBitmapData[SWFTagEnd-FTell()];
+			}
+			else if (BitmapFormat == 4 || BitmapFormat == 5) {
+				ubyte ZlibBitmapData[SWFTagEnd-FTell()];
+			}
+			break;
+		case 36:			/* DefineBitsLossless2 */
+			ushort CharacterID;
+			ubyte BitmapFormat;
+			ushort BitmapWidth;
+			ushort BitmapHeight;
+			if (BitmapFormat == 3) {
+				ubyte BitmapColorTableSize;
+				ubyte ZlibBitmapData[SWFTagEnd-FTell()];
+			}
+			else if (BitmapFormat == 4 || BitmapFormat == 5) {
+				ubyte ZlibBitmapData[SWFTagEnd-FTell()];
+			}
+			break;
+
+
+		/************************
+		 * Shape Morphing Tags	*
+		 ************************/ 
+		case 46:			/* DefineMorphShape */
+			ushort CharacterId;
+			RECT StartBounds;
+			RECT EndBounds;
+			uint Offset;
+			MORPHFILLSTYLEARRAY MorphFillStyles;
+			MORPHLINESTYLES MorphLineStyles;
+			SHAPE StartEdges;
+			SHAPE EndEdges;
+			break;
+		case 46:			/* DefineMorphShape2 */
+			ushort CharacterId;
+			RECT StartBounds;
+			RECT EndBounds;
+			RECT StartEdgeBounds;
+			RECT EndEdgeBounds;
+			ubyte Reserved			: 6;
+			ubyte UsesNonScalingStrokes	: 1;
+			ubyte UsesScalingStrokes	: 1;
+			uint Offset;
+			MORPHFILLSTYLEARRAY MorphFillStyles;
+			MORPHLINESTYLES MorphLineStyles;
+			SHAPE StartEdges;
+			SHAPE EndEdges;
+			break;
+
+
+		/************************
+		 *       Font Tags	*
+		 ************************/ 
+		case 10:			/* DefineFont */
+			ushort FontID;
+			ubyte Data[SWFTagEnd-FTell()];
+			break;
+		case 13:			/* DefineFontInfo */
+			ushort FontID;
+			ubyte FontNameLen;
+			BitfieldDisablePadding();
+			ubyte FontName[FontNameLen];
+			BitfieldEnablePadding();
+			ubyte FontFlagsReserved		: 2;
+			ubyte FontFlagsSmallText	: 1;
+			ubyte FontFlagsShiftJIS		: 1;
+			ubyte FontFlagsANSI		: 1;
+			ubyte FontFlagsBold		: 1;
+			ubyte FontFlagsWideCodes	: 1;
+			ubyte CodeTable[SWFTagEnd-FTell()];
+			break;
+		case 62:			/* DefineFontInfo2 */
+			ushort FontID;
+			ubyte FontNameLen;
+			BitfieldDisablePadding();
+			ubyte FontName[FontNameLen];
+			BitfieldEnablePadding();
+			ubyte FontFlagsReserved		: 2;
+			ubyte FontFlagsSmallText	: 1;
+			ubyte FontFlagsShiftJIS		: 1;
+			ubyte FontFlagsANSI		: 1;
+			ubyte FontFlagsBold		: 1;
+			ubyte FontFlagsWideCodes	: 1;
+			LANGCODE LanguageCode;
+			ubyte CodeTable[SWFTagEnd-FTell()];
+			break;
+		case 48:			/* DefineFont2 */
+		case 75:			/* DefineFont3 */
+			ushort FontID;
+			ubyte FontFlagsHasLayout	: 1;
+			ubyte FontFlagsShiftJIS		: 1;
+			ubyte FontFlagsSmallText	: 1;
+			ubyte FontFlagsANSI		: 1;
+			ubyte FontFlagsWideOffsets	: 1;
+			ubyte FontFlagsWideCodes	: 1;
+			ubyte FontFlagsItalic		: 1;
+			ubyte FontFlagsBold		: 1;
+			LANGCODE LanguageCode;
+			ubyte FontNameLen;
+			ubyte FontName[FontNameLen];
+			ushort NumGlyphs;
+			if (FontFlagsWideOffsets) {
+				if (NumGlyphs) {
+					uint OffsetTable[NumGlyphs];
+				}
+				uint CodeTableOffset;
+			}
+			else {
+				if (NumGlyphs) {
+					ushort OffsetTable[NumGlyphs];
+				}
+				ushort CodeTableOffset;
+			}
+			for (i=0; i<NumGlyphs; i++) {
+				SHAPE GlyphShapeTable;
+			}
+			if (FontFlagsWideCodes) {
+				if (NumGlyphs) {
+					ushort CodeTable[NumGlyphs];
+				}
+			}
+			else {
+				if (NumGlyphs) {
+					ubyte CodeTable[NumGlyphs];
+				}
+			}
+			if (FontFlagsHasLayout) {
+				short FontAscent;
+				short FontDescent;
+				short FontLeading;
+				short FontAdvanceTable[NumGlyphs];
+				for (i=0; i<NumGlyphs; i++) {
+					RECT FontBoundsTable;
+				}
+				ushort KerningCount;
+				for (i=0; i<KerningCount; i++) {
+			 		KERNINGRECORD FontKerningTable;
+				}
+			}
+			break;
+		case 73:			/* DefineFontAlignZones */
+			ushort FontID;
+			ubyte CSMTableHint	: 2;
+			ubyte Reserved		: 6;
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte ZoneTable[SWFTagEnd-FTell()];
+			}
+			break;	
+		case 88:			/* DefineFontName */
+			ushort FontID;
+			string FontName;
+			string FontCopyright;
+			break;
+		case 11:			/* DefineText */
+		case 33:			/* DefineText2 */
+			ushort CharacterID;
+			RECT TextBounds;
+			MATRIX TextMatrix;
+			ubyte GlyphBits;
+			ubyte AdvanceBits;
+			ubyte TextRecords[SWFTagEnd-FTell()];
+			break;	
+		case 37:			/* DefineEditText */
+			ushort CharacterID;
+			RECT Bounds;
+			ubyte HasText		: 1;
+			ubyte WordWrap		: 1;
+			ubyte Multiline		: 1;
+			ubyte Password		: 1;
+			ubyte ReadOnly		: 1;
+			ubyte HasTextColor	: 1;
+			ubyte HasMaxLength	: 1;
+			ubyte HasFont		: 1;
+			ubyte HasFontClass	: 1;
+			ubyte AutoSize		: 1;
+			ubyte HasLayout		: 1;
+			ubyte NoSelect		: 1;
+			ubyte Border		: 1;
+			ubyte WasStatic		: 1;
+			ubyte HTML		: 1;
+			ubyte UseOutlines	: 1;
+			if (HasFont) {
+				ushort FontID;
+			}
+			if (HasFontClass) {
+				string FontClass;
+			}
+			if (HasFont) {
+				ushort FontHeight;
+			}
+			if (HasTextColor) {
+				RGBA TextColor;
+			}
+			if (HasMaxLength) {
+				ushort MaxLength;
+			}
+			if (HasLayout) {
+				ubyte Align;
+				ushort LeftMargin;
+				ushort RightMargin;
+				ushort Indent;
+				ushort Leading;
+			}
+			string VariableName;
+			if (HasText) {
+				string InitialText;
+			}
+			break;
+		case 74:			/* CSMTextSettings */
+			ushort TextID;
+			ubyte UseFlashType	: 2;
+			ubyte GridFit		: 3;
+			ubyte Reserved		: 3;
+			float Thickness;
+			float Sharpness;
+			ubyte Reserved2;
+			break;
+
+
+		/************************
+		 *      Sound Tags	*
+		 ************************/ 
+		case 14:			/* DefineSound */
+			ushort SoundId;
+			ubyte SoundFormat	: 4;
+			ubyte SoundRate		: 2;
+			ubyte SoundSize		: 1;
+			ubyte SoundType		: 1;
+			uint SoundSampleCount;
+			ubyte SoundData[SWFTagEnd-FTell()];
+			break;
+		case 15:			/* StartSound */
+			ushort SoundId;
+			SOUNDINFO SoundInfo;
+			break;
+		case 89:			/* StartSound2 */
+			string SoundClassName;
+			SOUNDINFO SoundInfo;
+			break;
+		case 18:			/* SoundStreamHead */
+			ubyte Reserved			: 4;
+			ubyte PlaybackSoundRate		: 2;
+			ubyte PlaybackSoundSize		: 1;
+			ubyte PlaybackSoundType		: 1;
+			ubyte StreamSoundCompression	: 4;
+			ubyte StreamSoundRate		: 2;
+			ubyte StreamSoundSize		: 1;
+			ubyte StreamSoundType		: 1;
+			ushort StreamSoundSampleCount;
+			if (StreamSoundCompression==2) {
+				short LatencySeek;
+			}
+			break;
+		case 45:			/* SoundStreamHead2 */
+			ubyte Reserved			: 4;
+			ubyte PlaybackSoundRate		: 2;
+			ubyte PlaybackSoundSize		: 1;
+			ubyte PlaybackSoundType		: 1;
+			ubyte StreamSoundCompression	: 4;
+			ubyte StreamSoundRate		: 2;
+			ubyte StreamSoundSize		: 1;
+			ubyte StreamSoundType		: 1;
+			ushort StreamSoundSampleCount;
+			if (StreamSoundCompression==2) {
+				short LatencySeek;
+			}
+			break;
+		case 19:			/* SoundStreamBlock */
+			ubyte StreamSoundData[SWFTagEnd-FTell()];
+			break;
+
+
+		/************************
+		 *      Button Tags	*
+		 ************************/ 
+		case 7:				/* DefineButton */
+			ushort ButtonId;
+			do {
+				BUTTONRECORD Character;
+			} while (Character.ButtonReserved
+				|| Character.ButtonHasBlendMode
+				|| Character.ButtonHasFilterList
+				|| Character.ButtonStateHitTest
+				|| Character.ButtonStateDown
+				|| Character.ButtonStateOver
+				|| Character.ButtonStateUp);
+			do {
+				ACTIONRECORD Action;
+			} while (Action.ActionCode!=0x00);
+			break;
+		case 34:			/* DefineButton2 */
+			ushort ButtonId;
+			ubyte ReservedFlags	: 7;
+			ubyte TrackAsMenu	: 1;
+			local quad off_end = FTell();
+			ushort ActionOffset;
+			ubyte TODO[SWFTagEnd-FTell()]; // XXX
+			break;
+			while (FTell() < (off_end+ActionOffset)) {
+				BUTTONRECORD Character;
+			}
+			do {
+				BUTTONCONDACTION Action;
+			} while ((SWFTagEnd-FTell())>1);
+			break;
+		case 23:			/* DefineButtonCxform */
+			ushort ButtonId;
+			CXFORM ButtonColorTransform;
+			break;
+		case 17:			/* DefineButtonSound */
+			ushort ButtonId;
+			ushort ButtonSoundChar0;
+			if (ButtonSoundChar0) {
+				SOUNDINFO ButtonSoundInfo0;
+			}
+			ushort ButtonSoundChar1;
+			if (ButtonSoundChar1) {
+				SOUNDINFO ButtonSoundInfo1;
+			}
+			ushort ButtonSoundChar2;
+			if (ButtonSoundChar2) {
+				SOUNDINFO ButtonSoundInfo2;
+			}
+			ushort ButtonSoundChar3;
+			if (ButtonSoundChar3) {
+				SOUNDINFO ButtonSoundInfo3;
+			}
+			break;
+
+
+		/************************
+		 *     Sprite Tags	*
+		 ************************/ 
+		case 39:			/* DefineSprite */
+			ushort SpriteID;
+			ushort FrameCount;
+			ubyte Data[SWFTagEnd-FTell()];
+			break;
+
+
+		/************************
+		 *      Video Tags	*
+		 ************************/ 
+		case 60:			/* DefineVideoSteam */
+			ushort CharacterID;
+			ushort NumFrames;
+			ushort Width;
+			ushort Height;
+			ubyte VideoFlagsReserved	: 4;
+			ubyte VideoFlagsDeblocking	: 3;
+			ubyte VideoFlagsSmoothing	: 1;
+			ubyte CodecID;
+			break;
+		case 61:			/* VideoFrame */
+			ushort StreamID;
+			ushort FrameNum;
+			ubyte VideoData[SWFTagEnd-FTell()];
+			break;
+
+
+		/************************
+		 *   Binary Data Tags	*
+		 ************************/ 
+		case 87:			/* DefineBinaryData */
+			ushort Tag;
+			uint Reserved;
+			ubyte Data[SWFTagEnd-FTell()];
+			break;
+
+
+		/************************
+		 *   Undocumented Tags	*
+		 ************************/ 
+		case 41:	 		/* Serial Number */
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte Data[SWFTagEnd-FTell()];
+			}
+			break;	
+		case 63:	 		/* MX4 */
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte Data[SWFTagEnd-FTell()];
+			}
+			break;	
+		case 253:			/* Amayeta Encryption */
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte Data[SWFTagEnd-FTell()];
+			}
+			break;	
+		default:
+			if ((SWFTagEnd-FTell())>0) {
+				ubyte Data[SWFTagEnd-FTell()];
+			}
+			break;
+	}
+
+	if ((SWFTagEnd-FTell())>0) {
+		ubyte Padding[SWFTagEnd-FTell()];
+		if (Header.TagType != 83) {
+			Printf("PADDING: Tag padded to 0x%LXh\n", FTell());
+		}
+	}
+	else if ((SWFTagEnd-FTell())<0) {
+		if (Header.TagType != 48) {
+			Printf("TAG OVERRUN: Expected next tag at 0x%LXh\n", SWFTagEnd);
+		}
+	}
+
+} SWFTAG <read=GetTagType>;
+
+string GetTagType(SWFTAG &Tag)
+{
+	string result;
+	ubyte TagType = Tag.Header.TagType;
+
+	switch (TagType) {
+		/************************
+		 *    DoAction Tags	*
+		 ************************/ 
+		case 59:	return "DoInitAction";
+		case 12:	return "DoAction";
+		case 82:	return "DoABC";
+
+
+		/************************
+		 *  Display List Tags	*
+		 ************************/ 
+		case 4:		return "PlaceObject";
+		case 26:	return "PlaceObject2";
+		case 70:	return "PlaceObject3";
+		case 5:		return "RemoveObject";
+		case 28:	return "RemoveObject2";
+		case 1:		return "ShowFrame";
+
+
+		/************************
+		 *     Control Tags	*
+		 ************************/ 
+		case 9:		return "SetBackgroundColor";
+		case 43:	return "FrameLabel";
+		case 24:	return "Protect";
+		case 0:		return "End";
+		case 56:	return "ExportAssets";
+		case 57:	return "ImportAssets";
+		case 58:	return "EnableDebugger";
+		case 64:	return "EnableDebugger2";
+		case 65:	return "ScriptLimits";
+		case 66:	return "SetTabIndex";
+		case 69:	return "FileAttributes";
+		case 71:	return "ImportAsset2";
+		case 76:	return "SymbolClass";
+		case 77:	return "Metadata";
+		case 78:	return "DefineScalingGrid";
+		case 86:	return "DefineSceneAndFrameLabelData";
+
+
+		/************************
+		 *     Shape Tags	*
+		 ************************/ 
+		case 2:		return "DefineShape";
+		case 22:	return "DefineShape2";
+		case 32:	return "DefineShape3";
+		case 83:	return "DefineShape4";
+
+
+		/************************
+		 *     Bitmap Tags	*
+		 ************************/ 
+		case 6:		return "DefineBits";
+		case 8:		return "JPEGTables";
+		case 21:	return "DefineBitsJPEG2";
+		case 35:	return "DefineBitsJPEG3";
+		case 20:	return "DefineBitsLossless";
+		case 36:	return "DefineBitsLossless2";
+
+
+		/************************
+		 * Shape Morphing Tags	*
+		 ************************/ 
+		case 46:	return "DefineMorphShape";
+		case 84:	return "DefineMorphShape2";
+
+
+		/************************
+		 *       Font Tags	*
+		 ************************/ 
+		case 10:	return "DefineFont";
+		case 13:	return "DefineFontInfo";
+		case 62:	return "DefineFontInfo2";
+		case 48:	return "DefineFont2";
+		case 75:	return "DefineFont3";
+		case 73:	return "DefineFontAlignZones";
+		case 88:	return "DefineFontName";
+		case 11:	return "DefineText";
+		case 33:	return "DefineText2";
+		case 37:	return "DefineEditText";
+		case 74:	return "CSMTextSettings";
+
+
+		/************************
+		 *      Sound Tags	*
+		 ************************/ 
+		case 14:	return "DefineSound";
+		case 15:	return "StartSound";
+		case 89:	return "StartSound2";
+		case 18:	return "SoundStreamHead";
+		case 45:	return "SoundStreamHead2";
+		case 19:	return "SoundStreamBlock";
+
+
+		/************************
+		 *      Button Tags	*
+		 ************************/ 
+		case 7:		return "DefineButton";
+		case 34:	return "DefineButton2";
+		case 23:	return "DefineButtonCxform";
+		case 17:	return "DefineButtonSound";
+
+
+		/************************
+		 *     Sprite Tags	*
+		 ************************/ 
+		case 39:	return "DefineSprite";
+
+
+		/************************
+		 *      Video Tags	*
+		 ************************/ 
+		case 60:	return "DefineVideoSteam";
+		case 61:	return "VideoFrame";
+
+
+		/************************
+		 *   Binary Data Tags	*
+		 ************************/ 
+		case 87:	return "DefineBinaryData";
+
+
+		/************************
+		 *  Undocumented Tags	*
+		 ************************/ 
+		case 41:	return "Serial Number";
+		case 63:	return "MX4";
+		case 253:	return "Amayeta Encrypt";
+
+
+		default:	return "\0";
+	}
+	return "\0";
+}
+
+
+
+
+/*************************************************************
+ * SWF File
+ *
+ * This section of the template contains the header structure
+ * as well as the structure that defines the overall loop that
+ * will be executed.
+ *************************************************************/
+
+BitfieldLeftToRight();
+
+typedef struct {
+	SetBackColor(cLtGray);
+	uchar Signature[3]; 
+	uchar Version;
+	uint FileLength; 	
+	RECT Rect; 
+	BigEndian();
+	ushort FrameRate;	
+	LittleEndian();
+	ushort FrameCount; 
+
+	if (Signature[0] != 'F'
+	||  Signature[1] != 'W'
+	||  Signature[2] != 'S') 
+		Printf("WARNING: This is not a SWF file... (compressed?)");
+} SWFHEADER;
+
+typedef struct {
+	SWFHEADER Header;
+	do {
+		SWFTAG Tag;
+	} while (!FEof());
+} SWF;
+
+/************************
+ *  Start File Parsing  *
+ ************************/ 
+
+SWF File;
+
+

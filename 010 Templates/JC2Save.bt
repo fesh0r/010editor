@@ -1,0 +1,126 @@
+//--------------------------------------
+//--- 010 Editor v3.1.2 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+DisplayFormatHex();
+LittleEndian();
+
+typedef struct {
+	int16 Index;
+	int DataSize;
+
+	SetBackColor(0xa0ffa0);
+	byte d[DataSize];
+	SetBackColor(0xd0ffd0);
+} ChunkDataEntry <read=read_ChunkDataEntry,optimize=false>;
+
+string read_ChunkDataEntry(ChunkDataEntry &in) {
+	string out;
+	SPrintf(out, "[%d] %d", in.Index, in.DataSize);
+	return out;
+}
+
+typedef struct {
+	local quad cur_pos;
+
+	int ObjectID;
+	int InstanceID;
+
+	int EntryListOffset;
+	int EntryListSize;
+
+	cur_pos = FTell();
+	FSeek(EntryListOffset + 236032);
+
+	while (FTell() < EntryListOffset + EntryListSize + 236032) {
+		SetBackColor(0xd0ffd0);
+		ChunkDataEntry d;
+		SetBackColor(0xd0d0ff);
+	}
+
+	FSeek(cur_pos);
+} ChunkHeader <read=read_ChunkHeader,optimize=false>;
+
+string read_ChunkHeader(ChunkHeader &in) {
+	string out;
+	SPrintf(out, "%08x %08x-%08x %s", in.ObjectID, in.EntryListOffset + 236032, in.EntryListOffset + in.EntryListSize + 236032, NameLookup(in.ObjectID));
+	return out;
+}
+
+string NameLookup(int hash) {
+	string out;
+	SPrintf(out, "%04X", hash);
+
+	switch(hash) {
+		case 0x07763c5a:
+			return "WorldTime";
+		case 0x0d7295f3:
+			return "PDADatabase";
+		case 0x24543a6f:
+			return "SaveBitStorage";
+		case 0x269ab061:
+			return "CHeatSpawnManager";
+		case 0x2bba6b01:
+			return "CSpawnManager";
+		case 0x419aabd2:
+			return "HeatLevels";
+		case 0x56e9fcec:
+			return "Settlements";
+		case 0x5b5fba2f:
+			return "CSheldonService";
+		case 0x753ec2e1:
+			return "HeatSystem";
+		case 0x8315344b:
+			return "DripfeedManager";
+		case 0x834020bb:
+			return "player_vocals";
+		case 0x83a89d0d:
+			return "MissionSystem";
+		case 0x89215d85:
+			return "Weather";
+		case 0xb0f23d91:
+			return "ResourceItemHandler";
+		case 0xc944399d:
+			return "Difficulty";
+		case 0xccbcfa29:
+			return "TriggerSaveHandler";
+		case 0xdf107f97:
+			return "BlackmarketHook";
+		case 0xe9bb5fd1:
+			return "CPlayer";
+	}
+
+	return out;
+}
+
+typedef struct {
+	int unk;
+	int unk;
+	int TotalChaos <format=decimal>;
+	int TotalCash <format=decimal>;
+	int PercentDone <format=decimal>;
+	int unk;
+	uint32 PlayTime <format=decimal>;
+	int unk;
+	time_t TimeSaved;
+	int unk;
+	int Difficulty;
+	int unk;
+	int unk;
+	int unk;
+} SaveFileHeader;
+
+SetBackColor(0xc0c0c0);
+SaveFileHeader s;
+SetBackColor(0xe8e8e8);
+SaveFileHeader ignore[7];
+
+FSeek(512);
+SetBackColor(0xd0d0ff);
+int ch_cnt;
+ChunkHeader ch[ch_cnt];

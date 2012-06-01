@@ -1,0 +1,104 @@
+//--------------------------------------
+//--- 010 Editor v3.0.6 Binary Template
+//
+// File: SAVTemplate.bt
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+DisplayFormatHex();
+LittleEndian();
+
+// UNICODE support
+// Thanks to Graeme Sweet for pointing this out!
+int CalcUnicodeLen() {
+	local quad pos = FTell();
+	local quad base = pos;
+	while ((ReadUShort(pos) != 0) && (pos - base < 65535)) {
+		pos += 2;
+	}
+	return (pos - base + 2) / 2;
+}
+
+typedef struct {
+	UINT16 s[CalcUnicodeLen()];
+} WCHAR <read=WCHAR_read>;
+
+string WCHAR_read(WCHAR &z) {
+	int len = sizeof(z.s) / 2;
+	char s[len];
+	ConvertUNICODEToASCIIW(len, z.s, s);
+	return s;
+}
+
+typedef struct {
+	UINT32 Length;
+	if (Length > 0) {
+		string d;
+	}
+} UTSTRING <read=UTSTRING_read>;
+
+string UTSTRING_read(UTSTRING &in) {
+	if (in.Length > 0) {
+		return in.d;
+	}
+	else {
+		return "";
+	}
+}
+
+typedef struct {
+	UINT32 Start;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UTSTRING Name;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+	UINT32 Unknown;
+} ENTRY <read=ENTRY_read>;
+
+string ENTRY_read(ENTRY &in) {
+	return UTSTRING_read(in.Name);
+}
+
+LittleEndian();
+
+SetBackColor(0xe0e0e0);
+
+local int i;
+
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+
+//UTSTRING Name;
+
+UINT32 Unknown;
+UINT32 EntrySize;
+UINT32 Unknown;
+UINT32 EntryCount;
+
+for (i = 0; i < EntryCount; i++) {
+	ENTRY e;
+}
+
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;
+UINT32 Unknown;

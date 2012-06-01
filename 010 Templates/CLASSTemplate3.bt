@@ -1,0 +1,425 @@
+//-------------------------------------------------------------------------
+//--- 010 Editor v2.1 Binary Template
+//
+// $Id: CLASSTemplate.bt 65 2007-03-08 16:22:35Z kogrover $
+//
+//    File: CLASSTemplate.bt
+//  Author: Kevin O. Grover <kevin@kevingrover.net>
+// Purpose: A template for parsing Java Class (JVM) Files
+// Version: $Rev: 65 $
+// History:
+// 2007-02-26  kogrover   Original Version
+//
+// This template was written to the "The Java Virtual Machine Specification",
+// Second Edition, by Tim Lindholm, Frank Yellin.
+//
+// The details used to write this Template came mainly from Chapter 4:
+// "The <code>class</code> File Format".
+//
+// You can get the document from the Sun Java Pages
+//  JVM Spec (all Editions): http://java.sun.com/docs/books/jvms/
+//  JVM Spec (2nd Edition):
+//     http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html
+//-------------------------------------------------------------------------
+
+BigEndian();
+BitfieldRightToLeft();
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+
+typedef float u4f;
+typedef double u8f;
+
+typedef struct {
+	u2 A_PUBLIC:1;		// Declared public; may be accessed from outside its package.
+	u2 A_PRIVATE:1;		// Declared private; usable only within the defining class.
+	u2 A_PROTECTED:1;	// Declared protected; may be accessed within subclasses.
+	u2 A_STATIC:1;		// Declared static.
+	u2 A_FINAL:1;		// Declared final; no subclasses allowed.
+	u2 A_SUPER:1;		// Treat superclass methods specially when invoked by the invokespecial instruction.
+	u2 A_VOLATILE:1;	// Declared volatile; cannot be cached.
+	u2 A_TRANSIENT:1;	// Declared transient; not written or read by a persistent object manager.
+	u2 A_NATIVE:1;		// Declared native; implemented in a language other than Java.
+	u2 A_INTERFACE:1;	// Is an interface, not a class.
+	u2 A_ABSTRACT:1;	// Declared abstract; may not be instantiated.
+	u2 A_STRICT:1;		// Declared strictfp; floating-point mode is FP-strict
+	u2 A_SYNTHETIC:1;
+	u2 A_ANNOTATION:1;
+	u2 A_ENUM:1;
+	u2 A_RESERVED:1;
+} ACCESS_FLAGS /*<read=read_ACCESS_FLAGS>*/;
+/*
+string read_ACCESS_FLAGS(ACCESS_FLAGS &af) {
+	local string s = "";
+	if (af.A_PUBLIC) Strcat(s, "public ");
+	if (af.A_PRIVATE) Strcat(s, "private ");
+	if (af.A_PROTECTED) Strcat(s, "protected ");
+	if (af.A_STATIC) Strcat(s, "static ");
+	if (af.A_FINAL) Strcat(s, "final ");
+	if (af.A_SUPER) Strcat(s, "super ");
+	if (af.A_VOLATILE) Strcat(s, "volatile ");
+	if (af.A_TRANSIENT) Strcat(s, "transient ");
+	if (af.A_NATIVE) Strcat(s, "native ");
+	if (af.A_INTERFACE) Strcat(s, "interface ");
+	if (af.A_ABSTRACT) Strcat(s, "abstract ");
+	if (af.A_STRICT) Strcat(s, "strict ");
+	if (af.A_SYNTHETIC) Strcat(s, "synthetic ");
+	if (af.A_ANNOTATION) Strcat(s, "annotation ");
+	if (af.A_ENUM) Strcat(s, "enum ");
+	if (af.A_RESERVED) Strcat(s, "reserved ");
+	return s;
+}
+*/
+typedef enum <u1> eCP_CONST {
+	C_Utf8 =       1,
+	C_Integer =    3,
+	C_Float =      4,
+	C_Long =       5,
+	C_Double =     6,
+	C_Class =      7,
+	C_String =     8,
+	C_Fieldref =   9,
+	C_Methodref =  10,
+	C_InterfaceMethodref = 11,
+	C_NameAndType = 12,
+} CP_CONST;
+
+typedef struct {
+	SetBackColor(cLtGray);
+	CP_CONST tag;
+
+	SetBackColor(cSilver);
+	switch (tag) {
+		case C_Utf8:
+			SetBackColor(cLtPurple);
+			u2 length;
+			if (length) {
+				SetBackColor(cLtAqua);
+				char bytes[length];
+			}
+			break;
+
+		case C_Integer:
+			SetBackColor(cLtGreen);
+			u4 bytes <format=hex>;
+			break;
+
+		case C_Float:
+			SetBackColor(cLtGreen);
+			u4f bytes;
+			break;
+
+		case C_Long:
+			SetBackColor(cLtGreen);
+			u8 bytes <format=hex>;
+			break;
+
+		case C_Double:
+			SetBackColor(cLtGreen);
+			u8f bytes;
+			break;
+
+		case C_Class:
+			u2 name_index;
+			break;
+
+		case C_String:
+			u2 string_index;
+			break;
+
+		case C_Fieldref:
+		case C_Methodref:
+		case C_InterfaceMethodref:
+			u2 class_index;
+			u2 name_and_type_index;
+			break;
+
+		case C_NameAndType:
+			u2 name_index;
+			u2 descriptor_index;
+			break;
+
+		default:
+			SetBackColor(cRed);
+			local string s;
+			SPrintf(s, "Unknown 'constant_pool' tag: %d", tag);
+			Warning(s);
+			return -3;
+	}
+
+	SetBackColor(cNone);
+} cp_info </*read=read_full_cp_info,*/optimize=false>;
+/*
+string read_cp_info(local cp_info &i) {
+	local string s = "!!!";
+
+	switch (i.tag) {
+		case C_Utf8:
+			if (i.length) {
+				s = i.bytes;
+			}
+            else {
+                s = "";
+            }
+			break;
+
+		case C_Integer:
+			SPrintf(s, "0x%X", i.bytes);
+			break;
+
+        case C_Float:
+            SPrintf(s, "%0.ff", i.bytes);
+            break;
+
+		case C_Long:
+			SPrintf(s, "0x%LXL", i.bytes);
+			break;
+
+        case C_Double:
+            SPrintf(s, "%0.lfd", i.bytes);
+            break;
+
+        case C_Class:
+            if (c.constant_pool[i.name_index-1].tag == C_Utf8) {
+                SPrintf(s, "%s", read_cp_info(c.constant_pool[i.name_index-1]));
+            }
+            break;
+    
+        case C_String:
+            if (c.constant_pool[i.string_index-1].tag == C_Utf8) {
+                s = read_cp_info(c.constant_pool[i.string_index-1]);
+            }
+            break;
+
+		case C_Methodref:
+		case C_Fieldref:
+		case C_InterfaceMethodref:
+            if ((c.constant_pool[i.class_index-1].tag == C_Class) && (c.constant_pool[i.name_and_type_index-1].tag == C_NameAndType)) {
+                SPrintf(s, "%s %s", read_cp_info(c.constant_pool[i.class_index-1]), read_cp_info(c.constant_pool[i.name_and_type_index-1]));
+            }
+            break;
+
+        case C_NameAndType:
+            if ((c.constant_pool[i.name_index-1].tag == C_Utf8) && (c.constant_pool[i.descriptor_index-1].tag == C_Utf8)) {
+                SPrintf(s, "%s %s", read_cp_info(c.constant_pool[i.name_index-1]), read_cp_info(c.constant_pool[i.descriptor_index-1]));
+            }
+            break;
+	}
+
+	return s;
+}
+
+string read_full_cp_info(local cp_info &i) {
+    switch (i.tag) {
+		case C_Integer:
+        case C_Float:
+		case C_Long:
+        case C_Double:
+            return EnumToString(i.tag) + " " + read_cp_info(i);
+
+		case C_Utf8:
+        case C_String:
+            return EnumToString(i.tag) + " '" + read_cp_info(i) + "'";
+
+        default:
+            return EnumToString(i.tag) + " " + read_cp_info(i);
+    }
+}
+*/
+typedef struct {
+} cp_null;
+
+typedef struct {
+	u2 attribute_name_index /*<read=read_name>*/;
+	u4 attribute_length;
+	if (attribute_length) {
+		u1 info[attribute_length];
+	}
+} attribute_info </*read=read_attribute_info,*/optimize=false>;
+/*
+string read_attribute_info(local attribute_info &i) {
+    local string attribute_name = read_name(i.attribute_name_index);
+    
+    switch (attribute_name) {
+        case "ConstantValue":
+        case "SourceFile":
+            if (i.attribute_length == 2) {
+                return attribute_name + " " + read_full_cp_info(c.constant_pool[i.info[0] * 256 + i.info[1] - 1]);
+            }
+            else {
+                return attribute_name + " !!!";
+            }
+            
+        default:
+            return attribute_name;
+    }
+}
+*/
+typedef struct {
+	ACCESS_FLAGS access_flags;
+	u2 name_index /*<read=read_name>*/;
+	u2 descriptor_index /*<read=read_name>*/;
+	u2 attributes_count;
+	if (attributes_count) {
+		attribute_info attributes[attributes_count];
+	}
+} field_info </*read=read_field_info,*/optimize=false>;
+/*
+string read_name(local u2 &i) {
+    if (c.constant_pool[i-1].tag == C_Utf8) {
+        return read_cp_info(c.constant_pool[i-1]);
+    }
+    else {
+        return "!!!";
+    }
+}
+
+string read_field_info(local field_info &i) {
+    return read_ACCESS_FLAGS(i.access_flags) + read_name(i.descriptor_index) + " " + read_name(i.name_index);
+}
+
+string read_class(local u2 &i) {
+    if (i == 0) {
+        return "Object";
+    }
+    else if (c.constant_pool[i-1].tag == C_Class) {
+        return read_cp_info(c.constant_pool[i-1]);
+    }
+    else {
+        return "!!!";
+    }
+}
+*/
+typedef struct {
+	ACCESS_FLAGS access_flags;
+	u2 name_index /*<read=read_name>*/;
+	u2 descriptor_index /*<read=read_name>*/;
+	u2 attributes_count;
+	if (attributes_count) {
+		attribute_info attributes[attributes_count];
+	}
+} method_info </*read=read_method_info,*/optimize=false>;
+/*
+string read_method_info(local method_info &i) {
+    return read_ACCESS_FLAGS(i.access_flags) + read_name(i.name_index) + " " + read_name(i.descriptor_index);
+}
+*/
+typedef struct {
+	local int i = 0;
+	SetBackColor(cLtBlue);
+	u4 magic <format=hex>;
+	if (magic != 0xCAFEBABE) {
+		Warning("Incorrect Magic Number.  This is not a JVM Class.  Template Terminated.");
+		return -1;
+	}
+
+	u2 minor_version;
+	u2 major_version;
+
+	SetBackColor(cLtGray);
+	u2 constant_pool_count;
+	for (i = 0; i < constant_pool_count - 1; i++) {
+		cp_info constant_pool;
+		if (constant_pool.tag == C_Long || constant_pool.tag == C_Double) {
+            cp_null constant_pool;
+			i++;
+		}
+	};
+
+	SetBackColor(cLtBlue);
+	ACCESS_FLAGS access_flags;
+
+	SetBackColor(cLtBlue);
+	u2 this_class /*<read=read_class>*/;
+
+	SetBackColor(cLtBlue);
+	u2 super_class /*<read=read_class>*/;
+
+	SetBackColor(cLtGreen);
+	u2 interfaces_count;
+	for (i = 0; i < interfaces_count; i++) {
+		SetBackColor(cLtGreen);
+		u2 interfaces /*<read=read_class>*/;
+	}
+
+	SetBackColor(cLtYellow);
+	u2 fields_count;
+	for (i = 0; i < fields_count; i++) {
+		SetBackColor(cLtYellow);
+		field_info fields;
+	}
+
+	SetBackColor(cLtRed);
+	u2 methods_count;
+	for (i = 0; i < methods_count; i++) {
+		SetBackColor(cLtRed);
+		method_info methods;
+	}
+
+	SetBackColor(cLtAqua);
+	u2 attributes_count;
+	for (i = 0; i < attributes_count; i++) {
+		SetBackColor(cLtAqua);
+		attribute_info attributes;
+	}
+
+	SetBackColor(cNone);
+} ClassFile </*read=read_ClassFile,*/optimize=false>;
+/*
+string read_ClassFile(ClassFile &j) {
+	local string s;
+	SPrintf(s, "JVM class v%d.%d", j.major_version, j.minor_version);
+
+	local string jre_v = "";
+	local int ma = 1;
+	local int mi = 0;
+
+	switch(j.major_version) {
+		case 45:
+			if (j.minor_version > 3) {
+				mi = 1;
+			}
+			break;
+
+		case 46:
+			mi = 2;
+			break;
+
+		case 47:
+			mi = 3;
+			break;
+
+		case 48:
+			mi = 4;
+			break;
+
+		case 49:
+			mi = 5;
+			break;
+
+		case 50:
+			mi = 6;
+			break;
+
+		default:
+			ma = 0;
+			mi = 0;
+	}
+
+	if (ma || mi) {
+		SPrintf(jre_v, " (Java %d.%d)", ma, mi);
+		s += jre_v;
+	}
+
+	return s;
+}
+*/
+struct ClassFile c;
+
+if (!FEof()) {
+	byte trailing_bytes[FileSize()-FTell()];
+	Warning("Trailing bytes in file.");
+}
