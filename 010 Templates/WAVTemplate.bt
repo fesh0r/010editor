@@ -94,7 +94,7 @@ typedef struct
                  short channels[ format.wChannels ];
             else if( format.wBitsPerSample == 32 )
                  int   channels[ format.wChannels ];
-        } samples[ chunkSize / (int)format.wBlockAlign ] <optimize=false>;
+        } samples[ chunkSize / (int)format.wBlockAlign ];
     }
 
     // Padding so the next chunk starts on an even byte
@@ -177,7 +177,7 @@ SetBackColor( cLtPurple );
 WAVRIFFHEADER header;
 
 // Check for valid header
-if( header.groupID != "RIFF" /*|| header.riffType != "WAVE" */)
+if( header.groupID != "RIFF" || header.riffType != "WAVE" )
 {
     Warning( "File is not a valid wave file. Template stopped." );
     return -1;

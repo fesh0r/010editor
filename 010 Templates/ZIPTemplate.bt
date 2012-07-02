@@ -50,10 +50,9 @@ typedef struct {
         uchar    frExtraField[ frExtraFieldLength ];
 
     // Compressed data
-    SetBackColor( cLtRed );
+    SetBackColor( cNone );
     if( frCompressedSize > 0 )
         uchar    frData[ frCompressedSize ];
-    SetBackColor( cNone );
 
 } ZIPFILERECORD <read=ReadZIPFILERECORD, write=WriteZIPFILERECORD>;
 

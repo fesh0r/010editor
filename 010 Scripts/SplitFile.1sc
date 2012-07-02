@@ -3,7 +3,7 @@
 //
 // File:     SplitFile.1sc
 // Author:   SweetScape Software
-// Revision: 1.0
+// Revision: 1.1
 // Purpose:  Split a large file into a number of 
 //     smaller files. The user must specify the 
 //     number of bytes per created file, and also 
@@ -12,6 +12,8 @@
 //     in it (e.g. 'c:\temp\file.bmp.001', or 
 //     'c:\temp\file0000.dat').
 //--------------------------------------
+RequiresVersion( 4.0 );
+RequiresFile();
 
 // Define local variables
 const int DEFAULT_FILE_SIZE = 1000000;
@@ -19,24 +21,16 @@ quad filesize, size, pos, blocksize;
 int  filecount, len, i, j, digitpos, filenum, done;
 char filename[512], str[128];
 
-// Check that a file is open
-if( FileCount() == 0 )
-{
-    MessageBox( idOk, "SplitFile", "SplitFile can only be executed when a file is loaded." );
-    return -1;
-}
-
 // Input size of each file
 SPrintf( str, "%d", DEFAULT_FILE_SIZE );
-filesize = InputNumber( "SplitFile", "Enter the size in bytes of each file to create:", str );
+filesize = InputNumber( GetScriptName(), "Enter the size in bytes of each file to create:", str );
 if( filesize == BAD_VALUE )
     return -1;
-
 
 // Check that size is valid
 if( filesize <= 0 )
 {
-    MessageBox( idOk, "SplitFile", "Invalid file size." );
+    MessageBox( idOk, GetScriptName(), "Invalid file size." );
     return -1;
 }
 
@@ -44,13 +38,13 @@ if( filesize <= 0 )
 filecount = (int)Ceil( FileSize() / (double)filesize );
 if( filecount == 1 )
 {
-    MessageBox( idOk, "SplitFile", "File was not split into any pieces. Script stopped." );
+    MessageBox( idOk, GetScriptName(), "File was not split into any pieces. Script stopped." );
     return -1;
 }
 else if( filecount > 20 )
 {
     // Ask for confirmation if we will generate a lot of files
-    if( MessageBox( idYes | idNo, "SplitFile", "File will be split into %d parts. Are you sure you want to continue?", filecount ) == idNo )
+    if( MessageBox( idYes | idNo, GetScriptName(), "File will be split into %d parts. Are you sure you want to continue?", filecount ) == idNo )
         return -1;
 }
 
@@ -63,7 +57,7 @@ if( len == 0 )
 // Check that file is not the same as the source
 if( filename == GetFileName() )
 {
-    MessageBox( idOk, "SplitFile", "File to write must be different than the source filename." );
+    MessageBox( idOk, GetScriptName(), "File to write must be different than the source filename." );
     return -1;
 }
 
@@ -76,7 +70,7 @@ while( (i >= 0) && (filename[i] != '\\') && (filename[i] != '/') &&
 }
 if( (i < 0) || (filename[i] < '0') || (filename[i] > '9') )
 {
-    MessageBox( idOk, "SplitFile", "File name must contain numbers. Script stopped." );
+    MessageBox( idOk, GetScriptName(), "File name must contain numbers. Script stopped." );
     return -1;
 }
 digitpos = i;
@@ -91,13 +85,13 @@ while( size > 0 )
     blocksize = Min( filesize, size );
     SetSelection( pos, blocksize );
     CopyToClipboard();
-    FileNew();
+    FileNew( "Hex" );
     PasteFromClipboard();
 
     // Save the new file to disk
     if( FileSave( filename ) < 0 )
     {
-        MessageBox( idOk, "SplitFile", "An error occured writing file '%s' of size %Ld.", filename, blocksize );
+        MessageBox( idOk, GetScriptName(), "An error occured writing file '%s' of size %Ld.", filename, blocksize );
         return -1;
     }
     FileClose();
@@ -149,4 +143,4 @@ CopyToClipboard();
 SetSelection( 0, 0 );
 
 // Show status message
-MessageBox( idOk, "SplitFile", "Successfully split file into %d parts.", filecount );
+MessageBox( idOk, GetScriptName(), "Successfully split file into %d parts.", filecount );

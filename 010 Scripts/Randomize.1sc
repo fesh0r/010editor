@@ -3,13 +3,15 @@
 //
 // File:     Randomize.1sc
 // Author:   SweetScape Software
-// Revision: 2.0
+// Revision: 2.1
 // Purpose:  Randomizes all the selected
 //    bytes. If not bytes are selected,
 //    the whole file is randomized. A
 //    minimum and maximum byte value 
 //    can be entered.
 //-----------------------------------
+RequiresVersion( 4.0 );
+RequiresFile();
 
 // Define variables
 const int BLOCK_SIZE = 1024;
@@ -17,20 +19,13 @@ uchar buffer[ BLOCK_SIZE ];
 quad  size, pos;
 int   i, bufsize, minvalue, maxvalue, range;
 
-// Check that a file is open
-if( FileCount() == 0 )
-{
-    MessageBox( idOk, "Randomize", "Randomize can only be executed when a file is loaded." );
-    return -1;
-}
-
 // Input minimum value
-minvalue = InputNumber( "Randomize", "Enter a minimum byte value:", "0" );
+minvalue = InputNumber( GetScriptName(), "Enter a minimum byte value:", "0" );
 if( minvalue == BAD_VALUE )
     return -1;
 
 // Input maximum value
-maxvalue = InputNumber( "Randomize", "Enter a maximum byte value:", "255" );
+maxvalue = InputNumber( GetScriptName(), "Enter a maximum byte value:", "255" );
 if( maxvalue == BAD_VALUE )
     return -1;
 
@@ -38,7 +33,7 @@ if( maxvalue == BAD_VALUE )
 range = maxvalue - minvalue;
 if( range <= 0 )
 {
-    MessageBox( idOk, "Randomize", "Invalid minimum and maximum." );
+    MessageBox( idOk, GetScriptName(), "Invalid minimum and maximum." );
     return -1;
 }
 

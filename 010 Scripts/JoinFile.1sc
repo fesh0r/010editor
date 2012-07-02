@@ -3,7 +3,7 @@
 //
 // File:     JoinFile.1sc
 // Author:   SweetScape Software
-// Revision: 1.0
+// Revision: 1.1
 // Purpose:  Join a number of files that have been
 //     split back into the original file. Open the
 //     first file in the file sequence with the
@@ -12,6 +12,7 @@
 //     (e.g. 'c:\temp\file.bmp.001'). The joined 
 //     file will be created as a new file.
 //--------------------------------------
+RequiresVersion( 4.0 );
 
 // Define local variables
 int  filecount, len, i, j, digitpos, done;
@@ -32,13 +33,13 @@ while( (i >= 0) && (filename[i] != '\\') && (filename[i] != '/') &&
 }
 if( (i < 0) || (filename[i] < '0') || (filename[i] > '9') )
 {
-    MessageBox( idOk, "JoinFile", "File name must contain numbers. Script stopped." );
+    MessageBox( idOk, GetScriptName(), "File name must contain numbers. Script stopped." );
     return -1;
 }
 digitpos = i;
 
 // Create a new file to hold the joined file
-FileNew();
+FileNew( "Hex" );
 
 // Separate file into a number of smaller files
 filecount = 0;
@@ -47,7 +48,7 @@ while( FileExists( filename ) )
     // Insert file into current file
     if( InsertFile( filename, FileSize() ) < 0 )
     {
-        MessageBox( idOk, "JoinFile", "An error occured opening file '%s'.", filename );
+        MessageBox( idOk, GetScriptName(), "An error occured opening file '%s'.", filename );
         return -1;
     }
 
@@ -93,4 +94,4 @@ while( FileExists( filename ) )
 // Show status message
 SetSelection( 0, 0 );
 SetCursorPos( 0 );
-MessageBox( idOk, "JoinFile", "Joined %d files into a file of %Ld bytes.", filecount, FileSize() );
+MessageBox( idOk, GetScriptName(), "Joined %d files into a file of %Ld bytes.", filecount, FileSize() );
