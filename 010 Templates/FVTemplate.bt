@@ -1,0 +1,114 @@
+//--------------------------------------
+//--- 010 Editor v4.0.1 Binary Template
+//
+// File: FVTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: UEFI FV firmware file
+//--------------------------------------
+
+
+typedef ubyte UINT8;
+typedef byte INT8;
+
+
+typedef struct {
+	UINT32 Data1;
+	UINT16 Data2;
+	UINT16 Data3;
+	BigEndian();
+	UINT64 Data4;
+	LittleEndian();
+} GUID <read=read_GUID>;
+
+string read_GUID(GUID &in) {
+	string out;
+	local UINT32 Data4a = in.Data4 >> 32;
+	local UINT32 Data4b = in.Data4 & 0xFFFFFFFF;
+	SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
+		in.Data1, in.Data2, in.Data3, Data4a >> 16, Data4a & 0xFFFF, Data4b);
+	return out;
+}
+
+
+typedef struct {
+	BitfieldDisablePadding();
+
+	int EFI_FVB_READ_DISABLED_CAP: 1;
+	int EFI_FVB_READ_ENABLED_CAP: 1;
+	int EFI_FVB_READ_STATUS: 1;
+	int EFI_FVB_WRITE_DISABLED_CAP: 1;
+	int EFI_FVB_WRITE_ENABLED_CAP: 1;
+	int EFI_FVB_WRITE_STATUS: 1;
+	int EFI_FVB_LOCK_CAP: 1;
+	int EFI_FVB_LOCK_STATUS: 1;
+	int EFI_FVB_RES_1: 1;
+	int EFI_FVB_STICKY_WRITE: 1;
+	int EFI_FVB_MEMORY_MAPPED: 1;
+	int EFI_FVB_ERASE_POLARITY: 1;
+	int EFI_FVB_RES_2: 1;
+	int EFI_FVB_RES_3: 1;
+	int EFI_FVB_RES_4: 1;
+	int EFI_FVB_ALIGNMENT_CAP: 1;
+	int EFI_FVB_ALIGNMENT_2: 1;
+	int EFI_FVB_ALIGNMENT_4: 1;
+	int EFI_FVB_ALIGNMENT_8: 1;
+	int EFI_FVB_ALIGNMENT_16: 1;
+	int EFI_FVB_ALIGNMENT_32: 1;
+	int EFI_FVB_ALIGNMENT_64: 1;
+	int EFI_FVB_ALIGNMENT_128: 1;
+	int EFI_FVB_ALIGNMENT_256: 1;
+	int EFI_FVB_ALIGNMENT_512: 1;
+	int EFI_FVB_ALIGNMENT_1K: 1;
+	int EFI_FVB_ALIGNMENT_2K: 1;
+	int EFI_FVB_ALIGNMENT_4K: 1;
+	int EFI_FVB_ALIGNMENT_8K: 1;
+	int EFI_FVB_ALIGNMENT_16K: 1;
+	int EFI_FVB_ALIGNMENT_32K: 1;
+	int EFI_FVB_ALIGNMENT_64K: 1;
+
+	BitfieldEnablePadding();
+} EFI_FVB_ATTRIBUTES;
+
+
+typedef struct {
+	UINT32 NumBlocks;
+	UINT32 Length;
+} EFI_FV_BLOCK_MAP_ENTRY <read=read_EFI_FV_BLOCK_MAP_ENTRY>;
+
+string read_EFI_FV_BLOCK_MAP_ENTRY(EFI_FV_BLOCK_MAP_ENTRY &in) {
+	string out;
+	if (in.NumBlocks == 0 && in.Length == 0) {
+		SPrintf(out, "END");
+	}
+	else {
+		SPrintf(out, "0x%X 0x%X", in.NumBlocks, in.Length);
+	}
+	return out; 
+}
+
+
+typedef struct {
+	UINT8 ZeroVector[16];
+	GUID FileSystemGuid;
+	UINT64 FvLength;
+	char Signature[4];
+	EFI_FVB_ATTRIBUTES Attributes;
+	UINT16 HeaderLength;
+	UINT16 Checksum;
+	UINT16 ExtHeaderOffset;
+	UINT8 Reserved;
+	UINT8 Revision;
+	local UINT64 cur_entry = 0;
+	do {
+		cur_entry = ReadQuad(FTell());
+		EFI_FV_BLOCK_MAP_ENTRY BlockMap;
+	} while (cur_entry != 0);
+} EFI_FIRMWARE_VOLUME_HEADER;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+SetBackColor(0xe0e0e0);
+EFI_FIRMWARE_VOLUME_HEADER h;

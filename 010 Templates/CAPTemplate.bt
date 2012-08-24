@@ -1,0 +1,104 @@
+//--------------------------------------
+//--- 010 Editor v4.0.1 Binary Template
+//
+// File: CAPTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: UEFI Cap firmware file
+//--------------------------------------
+
+
+typedef ubyte UINT8;
+typedef byte INT8;
+
+
+typedef struct {
+	UINT32 Data1;
+	UINT16 Data2;
+	UINT16 Data3;
+	BigEndian();
+	UINT64 Data4;
+	LittleEndian();
+} GUID <read=read_GUID>;
+
+string read_GUID(GUID &in) {
+	string out;
+	local UINT32 Data4a = in.Data4 >> 32;
+	local UINT32 Data4b = in.Data4 & 0xFFFFFFFF;
+	SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
+		in.Data1, in.Data2, in.Data3, Data4a >> 16, Data4a & 0xFFFF, Data4b);
+	return out;
+}
+
+
+typedef struct {
+	UINT32 Offset;
+
+	if (Offset) {
+		local quad pos = FTell();
+		FSeek(Offset);
+		SetBackColor(0xc0c0ff);
+		while (ReadShort(FTell())) {
+			wstring name;
+		}
+		SetBackColor(0xc0c0e0);
+		UINT16 end;
+		FSeek(pos);
+	}
+} EFI_STRING_OFFSET <read=read_EFI_STRING_OFFSET>;
+
+string read_EFI_STRING_OFFSET(EFI_STRING_OFFSET &in) {
+	return WStringToUTF8(in.name);
+}
+
+
+typedef struct {
+	GUID CapsuleGuid;
+	UINT32 HeaderSize;
+	UINT32 Flags;
+	UINT32 CapsuleImageSize;
+	if (HeaderSize > 0x1c) {
+		UINT32 SequenceNumber;
+		GUID InstanceId;
+		UINT32 OffsetToSplitInformation;
+		UINT32 OffsetToCapsuleBody;
+		UINT32 OffsetToOemDefinedHeader;
+		EFI_STRING_OFFSET OffsetToAuthorInformation;
+		EFI_STRING_OFFSET OffsetToRevisionInformation;
+		EFI_STRING_OFFSET OffsetToShortDescription;
+		EFI_STRING_OFFSET OffsetToLongDescription;
+		UINT32 OffsetToApplicableDevices;
+	}
+	else {
+		local UINT32 OffsetToCapsuleBody=0;
+		local UINT32 OffsetToOemDefinedHeader=0;
+	}
+} EFI_CAPSULE_HEADER;
+
+
+typedef struct {
+	GUID OemGuid;
+	UINT32 HeaderSize;
+
+	if (HeaderSize > (16 + 4)) {
+		SetBackColor(0xc0e0c0);
+		UINT8 Data[HeaderSize - (16 + 4)];
+	}
+} EFI_CAPSULE_OEM_HEADER;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+SetBackColor(0xe0e0e0);
+EFI_CAPSULE_HEADER h;
+
+if (h.OffsetToOemDefinedHeader) {
+	FSeek(h.OffsetToOemDefinedHeader);
+	SetBackColor(0xc0ffc0);
+	EFI_CAPSULE_OEM_HEADER ho;
+}
+
+if (h.OffsetToCapsuleBody) {
+	FSeek(h.OffsetToCapsuleBody);
+}
