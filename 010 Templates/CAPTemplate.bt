@@ -23,10 +23,14 @@ typedef struct {
 
 string read_GUID(GUID &in) {
 	string out;
-	local UINT32 Data4a = in.Data4 >> 32;
-	local UINT32 Data4b = in.Data4 & 0xFFFFFFFF;
+	local UINT32 d1 = in.Data1;
+	local UINT32 d2 = in.Data2;
+	local UINT32 d3 = in.Data3;
+	local UINT64 d4 = in.Data4;
+	local UINT32 d4a = d4 >> 32;
+	local UINT32 d4b = d4 & 0xFFFFFFFF;
 	SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
-		in.Data1, in.Data2, in.Data3, Data4a >> 16, Data4a & 0xFFFF, Data4b);
+		d1, d2, d3, d4a >> 16, d4a & 0xFFFF, d4b);
 	return out;
 }
 
@@ -48,15 +52,49 @@ typedef struct {
 } EFI_STRING_OFFSET <read=read_EFI_STRING_OFFSET>;
 
 string read_EFI_STRING_OFFSET(EFI_STRING_OFFSET &in) {
-	return WStringToUTF8(in.name);
+	if (in.Offset) {
+		return WStringToUTF8(in.name);
+	}
+	else {
+		return "";
+	}
+}
+
+
+typedef struct {
+	local UINT32 value = ReadUInt(FTell());
+	BitfieldDisablePadding();
+
+// 0x00000001
+int EFI_CAPSULE_HEADER_FLAG_SETUP: 1;
+
+int CAPSULE_FLAGS_res1: 15 <hidden=true>;
+
+// 0x00010000
+int CAPSULE_FLAGS_PERSIST_ACROSS_RESET: 1;
+
+// 0x00020000
+int CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE: 1;
+
+int CAPSULE_FLAGS_res2: 14 <hidden=true>;
+	
+	BitfieldEnablePadding();
+} EFI_CAPSULE_HEADER_FLAGS <read=read_EFI_CAPSULE_HEADER_FLAGS>;
+
+string read_EFI_CAPSULE_HEADER_FLAGS(EFI_CAPSULE_HEADER_FLAGS &in) {
+	string out;
+	SPrintf(out, "%Xh", in.value);
+	return out;
 }
 
 
 typedef struct {
 	GUID CapsuleGuid;
 	UINT32 HeaderSize;
-	UINT32 Flags;
+	Assert(HeaderSize == 0x1c || HeaderSize == 0x50, "Unknown HeaderSize");
+	EFI_CAPSULE_HEADER_FLAGS Flags;
 	UINT32 CapsuleImageSize;
+	//Assert(CapsuleImageSize == FileSize(), "Invalid CapsuleImageSize");
 	if (HeaderSize > 0x1c) {
 		UINT32 SequenceNumber;
 		GUID InstanceId;
@@ -73,7 +111,11 @@ typedef struct {
 		local UINT32 OffsetToCapsuleBody=0;
 		local UINT32 OffsetToOemDefinedHeader=0;
 	}
-} EFI_CAPSULE_HEADER;
+} EFI_CAPSULE_HEADER <read=read_EFI_CAPSULE_HEADER>;
+
+string read_EFI_CAPSULE_HEADER(EFI_CAPSULE_HEADER &in) {
+	return read_GUID(in.CapsuleGuid);
+}
 
 
 typedef struct {
@@ -96,9 +138,12 @@ EFI_CAPSULE_HEADER h;
 if (h.OffsetToOemDefinedHeader) {
 	FSeek(h.OffsetToOemDefinedHeader);
 	SetBackColor(0xc0ffc0);
-	EFI_CAPSULE_OEM_HEADER ho;
+	EFI_CAPSULE_OEM_HEADER oh;
 }
 
 if (h.OffsetToCapsuleBody) {
 	FSeek(h.OffsetToCapsuleBody);
 }
+
+SetBackColor(0xa0a0a0);
+UINT8 data[h.CapsuleImageSize - FTell()];
