@@ -22,15 +22,29 @@ typedef struct {
 } GUID <read=read_GUID>;
 
 string read_GUID(GUID &in) {
-	string out;
+	local string out;
 	local UINT32 d1 = in.Data1;
 	local UINT32 d2 = in.Data2;
 	local UINT32 d3 = in.Data3;
 	local UINT64 d4 = in.Data4;
 	local UINT32 d4a = d4 >> 32;
 	local UINT32 d4b = d4 & 0xFFFFFFFF;
-	SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
-		d1, d2, d3, d4a >> 16, d4a & 0xFFFF, d4b);
+	     if (d1 == 0xa7717414 && d2 == 0xc616 && d3 == 0x4977 && d4a == 0x94208447 && d4b == 0x12a735bf) {
+		out = "EFI_CERT_TYPE_RSA2048_SHA256_GUID";
+	}
+	else if (d1 == 0x3b6686bd && d2 == 0x0d76 && d3 == 0x4030 && d4a == 0xb70eb551 && d4b == 0x9e2fc5a0) {
+		out = "EFI_CAPSULE_GUID";
+	}
+	else if (d1 == 0x4a3ca68b && d2 == 0x7723 && d3 == 0x48fb && d4a == 0x803d578c && d4b == 0xc1fec44d) {
+		out = "EFI_ASUS_CAPSULE_GUID";
+	}
+	else if (d1 == 0x51aa59de && d2 == 0xfdf2 && d3 == 0x4ea3 && d4a == 0xbc63875f && d4b == 0xb7842ee9) {
+		out = "EFI_HASH_ALGORITHM_SHA256_GUID";
+	}
+	else {
+		SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
+			d1, d2, d3, d4a >> 16, d4a & 0xFFFF, d4b);
+	}
 	return out;
 }
 
@@ -82,7 +96,7 @@ int CAPSULE_FLAGS_res2: 14 <hidden=true>;
 } EFI_CAPSULE_HEADER_FLAGS <read=read_EFI_CAPSULE_HEADER_FLAGS>;
 
 string read_EFI_CAPSULE_HEADER_FLAGS(EFI_CAPSULE_HEADER_FLAGS &in) {
-	string out;
+	local string out;
 	SPrintf(out, "%Xh", in.value);
 	return out;
 }
@@ -129,6 +143,29 @@ typedef struct {
 } EFI_CAPSULE_OEM_HEADER;
 
 
+typedef struct {
+	GUID HashType;
+	UINT8 PublicKey[256];
+	UINT8 Signature[256];
+} EFI_CERT_TYPE_RSA2048_SHA256;
+
+typedef struct {
+	UINT32 dwLength;
+	UINT16 wRevision;
+	enum <UINT16> {
+WIN_CERT_TYPE_PKCS_SIGNED_DATA = 0x002,
+WIN_CERT_TYPE_EFI_PKCS115 = 0x0EF0,
+WIN_CERT_TYPE_EFI_GUID = 0xEF1
+	} wCertificateType;
+
+	if (wCertificateType == WIN_CERT_TYPE_EFI_GUID) {
+		GUID CertType;
+		if (read_GUID(CertType) == "EFI_CERT_TYPE_RSA2048_SHA256_GUID") {
+			EFI_CERT_TYPE_RSA2048_SHA256 Cert;
+		}
+	}
+} WIN_CERTIFICATE;
+
 DisplayFormatHex();
 LittleEndian();
 
@@ -145,5 +182,24 @@ if (h.OffsetToCapsuleBody) {
 	FSeek(h.OffsetToCapsuleBody);
 }
 
+if (read_GUID(h.CapsuleGuid) == "EFI_ASUS_CAPSULE_GUID") {
+	SetBackColor(0xc0c0c0);
+	UINT16 RomOffset;
+	UINT16 UnknownOffset;
+
+	SetBackColor(0xc0c0ff);
+	WIN_CERTIFICATE c;
+	EFI_CERT_TYPE_RSA2048_SHA256 c2;
+
+	if (UnknownOffset) {
+		FSeek(UnknownOffset);
+		SetBackColor(0xffc0c0);
+		UINT32 stuff[(RomOffset - UnknownOffset) >> 2];
+	}
+
+	FSeek(RomOffset);
+}
+
 SetBackColor(0xa0a0a0);
 UINT8 data[h.CapsuleImageSize - FTell()];
+

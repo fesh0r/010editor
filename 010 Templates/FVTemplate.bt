@@ -22,7 +22,7 @@ typedef struct {
 } UINT24 <read=read_UINT24>;
 
 string read_UINT24(UINT24 &in) {
-	string out;
+	local string out;
 	SPrintf(out, "%06Xh", in.v);
 	return out;
 }
@@ -38,7 +38,7 @@ typedef struct {
 } GUID <read=read_GUID>;
 
 string read_GUID(GUID &in) {
-	string out;
+	local string out;
 	local UINT32 d1 = in.Data1;
 	local UINT32 d2 = in.Data2;
 	local UINT32 d3 = in.Data3;
@@ -120,7 +120,7 @@ int EFI_FVB_ALIGNMENT: 16;
 } EFI_FVB_ATTRIBUTES <read=read_EFI_FVB_ATTRIBUTES>;
 
 string read_EFI_FVB_ATTRIBUTES(EFI_FVB_ATTRIBUTES &in) {
-	string out;
+	local string out;
 	SPrintf(out, "%Xh", in.value);
 	return out;
 }
@@ -133,7 +133,7 @@ typedef struct {
 } EFI_FV_BLOCK_MAP_ENTRY <read=read_EFI_FV_BLOCK_MAP_ENTRY>;
 
 string read_EFI_FV_BLOCK_MAP_ENTRY(EFI_FV_BLOCK_MAP_ENTRY &in) {
-	string out;
+	local string out;
 	if (in.NumBlocks == 0 && in.Length == 0) {
 		SPrintf(out, "END");
 	}
@@ -203,7 +203,7 @@ int FFS_ATTRIB_res2: 1 <hidden=true>;
 } EFI_FFS_FILE_ATTRIBUTES <read=read_EFI_FFS_FILE_ATTRIBUTES>;
 
 string read_EFI_FFS_FILE_ATTRIBUTES(EFI_FFS_FILE_ATTRIBUTES &in) {
-	string out;
+	local string out;
 	SPrintf(out, "%Xh", in.value);
 	return out;
 }
@@ -234,7 +234,7 @@ EFI_SECTION_SMM_DEPEX = 0x1C
 } EFI_COMMON_SECTION_HEADER <read=read_EFI_COMMON_SECTION_HEADER>;
 
 string read_EFI_COMMON_SECTION_HEADER(EFI_COMMON_SECTION_HEADER &in) {
-	string out;
+	local string out;
 	SPrintf(out, "%Xh %s", in.Size.v, EnumToString(in.Type));
 	return out;
 }
@@ -321,6 +321,7 @@ while (G_data_remaining > 0) {
 		continue;
 	}
 */
+
 	SetBackColor(0xc0ffc0);
 	EFI_FFS_FILE_HEADER ffsh;
 	padding_size = 8 - (FTell() & 7);
