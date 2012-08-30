@@ -259,7 +259,7 @@ typedef struct {
 		UINT8 data[Size.v - 0x18];
 	}
 	else if (Size.v > 0x18) {
-		SetBackColor(0xc0d8c0);
+		SetBackColor(0xb0e0b0);
 		EFI_COMMON_SECTION_HEADER csh;
 	
 		//Assert((Size.v - csh.Size.v) == 0x18, "size mismatch between ffsh and csh");

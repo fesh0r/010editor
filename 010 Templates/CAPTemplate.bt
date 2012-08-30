@@ -29,14 +29,17 @@ string read_GUID(GUID &in) {
 	local UINT64 d4 = in.Data4;
 	local UINT32 d4a = d4 >> 32;
 	local UINT32 d4b = d4 & 0xFFFFFFFF;
-	     if (d1 == 0xa7717414 && d2 == 0xc616 && d3 == 0x4977 && d4a == 0x94208447 && d4b == 0x12a735bf) {
-		out = "EFI_CERT_TYPE_RSA2048_SHA256_GUID";
-	}
-	else if (d1 == 0x3b6686bd && d2 == 0x0d76 && d3 == 0x4030 && d4a == 0xb70eb551 && d4b == 0x9e2fc5a0) {
+	     if (d1 == 0x3b6686bd && d2 == 0x0d76 && d3 == 0x4030 && d4a == 0xb70eb551 && d4b == 0x9e2fc5a0) {
 		out = "EFI_CAPSULE_GUID";
 	}
 	else if (d1 == 0x4a3ca68b && d2 == 0x7723 && d3 == 0x48fb && d4a == 0x803d578c && d4b == 0xc1fec44d) {
-		out = "EFI_ASUS_CAPSULE_GUID";
+		out = "EFI_SIGNED_CAPSULE_GUID";
+	}
+	else if (d1 == 0xa7717414 && d2 == 0xc616 && d3 == 0x4977 && d4a == 0x94208447 && d4b == 0x12a735bf) {
+		out = "EFI_CERT_TYPE_RSA2048_SHA256_GUID";
+	}
+	else if (d1 == 0x4aafd29d && d2 == 0x68df && d3 == 0x49ee && d4a == 0x8aa9347d && d4b == 0x375665a7) {
+		out = "EFI_CERT_TYPE_PKCS7_GUID";
 	}
 	else if (d1 == 0x51aa59de && d2 == 0xfdf2 && d3 == 0x4ea3 && d4a == 0xbc63875f && d4b == 0xb7842ee9) {
 		out = "EFI_HASH_ALGORITHM_SHA256_GUID";
@@ -59,7 +62,7 @@ typedef struct {
 		while (ReadShort(FTell())) {
 			wstring name;
 		}
-		SetBackColor(0xc0c0e0);
+		SetBackColor(0xb0b0e0);
 		UINT16 end;
 		FSeek(pos);
 	}
@@ -103,41 +106,11 @@ string read_EFI_CAPSULE_HEADER_FLAGS(EFI_CAPSULE_HEADER_FLAGS &in) {
 
 
 typedef struct {
-	GUID CapsuleGuid;
-	UINT32 HeaderSize;
-	Assert(HeaderSize == 0x1c || HeaderSize == 0x50, "Unknown HeaderSize");
-	EFI_CAPSULE_HEADER_FLAGS Flags;
-	UINT32 CapsuleImageSize;
-	//Assert(CapsuleImageSize == FileSize(), "Invalid CapsuleImageSize");
-	if (HeaderSize > 0x1c) {
-		UINT32 SequenceNumber;
-		GUID InstanceId;
-		UINT32 OffsetToSplitInformation;
-		UINT32 OffsetToCapsuleBody;
-		UINT32 OffsetToOemDefinedHeader;
-		EFI_STRING_OFFSET OffsetToAuthorInformation;
-		EFI_STRING_OFFSET OffsetToRevisionInformation;
-		EFI_STRING_OFFSET OffsetToShortDescription;
-		EFI_STRING_OFFSET OffsetToLongDescription;
-		UINT32 OffsetToApplicableDevices;
-	}
-	else {
-		local UINT32 OffsetToCapsuleBody=0;
-		local UINT32 OffsetToOemDefinedHeader=0;
-	}
-} EFI_CAPSULE_HEADER <read=read_EFI_CAPSULE_HEADER>;
-
-string read_EFI_CAPSULE_HEADER(EFI_CAPSULE_HEADER &in) {
-	return read_GUID(in.CapsuleGuid);
-}
-
-
-typedef struct {
 	GUID OemGuid;
 	UINT32 HeaderSize;
 
 	if (HeaderSize > (16 + 4)) {
-		SetBackColor(0xc0e0c0);
+		SetBackColor(0xe0b0b0);
 		UINT8 Data[HeaderSize - (16 + 4)];
 	}
 } EFI_CAPSULE_OEM_HEADER;
@@ -168,6 +141,55 @@ WIN_CERT_TYPE_EFI_GUID = 0xEF1
 } WIN_CERTIFICATE;
 
 
+typedef struct {
+	GUID CapsuleGuid;
+	UINT32 HeaderSize;
+	Assert(HeaderSize == 0x1c || HeaderSize == 0x50, "Unknown HeaderSize");
+	EFI_CAPSULE_HEADER_FLAGS Flags;
+	UINT32 CapsuleImageSize;
+	//Assert(CapsuleImageSize == FileSize(), "Invalid CapsuleImageSize");
+	if (HeaderSize == 0x50) {
+		UINT32 SequenceNumber;
+		GUID InstanceId;
+		UINT32 OffsetToSplitInformation;
+		UINT32 OffsetToCapsuleBody;
+		UINT32 OffsetToOemDefinedHeader;
+		EFI_STRING_OFFSET OffsetToAuthorInformation;
+		EFI_STRING_OFFSET OffsetToRevisionInformation;
+		EFI_STRING_OFFSET OffsetToShortDescription;
+		EFI_STRING_OFFSET OffsetToLongDescription;
+		UINT32 OffsetToApplicableDevices;
+
+		if (OffsetToOemDefinedHeader) {
+			FSeek(OffsetToOemDefinedHeader);
+			SetBackColor(0xffc0c0);
+			EFI_CAPSULE_OEM_HEADER oh;
+		}
+	}
+	else if (read_GUID(CapsuleGuid) == "EFI_SIGNED_CAPSULE_GUID") {
+		UINT16 OffsetToCapsuleBody;
+		UINT16 OffsetToOemDefinedHeader;
+
+		SetBackColor(0xc0ffc0);
+		WIN_CERTIFICATE c;
+		EFI_CERT_TYPE_RSA2048_SHA256 c2;
+
+		if (OffsetToOemDefinedHeader) {
+			FSeek(OffsetToOemDefinedHeader);
+			SetBackColor(0xffc0c0);
+			UINT8 oh[OffsetToCapsuleBody - OffsetToOemDefinedHeader];
+		}
+	}
+	else {
+		local UINT32 OffsetToCapsuleBody = 0;
+	}
+} EFI_CAPSULE_HEADER <read=read_EFI_CAPSULE_HEADER>;
+
+string read_EFI_CAPSULE_HEADER(EFI_CAPSULE_HEADER &in) {
+	return read_GUID(in.CapsuleGuid);
+}
+
+
 DisplayFormatHex();
 LittleEndian();
 
@@ -175,32 +197,8 @@ LittleEndian();
 SetBackColor(0xe0e0e0);
 EFI_CAPSULE_HEADER h;
 
-if (h.OffsetToOemDefinedHeader) {
-	FSeek(h.OffsetToOemDefinedHeader);
-	SetBackColor(0xc0ffc0);
-	EFI_CAPSULE_OEM_HEADER oh;
-}
-
 if (h.OffsetToCapsuleBody) {
 	FSeek(h.OffsetToCapsuleBody);
-}
-
-if (read_GUID(h.CapsuleGuid) == "EFI_ASUS_CAPSULE_GUID") {
-	SetBackColor(0xc0c0c0);
-	UINT16 RomOffset;
-	UINT16 UnknownOffset;
-
-	SetBackColor(0xc0c0ff);
-	WIN_CERTIFICATE c;
-	EFI_CERT_TYPE_RSA2048_SHA256 c2;
-
-	if (UnknownOffset) {
-		FSeek(UnknownOffset);
-		SetBackColor(0xffc0c0);
-		UINT32 stuff[(RomOffset - UnknownOffset) >> 2];
-	}
-
-	FSeek(RomOffset);
 }
 
 SetBackColor(0xa0a0a0);
