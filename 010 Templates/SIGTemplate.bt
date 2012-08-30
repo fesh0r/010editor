@@ -1,0 +1,112 @@
+//--------------------------------------
+//--- 010 Editor v4.0.2 Binary Template
+//
+// File: SIGTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: EFI signature list
+//--------------------------------------
+
+typedef ubyte UINT8;
+typedef byte INT8;
+
+
+typedef struct {
+	UINT32 Data1;
+	UINT16 Data2;
+	UINT16 Data3;
+	BigEndian();
+	UINT64 Data4;
+	LittleEndian();
+} GUID <read=read_GUID>;
+
+string read_GUID(GUID &in) {
+	local string out;
+	local UINT32 d1 = in.Data1;
+	local UINT32 d2 = in.Data2;
+	local UINT32 d3 = in.Data3;
+	local UINT64 d4 = in.Data4;
+	local UINT32 d4a = d4 >> 32;
+	local UINT32 d4b = d4 & 0xFFFFFFFF;
+	     if (d1 == 0xa7717414 && d2 == 0xc616 && d3 == 0x4977 && d4a == 0x94208447 && d4b == 0x12a735bf) {
+		out = "EFI_CERT_TYPE_RSA2048_SHA256_GUID";
+	}
+	else if (d1 == 0x51aa59de && d2 == 0xfdf2 && d3 == 0x4ea3 && d4a == 0xbc63875f && d4b == 0xb7842ee9) {
+		out = "EFI_HASH_ALGORITHM_SHA256_GUID";
+	}
+	else if (d1 == 0xc1c41626 && d2 == 0x504c && d3 == 0x4092 && d4a == 0xaca941f9 && d4b == 0x36934328) {
+		out = "EFI_CERT_SHA256_GUID";
+	}
+	else if (d1 == 0x3c5766e8 && d2 == 0x269c && d3 == 0x4e34 && d4a == 0xaa14ed77 && d4b == 0x6e85b3b6) {
+		out = "EFI_CERT_RSA2048_GUID";
+	}
+	else if (d1 == 0xe2b36190 && d2 == 0x879b && d3 == 0x4a3d && d4a == 0xad8df2e7 && d4b == 0xbba32784) {
+		out = "EFI_CERT_RSA2048_SHA256_GUID";
+	}
+	else if (d1 == 0x826ca512 && d2 == 0xcf10 && d3 == 0x4ac9 && d4a == 0xb187be01 && d4b == 0x496631bd) {
+		out = "EFI_CERT_SHA1_GUID";
+	}
+	else if (d1 == 0x67f8444f && d2 == 0x8743 && d3 == 0x48f1 && d4a == 0xa3281eaa && d4b == 0xb8736080) {
+		out = "EFI_CERT_RSA2048_SHA1_GUID";
+	}
+	else if (d1 == 0xa5c059a1 && d2 == 0x94e4 && d3 == 0x4aa7 && d4a == 0x87b5ab15 && d4b == 0x5c2bf072) {
+		out = "EFI_CERT_X509_GUID";
+	}
+	else if (d1 == 0x0b6e5233 && d2 == 0xa65c && d3 == 0x44c9 && d4a == 0x9407d9ab && d4b == 0x83bfc8bd) {
+		out = "EFI_CERT_SHA224_GUID";
+	}
+	else if (d1 == 0xff3e5307 && d2 == 0x9fd0 && d3 == 0x48c9 && d4a == 0x85f18ad5 && d4b == 0x6c701e01) {
+		out = "EFI_CERT_SHA384_GUID";
+	}
+	else if (d1 == 0x093e0fae && d2 == 0xa6c4 && d3 == 0x4f50 && d4a == 0x9f1bd41e && d4b == 0x2b89c19a) {
+		out = "EFI_CERT_SHA512_GUID";
+	}
+	else if (d1 == 0x4aafd29d && d2 == 0x68df && d3 == 0x49ee && d4a == 0x8aa9347d && d4b == 0x375665a7) {
+		out = "EFI_CERT_TYPE_PKCS7_GUID";
+	}
+	else {
+		SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
+			d1, d2, d3, d4a >> 16, d4a & 0xFFFF, d4b);
+	}
+	return out;
+}
+
+
+typedef struct (int size) {
+	GUID SignatureOwner;
+
+	SetBackColor(0xc0d8c0);	
+	UINT8 SignatureData[size - 16];
+} EFI_SIGNATURE_DATA <optimize=false>;
+
+
+typedef struct {
+	local quad start_pos = FTell();
+	GUID SignatureType;
+	UINT32 SignatureListSize;
+	UINT32 SignatureHeaderSize;
+	UINT32 SignatureSize;
+
+	if (SignatureHeaderSize) {
+		SetBackColor(0xc0c0ff);
+		UINT8 SignatureHeader[SignatureHeaderSize];
+	}
+	
+	local quad cur_pos = FTell();
+	while ((cur_pos - start_pos) < SignatureListSize) {
+		SetBackColor(0xc0ffc0);
+		EFI_SIGNATURE_DATA Signature(SignatureSize);
+		cur_pos = FTell();
+	}
+} EFI_SIGNATURE_LIST <optimize=false>;
+
+
+
+DisplayFormatHex();
+LittleEndian();
+
+
+while (!FEof()) {
+	SetBackColor(0xe0e0e0);
+	EFI_SIGNATURE_LIST l;
+}

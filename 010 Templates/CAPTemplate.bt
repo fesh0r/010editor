@@ -149,6 +149,7 @@ typedef struct {
 	UINT8 Signature[256];
 } EFI_CERT_TYPE_RSA2048_SHA256;
 
+
 typedef struct {
 	UINT32 dwLength;
 	UINT16 wRevision;
@@ -166,8 +167,10 @@ WIN_CERT_TYPE_EFI_GUID = 0xEF1
 	}
 } WIN_CERTIFICATE;
 
+
 DisplayFormatHex();
 LittleEndian();
+
 
 SetBackColor(0xe0e0e0);
 EFI_CAPSULE_HEADER h;
