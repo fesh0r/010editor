@@ -306,7 +306,6 @@ local int cur_pos = 0;
 G_data_remaining -= 0x48;
 
 while (G_data_remaining > 0) {
-/*
 	cur_pos = FTell();
 	if (ReadUInt(cur_pos) == 0xFFFFFFFF) {
 		SetBackColor(0xf0f0f0);
@@ -320,7 +319,6 @@ while (G_data_remaining > 0) {
 		G_data_remaining -= 4;
 		continue;
 	}
-*/
 
 	SetBackColor(0xc0ffc0);
 	EFI_FFS_FILE_HEADER ffsh;
