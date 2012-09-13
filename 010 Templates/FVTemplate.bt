@@ -509,8 +509,7 @@ while (G_data_remaining > 0) {
 	EFI_FFS_FILE_HEADER ffsh;
 	G_data_remaining -= ffsh.full_size;
 
-	padding_size = 8 - (FTell() & 7);
-	if (padding_size == 8) padding_size = 0;
+	padding_size = (8 - (FTell() & 7)) & 7;
 	for (i = 0; i < padding_size; i++) {
 		SetBackColor(0xf0f0f0);
 		SetForeColor(0x808080);
