@@ -128,6 +128,7 @@ typedef struct {
 	char signature[3];
 
 	enum <char> Platform { MOBILE = 'm', WINDOWS = 'w', XBOX = 'x' } platform;
+	global_platform = platform;
 
 	enum <u1> Version { V1_0 = 1, V2_0 = 2, V3_0 = 3, V3_1 = 4, V4_0 = 5 } version;
 	global_version = version;
@@ -219,7 +220,13 @@ typedef struct {
 
 	u4 format_size;
 	if (format_size) {
+		if (global_platform == 'x') {
+			BigEndian();
+		}
 		WAV_FORMAT format(format_size);
+		if (global_platform == 'x') {
+			LittleEndian();
+		}
 	}
 
 	u4 data_size;
@@ -583,6 +590,72 @@ string read_XNB_Dict_String_Dict_String_String(XNB_Dict_String_Dict_String_Strin
 
 
 typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 num;
+
+	if (num) {
+		u4 d[num];
+	}
+} XNB_List_Enum <optimize=false>;
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 d;
+} XNB_Enum <optimize=false>;
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	s4 duration;
+	s4 loop_times_from;
+	s4 loop_times_to;
+	EncodedStr name;
+	s4 trigger_from;
+	s4 trigger_to;
+	s4 delay;
+	u1 night;
+	u1 day;
+	u1 dusk;
+	u1 dawn;
+	u1 frac_time;
+	u1 one_at_a_time;
+	u1 cut_off_tail;
+} FEZ_Loop <read=read_FEZ_Loop,optimize=false>;
+
+string read_FEZ_Loop(FEZ_Loop &in) {
+	return read_EncodedStr(in.name);
+}
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 num;
+
+	if (num) {
+		FEZ_Loop d[num];
+	}
+} XNB_List_FEZ_Loop <optimize=false>;
+
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+	
+	XNB_List_FEZ_Loop loops;
+	EncodedStr name;
+	s4 tempo;
+	s4 time_sig;
+	XNB_List_Enum notes;
+	XNB_Enum assemble_chord;
+	u1 random_ordering;
+} FEZ_TrackedSong <read=read_FEZ_TrackedSong,optimize=false>;
+
+string read_FEZ_TrackedSong(FEZ_TrackedSong &in) {
+	return read_EncodedStr(in.name);
+}
+
+typedef struct {
 	EncodedStr type;
 	u4 version;
 } XNB_Reader <read=read_XNB_Reader,optimize=false>;
@@ -716,6 +789,10 @@ string ReaderType(string type) {
 			out = "List(Int32)";
 			break;
 
+		case "FezEngine.Readers.TrackedSongReader":
+			out = "TrackedSong (FEZ)";
+			break;
+
 		default:
 			out = type;
 /*
@@ -791,6 +868,7 @@ DisplayFormatHex();
 LittleEndian();
 
 local u1 global_version;
+local char global_platform;
 
 local char sig[4];
 ReadBytes(sig, 0, 4);
@@ -860,6 +938,10 @@ switch (type) {
 
 	case "Microsoft.Xna.Framework.Content.DictionaryReader`2[[System.String],[System.Collections.Generic.Dictionary`2[[System.String],[System.String]]]]":
 		XNB_Dict_String_Dict_String_String d;
+		break;
+
+	case "FezEngine.Readers.TrackedSongReader":
+		FEZ_TrackedSong d;
 		break;
 
 	default:
