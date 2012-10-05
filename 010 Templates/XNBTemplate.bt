@@ -31,7 +31,6 @@ string str_replace(string in, string rem, string add) {
 			tmp = SubStr(in, str_pos + rem_len);
 			out += tmp;
 		}
-
 		out = str_replace(out, rem, add);
 	}
 	else {
@@ -45,7 +44,6 @@ string str_del(string in, string rem) {
 	local int str_pos = Strstr(in, rem);
 	if (str_pos > -1) {
 		out = StrDel(in, str_pos, Strlen(rem));
-
 		out = str_del(out, rem);
 	}
 	else {
@@ -68,8 +66,12 @@ string strip_type(string type) {
 	type = str_replace(type, ", FezEngine,", ",");
 	type = str_replace(type, ", FezEngine]", "]");
 	type = str_replace(type, ", FezEngine%", "%");
+	type = str_replace(type, ", Common,", ",");
+	type = str_replace(type, ", Common]", "]");
+	type = str_replace(type, ", Common%", "%");
 	type = str_del(type, "%");
 
+	type = str_del(type, ", Version=1.0.0.0");
 	type = str_del(type, ", Version=2.0.0.0");
 	type = str_del(type, ", Version=3.1.0.0");
 	type = str_del(type, ", Version=3.5.0.0");
@@ -281,7 +283,7 @@ typedef struct {
 			HdrBlendable_5
 		} surface_format;
 	}
-	else if (global_version > 2) {
+	else {
 		enum <u4> SurfaceFormat3 {
 			Unknown0_3 = 0,
 			Color_3,
@@ -342,13 +344,9 @@ typedef struct {
 			Depth15Stencil1_3
 		} surface_format;
 	}
-	else {
-		u4 surface_format;
-	}
 	u4 width <format=decimal>;
 	u4 height <format=decimal>;
 	u4 mipmap_levels <format=decimal>;
-
 	if (mipmap_levels > 0) {
 		XNB_TextureData d[mipmap_levels];
 	}
@@ -369,7 +367,6 @@ typedef struct {
 	u4 height <format=decimal>;
 	u4 depth <format=decimal>;
 	u4 mipmap_levels <format=decimal>;
-
 	if (mipmap_levels > 0) {
 		XNB_TextureData d[mipmap_levels];
 	}
@@ -400,7 +397,6 @@ typedef struct {
 	EncodedInt readerIndex;
 
 	u4 num;
-
 	if (num) {
 		SetBackColor(0xc0ffff);
 		Rectangle d[num];
@@ -418,7 +414,6 @@ typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		char d[num];
 	}
@@ -445,10 +440,21 @@ string read_Vector3(Vector3 &in) {
 
 
 typedef struct {
+	float x;
+	float y;
+} Vector2 <read=read_Vector2>;
+
+string read_Vector2(Vector2 &in) {
+	local string out;
+	SPrintf(out, "%.2f,%.2f,", in.x, in.y);
+	return out;
+}
+
+
+typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		SetBackColor(0xc0ffff);
 		Vector3 d[num];
@@ -471,11 +477,11 @@ string read_XNB_String(XNB_String &in) {
 	return read_EncodedStr(in.d);
 }
 
+
 typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		XNB_String d[num];
 	}
@@ -518,7 +524,6 @@ typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		SetBackColor(0xc0ffff);
 		u1 d[num];
@@ -551,7 +556,6 @@ typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		XNB_Dict_String_String_Entry d[num];
 	}
@@ -563,6 +567,7 @@ string read_XNB_Dict_String_String(XNB_Dict_String_String &in) {
 	return out;
 }
 
+
 typedef struct {
 	XNB_String k;
 	XNB_Dict_String_String v;
@@ -572,11 +577,11 @@ string read_XNB_Dict_String_Dict_String_String_entry(XNB_Dict_String_Dict_String
 	return read_XNB_String(in.k);
 }
 
+
 typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		XNB_Dict_String_Dict_String_String_entry d[num];
 	}
@@ -593,17 +598,18 @@ typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		u4 d[num];
 	}
 } XNB_List_Enum <optimize=false>;
+
 
 typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 d;
 } XNB_Enum <optimize=false>;
+
 
 typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
@@ -628,11 +634,11 @@ string read_FEZ_Loop(FEZ_Loop &in) {
 	return read_EncodedStr(in.name);
 }
 
+
 typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	u4 num;
-
 	if (num) {
 		FEZ_Loop d[num];
 	}
@@ -655,6 +661,68 @@ string read_FEZ_TrackedSong(FEZ_TrackedSong &in) {
 	return read_EncodedStr(in.name);
 }
 
+
+typedef struct {
+	Vector3 position;
+	s1 normal;
+	Vector2 texture_coord;
+} FEZ_VertexPos;
+
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 num;
+	if (num) {
+		FEZ_VertexPos d[num];
+	}
+} FEZ_List_VertexPos <optimize=false>;
+
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 num;
+	if (num) {
+		s2 d[num];
+	}
+} XNB_List_UInt16 <optimize=false>;
+
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	XNB_Enum primitive_type;
+	FEZ_List_VertexPos vertices;
+	XNB_List_UInt16 indices;
+} FEZ_SIIP_VertexPos <optimize=false>;
+
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 d;
+} FEZ_ActorType <optimize=false>;
+
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	EncodedStr name;
+	EncodedStr cubemap_path;
+	Vector3 size;
+	FEZ_SIIP_VertexPos geometry;
+	FEZ_ActorType actor_type;
+	u1 no_silhouette;
+
+	EncodedInt readerIndex2 <read=EncIntReaderType>;
+} FEZ_ArtObject <read=read_FEZ_ArtObject,optimize=false>;
+
+string read_FEZ_ArtObject(FEZ_ArtObject &in) {
+	return read_EncodedStr(in.name);
+}
+
+
 typedef struct {
 	EncodedStr type;
 	u4 version;
@@ -664,9 +732,11 @@ string read_XNB_Reader(XNB_Reader &in) {
 	return ReaderType((string)in.type.v);
 }
 
+
 string EncIntReaderType(EncodedInt &in) {
 	return read_XNB_Reader(r[in.v-1]);
 }
+
 
 string ReaderType(string type) {
 	local string out;
@@ -791,6 +861,10 @@ string ReaderType(string type) {
 
 		case "FezEngine.Readers.TrackedSongReader":
 			out = "TrackedSong (FEZ)";
+			break;
+
+		case "FezEngine.Readers.ArtObjectReader":
+			out = "ArtObject (FEZ)";
 			break;
 
 		default:
@@ -942,6 +1016,10 @@ switch (type) {
 
 	case "FezEngine.Readers.TrackedSongReader":
 		FEZ_TrackedSong d;
+		break;
+
+	case "FezEngine.Readers.ArtObjectReader":
+		FEZ_ArtObject d;
 		break;
 
 	default:
