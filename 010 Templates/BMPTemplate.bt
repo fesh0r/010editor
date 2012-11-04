@@ -100,6 +100,9 @@ if( bmih.biCompression > 0 )
 }
 else
 {
+    local int height = bmih.biHeight;
+    if (height < 0)
+        height = -height;
     // Calculate bytes per line and padding required
     local int bytesPerLine = (int)Ceil( bmih.biWidth * bmih.biBitCount / 8.0 );
     local int padding      = 4 - (bytesPerLine % 4);
@@ -123,5 +126,5 @@ else
         if( padding != 0 )
              UBYTE padBytes[ padding ];
 
-    } lines[ bmih.biHeight ] <optimize=true>;
+    } lines[ height ] <optimize=true>;
 } 
