@@ -724,6 +724,54 @@ string read_FEZ_ArtObject(FEZ_ArtObject &in) {
 
 
 typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 num;
+	if (num) {
+		u4 c[num];
+	}
+} XNB_List_Color <optimize=false>;
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	s8 time;
+} XNB_TimeSpan;
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	XNB_TimeSpan duration;
+	XNB_List_Color data;	
+} FEZ_Frame <optimize=false>;
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	u4 num;
+	if (num) {
+		FEZ_Frame f[num];
+	}
+} XNB_List_Frame <optimize=false>;
+
+typedef struct {
+	EncodedInt readerIndex <read=EncIntReaderType>;
+
+	s4 width;
+	s4 height;
+	s4 actual_width;
+	s4 actual_height;
+	XNB_List_Frame frames;
+} FEZ_AnimatedTexture <read=read_FEZ_AnimatedTexture,optimize=false>;
+
+string read_FEZ_AnimatedTexture(FEZ_AnimatedTexture &in) {
+	local string out;
+	SPrintf(out, "FEZ_AnimatedTexture(%dx%d,%d)", in.actual_width, in.actual_height, in.frames.num);
+	return out;
+}
+
+
+typedef struct {
 	EncodedStr type;
 	u4 version;
 } XNB_Reader <read=read_XNB_Reader,optimize=false>;
@@ -865,6 +913,10 @@ string ReaderType(string type) {
 
 		case "FezEngine.Readers.ArtObjectReader":
 			out = "ArtObject (FEZ)";
+			break;
+
+		case "FezEngine.Readers.AnimatedTextureReader":
+			out = "AnimatedTexture (FEZ)";
 			break;
 
 		default:
@@ -1020,6 +1072,10 @@ switch (type) {
 
 	case "FezEngine.Readers.ArtObjectReader":
 		FEZ_ArtObject d;
+		break;
+
+	case "FezEngine.Readers.AnimatedTextureReader":
+		FEZ_AnimatedTexture d;
 		break;
 
 	default:
