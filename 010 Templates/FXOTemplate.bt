@@ -257,6 +257,10 @@ typedef struct {
 	u4 element_index;
 	u4 state_index;
 	u4 usage;
+	u4 size;
+	if (size) {
+		u1 data[size];
+	}
 } D3DX_RESOURCE;
 
 
@@ -283,8 +287,7 @@ typedef struct {
 		D3DX_STRING s;
 	}
 
-	//for (i = 0; i < resource_count; i++) {
-	if (resource_count) {
+	for (i = 0; i < resource_count; i++) {
 		D3DX_RESOURCE r;
 	}
 } D3DX_EFFECT <optimize=false>;
