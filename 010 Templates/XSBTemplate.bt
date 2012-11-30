@@ -1,0 +1,174 @@
+//--------------------------------------
+//--- 010 Editor v4.0.2 Binary Template
+//
+// File: XSBTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse XACT sound bank
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+	SetBackColor(0xb8b8b8);
+
+	char signature[4];
+
+	u2 content_version <format=decimal>;
+
+	u2 header_version <format=decimal>;
+	u2 crc;
+
+	FILETIME last_modified;
+
+	u1 platform;
+
+	u2 num_simple_cues <format=decimal>;
+	u2 num_complex_cues <format=decimal>;
+	u2 num_unknown1 <format=decimal>;
+	u2 num_total_cues <format=decimal>;
+	u1 num_wavebanks <format=decimal>;
+	u2 num_sounds <format=decimal>;
+
+	u4 cue_name_table_len;
+
+	s4 off_simple_cues;
+	s4 off_complex_cues;
+	s4 off_cue_names;
+	s4 off_unknown1;
+	s4 off_variation_tables;
+	s4 off_unknown2;
+	s4 off_wavebank_names;
+	s4 off_cue_name_hash_table;
+	s4 off_cue_name_hash_values;
+	s4 off_sounds;
+
+	char name[64];
+} XSB_HEADER;
+
+
+typedef struct {
+	SetBackColor(0xff9090);
+
+	u1 flags;
+	u2 category;
+	u1 unknown;
+	u2 volume;
+	u1 unknown;
+	u2 entry_len;
+} XSB_SOUND <optimize=false>;
+
+
+typedef struct (int name_offset) {
+	SetBackColor(0x90ff90);
+
+	u1 flags;
+	u4 sound_offset;
+
+	local int cur_pos = FTell();
+	FSeek(name_offset);
+	SetBackColor(0x90ffff);
+	string name;
+	FSeek(cur_pos);
+} XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE,optimize=false>;
+
+string read_XSB_SIMPLE_CUE(XSB_SIMPLE_CUE &in) {
+	return in.name;
+}
+
+
+typedef struct (int name_offset) {
+	SetBackColor(0x9090ff);
+
+	u1 flags;
+	u4 off_variation;
+	u4 off_transition;
+
+	u4 unknown;
+	u1 unknown;
+	u1 unknown;
+
+	local int cur_pos = FTell();
+	FSeek(name_offset);
+	SetBackColor(0x90ffff);
+	string name;
+	FSeek(cur_pos);
+} XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE,optimize=false>;
+
+string read_XSB_COMPLEX_CUE(XSB_COMPLEX_CUE &in) {
+	return in.name;
+}
+
+
+DisplayFormatHex();
+LittleEndian();
+BitfieldRightToLeft();
+
+local uint sig;
+sig = ReadInt(0);
+
+if (sig == 0x5344424B) {
+	Warning("BigEndian");
+	BigEndian();
+	BitfieldRightToLeft();
+	sig = ReadInt(0);
+}
+
+if (sig != 0x4B424453) {
+	Printf("Incorrect signature\n");
+	Warning("Incorrect signature");
+	return -1;
+}
+
+
+XSB_HEADER h;
+
+local int i;
+
+if (h.num_wavebanks) {
+	FSeek(h.off_wavebank_names);
+	for (i = 0; i < h.num_wavebanks; i++) {
+		SetBackColor(0xd8d8d8);
+		char wavebank_name[64];
+	}
+}
+
+local int name_offsets[h.num_simple_cues + h.num_complex_cues];
+local int cur_name = 0;
+if (h.cue_name_table_len) {
+	local string temp_name;
+	local int end_pos = h.off_cue_names + h.cue_name_table_len;
+	local int cur_pos = h.off_cue_names;
+	for (i = 0; cur_pos < end_pos; i++) {
+		temp_name = ReadString(cur_pos);
+		name_offsets[i] = cur_pos;
+		cur_pos += Strlen(temp_name) + 1;
+	}
+}
+
+if (h.num_sounds) {
+	FSeek(h.off_sounds);
+//	XSB_SOUND s[h.num_sounds];
+	XSB_SOUND s;
+}
+
+if (h.num_simple_cues) {
+	FSeek(h.off_simple_cues);
+	for (i = 0; i < h.num_simple_cues; i++, cur_name++) {
+		XSB_SIMPLE_CUE c(name_offsets[cur_name]);
+	}
+}
+
+if (h.num_complex_cues) {
+	FSeek(h.off_complex_cues);
+	for (i = 0; i < h.num_complex_cues; i++, cur_name++) {
+		XSB_COMPLEX_CUE cc(name_offsets[cur_name]);
+	}
+}
