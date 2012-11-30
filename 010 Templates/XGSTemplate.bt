@@ -16,6 +16,7 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
+
 typedef struct {
 	SetBackColor(0xb8b8b8);
 
@@ -23,40 +24,156 @@ typedef struct {
 
 	u2 content_version <format=decimal>;
 
-	u2 unknown;
+	u2 header_version <format=decimal>;
 	u2 unknown;
 
 	FILETIME last_modified;
 
 	u1 unknown;
-	u2 num_category;
-	u2 num_variable;
-	u2 unknown;
-	u2 unknown;
-	u2 num_rpc_preset;
-	u2 unknown;
-	u2 unknown;
 
-    u4 off_category;
-    u4 offsets;
-    u4 offsets;
-    u4 offsets;
-    u4 offsets;
-    u4 offsets;
-    u4 off_category_name;
-    u4 off_variable_name;
+	u2 num_category <format=decimal>;
+	u2 num_variable <format=decimal>;
+	u2 num_unknown1 <format=decimal>;
+	u2 num_unknown2 <format=decimal>;
+	u2 num_rpc <format=decimal>;
+	u2 num_dsp <format=decimal>;
+	u2 num_dsp_param <format=decimal>;
 
-} XGS_Header;
+    s4 off_category;
+    s4 off_variable;
+    s4 off_unknown1;
+    s4 off_category_names;
+    s4 off_unknown2;
+    s4 off_variable_names;
+    s4 off_category_name;
+    s4 off_variable_name;
+	s4 off_rpc;
+	s4 off_dsp;
+	s4 off_dsp_param;
+} XGS_HEADER;
 
-string read_name(u4 &in) {
-    string out;
-    SPrintf(out, "(%Xh) %s", in, ReadString(in));
-    return out;
+
+
+typedef struct {
+	SetBackColor(0xff90ff);
+	u4 name_offset;
+	s2 unknown;
+	local int cur_pos = FTell();
+	FSeek(name_offset);
+	SetBackColor(0xffc0ff);
+	string name;
+	FSeek(cur_pos);
+} XGS_NAME <read=read_XGS_NAME,optimize=false>;
+
+string read_XGS_NAME(XGS_NAME &in) {
+	return in.name;
 }
+
+
+typedef struct (int index) {
+	SetBackColor(0xff9090);
+
+	u1 max_instances <format=decimal>;
+	u2 fade_in;
+	u2 fade_out;
+	enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
+	enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
+	s2 parent <read=read_CAT_parent>;
+	u1 volume;
+	u1 bg_music: 1;
+	u1 public: 1;
+	u1 unknown: 6 <hidden=true>;
+
+	local int cur_pos = FTell();
+	FSeek(h.off_category_names + index * 6);
+	XGS_NAME name;
+	FSeek(cur_pos);
+} XGS_CATEGORY <read=read_XGS_CATEGORY>;
+
+string read_CAT_parent(s2 in) {
+	if (in >= 0) {
+		return c[in].name.name;
+	}
+	else {
+		return "";
+	}
+}
+
+string read_XGS_CATEGORY(XGS_CATEGORY &in) {
+	return in.name.name;
+}
+
+
+typedef struct (int index) {
+	SetBackColor(0x90ff90);
+
+	u1 public: 1;
+	u1 read_only: 1;
+	u1 cue_instance: 1;
+	u1 reserved: 1;
+	u1 unknown: 4;
+
+	float init_val;
+	float min_val;
+	float max_val;
+
+	local int cur_pos = FTell();
+	FSeek(h.off_variable_names + index * 6);
+	XGS_NAME name;
+	FSeek(cur_pos);
+} XGS_VARIABLE <read=read_XGS_VARIABLE>;
+
+string read_XGS_VARIABLE(XGS_VARIABLE &in) {
+	return in.name.name;
+}
+
+
+typedef struct {
+	float x;
+	float y;
+	enum <u1> {cLINEAR, cFAST, cSLOW, cSINCOS} type;
+} RPC_POINT;
+
+
+typedef struct {
+	SetBackColor(0x9090ff);
+
+	u2 var_index <read=read_RPC_var>;
+	u1 point_count;
+	u2 param;
+	RPC_POINT points[point_count];
+} XGS_RPC_CURVE <read=read_XGS_RPC_CURVE,optimize=false>;
+
+string read_RPC_var(u2 in) {
+	return v[in].name.name;
+}
+
+string read_XGS_RPC_CURVE(XGS_RPC_CURVE &in) {
+	return v[in.var_index].name.name;
+}
+
+
+typedef struct {
+	SetBackColor(0x90ffff);
+	u1 unknown;
+	u2 unknown;
+	u2 unknown;
+} XGS_DSP;
+
+
+typedef struct {
+	SetBackColor(0xffff90);
+	u1 unknown;
+	float unknown;
+	float unknown;
+	float unknown;
+	u2 unknown;
+} XGS_DSP_PARAM;
 
 
 DisplayFormatHex();
 LittleEndian();
+BitfieldRightToLeft();
 
 local uint sig;
 sig = ReadInt(0);
@@ -64,6 +181,7 @@ sig = ReadInt(0);
 if (sig == 0x58475346) {
 	Warning("BigEndian");
 	BigEndian();
+	BitfieldRightToLeft();
 	sig = ReadInt(0);
 }
 
@@ -74,6 +192,47 @@ if (sig != 0x46534758) {
 }
 
 
-XGS_Header h;
+XGS_HEADER h;
 
-SetBackColor(0xffb0b0);
+local int i;
+
+if (h.num_category) {
+	FSeek(h.off_category);
+	for (i = 0; i < h.num_category; i++) {
+		XGS_CATEGORY c(i);
+	}
+}
+
+if (h.num_variable) {
+	FSeek(h.off_variable);
+	for (i = 0; i < h.num_variable; i++) {
+		XGS_VARIABLE v(i);
+	}
+}
+
+if (h.num_rpc) {
+	FSeek(h.off_rpc);
+	XGS_RPC_CURVE r[h.num_rpc];
+}
+
+if (h.num_dsp) {
+	FSeek(h.off_dsp);
+	XGS_DSP d[h.num_dsp];
+}
+
+if (h.num_dsp_param) {
+	FSeek(h.off_dsp_param);
+	XGS_DSP_PARAM dp[h.num_dsp_param];
+}
+
+if (h.num_unknown1) {
+	FSeek(h.off_unknown1);
+	SetBackColor(0xc0c0c0);
+	s2 unknown1[h.num_unknown1] <format=decimal>;
+}
+
+if (h.num_unknown2) {
+	FSeek(h.off_unknown2);
+	SetBackColor(0xc0c0c0);
+	s2 unknown2[h.num_unknown2] <format=decimal>;
+}
