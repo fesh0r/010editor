@@ -34,8 +34,8 @@ typedef struct {
 
 	char signature[4];
 
-    u4 version <format=decimal>;
-    global_version = version;
+    u4 content_version <format=decimal>;
+    global_version = content_version;
 
     if (global_version <= 3) {
         Warning("Nonhandled version");

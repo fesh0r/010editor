@@ -23,13 +23,13 @@ typedef struct {
 	char signature[4];
 
 	u2 content_version <format=decimal>;
-
 	u2 header_version <format=decimal>;
-	u2 unknown;
+
+	u2 crc;
 
 	FILETIME last_modified;
 
-	u1 unknown;
+	u1 platform;
 
 	u2 num_category <format=decimal>;
 	u2 num_variable <format=decimal>;
@@ -51,7 +51,6 @@ typedef struct {
 	s4 off_dsp;
 	s4 off_dsp_param;
 } XGS_HEADER;
-
 
 
 typedef struct {
