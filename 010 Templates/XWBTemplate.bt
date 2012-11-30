@@ -44,7 +44,7 @@ typedef struct {
     }
     
     if (global_version >= 42) {
-        u4 header_size;
+        u4 header_version <format=decimal>;
     }
 
     XWB_Region r[5];
@@ -112,11 +112,30 @@ typedef struct (int size) {
     }
 } XWB_EntryMetadata <optimize=false>;
 
+typedef struct (int pos) {
+	SetBackColor(0xb0b0ff);
+	u4 offset;
+	local int cur_pos = FTell();
+	FSeek(pos + offset);
+	SetBackColor(0xd0d0ff);	
+	u4 size;
+	if (size > 0) {
+		u4 data[size];
+	}
+	FSeek(cur_pos);
+	SetBackColor(0xb0b0ff);
+} SeekTable <optimize=false>;
 
 typedef struct (int size) {
 	SetBackColor(0xb0b0ff);	
 
-    u4 unknown;
+    if (global_entries > 0) {
+		local int i;
+		local int table_pos = FTell() + 4 * global_entries;
+		for (i = 0; i < global_entries; i++) {
+			SeekTable s(table_pos);
+		}
+	}
 } XWB_SeekTable <optimize=false>;
 
 
