@@ -79,6 +79,55 @@ typedef struct {
 
 
 typedef struct {
+	u4 unknown;
+	u2 track;
+	u1 wavebank;
+	u1 unknown;
+	u2 unknown;
+	u2 unknown;
+} CLIP_EVENT_1 <optimize=false>;
+
+
+typedef struct {
+	SetBackColor(0xfff0a0);
+
+	u4 event_info;
+	
+	switch (event_info & 0x1f) {
+		case 1:
+			CLIP_EVENT_1 event;
+			break;
+		default:
+			break;
+	}
+
+} CLIP_EVENT <optimize=false>;
+
+typedef struct {
+	SetBackColor(0xfff0a0);
+	
+	u1 num_events;
+	Assert(num_events == 1);
+
+	CLIP_EVENT events[num_events];
+} SOUND_CLIP <optimize=false>;
+
+
+typedef struct {
+	SetBackColor(0xffc090);
+
+	u1 unknown;
+	u4 off_clip;
+	u4 unknown;
+
+	local int cur_pos = FTell();
+	FSeek(off_clip);
+	SOUND_CLIP clip;
+	FSeek(cur_pos);
+} XSB_CLIP <optimize=false>;
+
+
+typedef struct {
 	SetBackColor(0xff9090);
 
 	local int cur_pos = FTell();
@@ -90,6 +139,33 @@ typedef struct {
 	u1 unknown;
 	u2 entry_len;
 
+	if (flags & 1) {
+		u1 num_clip;
+	}
+	else {
+		u2 track;
+		u1 wavebank;
+	}
+
+	if (flags & 0xe) {
+		SetBackColor(0xff90c0);
+		u2 rpc_extra;
+		u1 rpc[rpc_extra - 2];
+	}
+
+	if (flags & 16) {
+		SetBackColor(0xffa0f0);
+		u2 dsp_extra;
+		u1 dsp_num;
+		u4 dsp_param[dsp_num];
+		Assert(dsp_extra == 2 + 1 + dsp_num * 4);
+	}
+
+	if (flags & 1) {
+		XSB_CLIP clips[num_clip];
+	}
+
+	Assert(FTell() <= (cur_pos + entry_len));
 	FSeek(cur_pos + entry_len);
 } XSB_SOUND <optimize=false>;
 
