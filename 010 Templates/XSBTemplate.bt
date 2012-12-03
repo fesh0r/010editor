@@ -20,7 +20,7 @@ typedef byte   s1;
 typedef struct {
 	SetBackColor(0xff90ff);
 	u4 name_offset;
-	s2 unknown;
+	s2 hash <format=decimal>;
 
 	local int cur_pos = FTell();
 	FSeek(name_offset);
@@ -67,8 +67,8 @@ typedef struct {
 	s4 off_complex_cue;
 	s4 off_cue_names;
 	s4 off_unknown1;
-	s4 off_unknown2;
-	s4 off_unknown3;
+	s4 off_variation;
+	s4 off_transition;
 	s4 off_wavebank_name;
 	s4 off_cue_name_hash;
 	s4 off_cue_name_table;
@@ -175,10 +175,10 @@ if (h.num_complex_cue) {
 if (h.num_cue_hash) {
 	FSeek(h.off_cue_name_hash);
 	SetBackColor(0xc0c0c0);
-	s2 ch[h.num_cue_hash] <format=decimal>;
+	s2 ch[h.num_cue_hash] <format=decimal,hidden=true>;
 }
 
 if (h.num_simple_cue + h.num_complex_cue) {
 	FSeek(h.off_cue_name_table);
-	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue];
+	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue] <hidden=true>;
 }

@@ -20,7 +20,7 @@ typedef byte   s1;
 typedef struct {
 	SetBackColor(0xff90ff);
 	u4 name_offset;
-	s2 unknown;
+	s2 hash <format=decimal>;
 
 	local int cur_pos = FTell();
 	FSeek(name_offset);
@@ -77,12 +77,21 @@ typedef struct (int index) {
 	u2 fade_out;
 	enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
 	enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
-	s2 parent;
+	s2 parent <read=read_CATEGORY_parent>;
 	u1 volume;
 	u1 bg_music: 1;
 	u1 public: 1;
 	u1 unknown: 6;
 } XGS_CATEGORY <read=read_XGS_CATEGORY>;
+
+string read_CATEGORY_parent(s2 &in) {
+	if (in >= 0) {
+		return cn[in].name;
+	}
+	else {
+		return "<root>";
+	}
+}
 
 string read_XGS_CATEGORY(XGS_CATEGORY &in) {
 	return cn[in.name_index].name;
@@ -141,9 +150,9 @@ typedef struct {
 typedef struct {
 	SetBackColor(0xffff90);
 	u1 unknown;
-	float unknown;
-	float unknown;
-	float unknown;
+	float init_val;
+	float min_val;
+	float max_val;
 	u2 unknown;
 } XGS_DSP_PARAM;
 
@@ -183,12 +192,12 @@ if (h.num_category) {
 if (h.num_category_name_hash) {
 	FSeek(h.off_category_name_hash);
 	SetBackColor(0xc0c0c0);
-	s2 cnh[h.num_category_name_hash] <format=decimal>;
+	s2 cnh[h.num_category_name_hash] <format=decimal,hidden=true>;
 }
 
 if (h.num_category) {
 	FSeek(h.off_category_name_table);
-	NAME_HASH cn[h.num_category];
+	NAME_HASH cn[h.num_category] <hidden=true>;
 }
 
 if (h.num_variable) {
@@ -201,12 +210,12 @@ if (h.num_variable) {
 if (h.num_variable_name_hash) {
 	FSeek(h.off_variable_name_hash);
 	SetBackColor(0xc0c0c0);
-	s2 vnh[h.num_variable_name_hash] <format=decimal>;
+	s2 vnh[h.num_variable_name_hash] <format=decimal,hidden=true>;
 }
 
 if (h.num_variable) {
 	FSeek(h.off_variable_name_table);
-	NAME_HASH vn[h.num_variable];
+	NAME_HASH vn[h.num_variable] <hidden=true>;
 }
 
 if (h.num_rpc) {
