@@ -16,6 +16,30 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
+
+typedef struct {
+	SetBackColor(0xff90ff);
+	u4 name_offset;
+	s2 unknown;
+
+	local int cur_pos = FTell();
+	FSeek(name_offset);
+	SetBackColor(0xffc0ff);
+	string name;
+	FSeek(cur_pos);
+} NAME_HASH <optimize=false>;
+
+
+
+typedef struct {
+	char name[64];	
+} NAME <read=read_NAME,optimize=false>;
+
+string read_NAME(NAME &in) {
+	return in.name;
+}
+
+
 typedef struct {
 	SetBackColor(0xb8b8b8);
 
@@ -30,27 +54,27 @@ typedef struct {
 
 	u1 platform;
 
-	u2 num_simple_cues <format=decimal>;
-	u2 num_complex_cues <format=decimal>;
+	u2 num_simple_cue <format=decimal>;
+	u2 num_complex_cue <format=decimal>;
 	u2 num_unknown1 <format=decimal>;
-	u2 num_total_cues <format=decimal>;
-	u1 num_wavebanks <format=decimal>;
-	u2 num_sounds <format=decimal>;
+	u2 num_cue_hash <format=decimal>;
+	u1 num_wavebank <format=decimal>;
+	u2 num_sound <format=decimal>;
 
-	u4 cue_name_table_len;
+	u4 cue_names_len;
 
-	s4 off_simple_cues;
-	s4 off_complex_cues;
+	s4 off_simple_cue;
+	s4 off_complex_cue;
 	s4 off_cue_names;
 	s4 off_unknown1;
-	s4 off_variation_tables;
 	s4 off_unknown2;
-	s4 off_wavebank_names;
-	s4 off_cue_name_hash_table;
-	s4 off_cue_name_hash_values;
-	s4 off_sounds;
+	s4 off_unknown3;
+	s4 off_wavebank_name;
+	s4 off_cue_name_hash;
+	s4 off_cue_name_table;
+	s4 off_sound;
 
-	char name[64];
+	NAME name;
 } XSB_HEADER;
 
 
@@ -66,25 +90,21 @@ typedef struct {
 } XSB_SOUND <optimize=false>;
 
 
-typedef struct (int name_offset) {
+typedef struct (int index) {
+	local int name_index = index;
 	SetBackColor(0x90ff90);
 
 	u1 flags;
 	u4 sound_offset;
-
-	local int cur_pos = FTell();
-	FSeek(name_offset);
-	SetBackColor(0x90ffff);
-	string name;
-	FSeek(cur_pos);
-} XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE,optimize=false>;
+} XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE>;
 
 string read_XSB_SIMPLE_CUE(XSB_SIMPLE_CUE &in) {
-	return in.name;
+	return cn[in.name_index].name;
 }
 
 
-typedef struct (int name_offset) {
+typedef struct (int index) {
+	local int name_index = index;
 	SetBackColor(0x9090ff);
 
 	u1 flags;
@@ -94,16 +114,10 @@ typedef struct (int name_offset) {
 	u4 unknown;
 	u1 unknown;
 	u1 unknown;
-
-	local int cur_pos = FTell();
-	FSeek(name_offset);
-	SetBackColor(0x90ffff);
-	string name;
-	FSeek(cur_pos);
-} XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE,optimize=false>;
+} XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE>;
 
 string read_XSB_COMPLEX_CUE(XSB_COMPLEX_CUE &in) {
-	return in.name;
+	return cn[in.name_index].name;
 }
 
 
@@ -132,43 +146,39 @@ XSB_HEADER h;
 
 local int i;
 
-if (h.num_wavebanks) {
-	FSeek(h.off_wavebank_names);
-	for (i = 0; i < h.num_wavebanks; i++) {
-		SetBackColor(0xd8d8d8);
-		char wavebank_name[64];
+if (h.num_wavebank) {
+	FSeek(h.off_wavebank_name);
+	SetBackColor(0xd8d8d8);
+	NAME wn[h.num_wavebank];
+}
+
+if (h.num_sound) {
+	FSeek(h.off_sound);
+	//XSB_SOUND s[h.num_sound];
+}
+
+local int cur_name_index = 0;
+if (h.num_simple_cue) {
+	FSeek(h.off_simple_cue);
+	for (i = 0; i < h.num_simple_cue; i++, cur_name_index++) {
+		XSB_SIMPLE_CUE cs(cur_name_index);
 	}
 }
 
-local int name_offsets[h.num_simple_cues + h.num_complex_cues];
-local int cur_name = 0;
-if (h.cue_name_table_len) {
-	local string temp_name;
-	local int end_pos = h.off_cue_names + h.cue_name_table_len;
-	local int cur_pos = h.off_cue_names;
-	for (i = 0; cur_pos < end_pos; i++) {
-		temp_name = ReadString(cur_pos);
-		name_offsets[i] = cur_pos;
-		cur_pos += Strlen(temp_name) + 1;
+if (h.num_complex_cue) {
+	FSeek(h.off_complex_cue);
+	for (i = 0; i < h.num_complex_cue; i++, cur_name_index++) {
+		XSB_COMPLEX_CUE cc(cur_name_index);
 	}
 }
 
-if (h.num_sounds) {
-	FSeek(h.off_sounds);
-//	XSB_SOUND s[h.num_sounds];
-	XSB_SOUND s;
+if (h.num_cue_hash) {
+	FSeek(h.off_cue_name_hash);
+	SetBackColor(0xc0c0c0);
+	s2 ch[h.num_cue_hash] <format=decimal>;
 }
 
-if (h.num_simple_cues) {
-	FSeek(h.off_simple_cues);
-	for (i = 0; i < h.num_simple_cues; i++, cur_name++) {
-		XSB_SIMPLE_CUE c(name_offsets[cur_name]);
-	}
-}
-
-if (h.num_complex_cues) {
-	FSeek(h.off_complex_cues);
-	for (i = 0; i < h.num_complex_cues; i++, cur_name++) {
-		XSB_COMPLEX_CUE cc(name_offsets[cur_name]);
-	}
+if (h.num_simple_cue + h.num_complex_cue) {
+	FSeek(h.off_cue_name_table);
+	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue];
 }
