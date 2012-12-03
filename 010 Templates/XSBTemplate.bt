@@ -81,12 +81,16 @@ typedef struct {
 typedef struct {
 	SetBackColor(0xff9090);
 
+	local int cur_pos = FTell();
+
 	u1 flags;
 	u2 category;
 	u1 unknown;
 	u2 volume;
 	u1 unknown;
 	u2 entry_len;
+
+	FSeek(cur_pos + entry_len);
 } XSB_SOUND <optimize=false>;
 
 
@@ -154,7 +158,7 @@ if (h.num_wavebank) {
 
 if (h.num_sound) {
 	FSeek(h.off_sound);
-	//XSB_SOUND s[h.num_sound];
+	XSB_SOUND s[h.num_sound];
 }
 
 local int cur_name_index = 0;
