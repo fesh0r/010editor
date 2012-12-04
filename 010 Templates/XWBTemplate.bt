@@ -17,6 +17,16 @@ typedef int16  s2;
 typedef byte   s1;
 
 
+
+typedef struct {
+	char name[64];	
+} NAME <read=read_NAME,optimize=false>;
+
+string read_NAME(NAME &in) {
+	return in.name;
+}
+
+
 typedef struct {
     u4 region_offset;
     u4 region_size;
@@ -105,8 +115,6 @@ typedef struct (int size) {
         Printf("EntryMetadata size != size*entries\n");
     }
 
-    local quad start_pos = FTell();
-
     if (global_entries > 0) {
         EntryMetadata em(bd.entry_metadata_element_size)[global_entries];
     }
@@ -142,7 +150,14 @@ typedef struct (int size) {
 typedef struct (int size) {
 	SetBackColor(0xb0ffff);	
 
-    u4 unknown;
+    if ((64 * global_entries) != size) {
+        Warning("EntryName size != size*entries");
+        Printf("EntryName size != size*entries\n");
+    }
+
+    if (global_entries > 0) {
+        NAME n[global_entries];
+    }
 } XWB_EntryName <optimize=false>;
 
 
