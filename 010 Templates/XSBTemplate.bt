@@ -79,23 +79,50 @@ typedef struct {
 
 
 typedef struct {
-	u4 unknown;
+	u1 unknown;
+	u1 unknown;
+	u1 unknown;
+	u1 unknown;
 	u2 track;
 	u1 wavebank;
+	u1 loop_count;
+	u2 unknown;
+	u2 unknown;
+} CLIP_EVENT_1;
+
+
+typedef struct {
+	s2 pitch_min <format=decimal>;
+	s2 pitch_max <format=decimal>;
+	u1 vol_min;
+	u1 vol_max;
+	float freq_min;
+	float freq_max;
+	float q_min;
+	float q_max;
 	u1 unknown;
-	u2 unknown;
-	u2 unknown;
-} CLIP_EVENT_1 <optimize=false>;
+	u1 unknown_flags: 4;
+	u1 pitch_var: 1;
+	u1 vol_var: 1;
+	u1 freq_var: 1;
+	u1 q_var: 1;
+	Assert(unknown_flags == 0, "Unknown flags in CLIP_EVENT_4");
+} CLIP_EVENT_4;
 
 
 typedef struct {
 	SetBackColor(0xfff0a0);
 
-	u4 event_info;
-	
-	switch (event_info & 0x1f) {
+	u4 event_type: 5;
+	u4 event_info: 27;
+
+	switch (event_type) {
 		case 1:
-			CLIP_EVENT_1 event;
+			CLIP_EVENT_1 event1;
+			break;
+		case 4:
+			CLIP_EVENT_1 event1;
+			CLIP_EVENT_4 event4;
 			break;
 		default:
 			break;
@@ -116,9 +143,12 @@ typedef struct {
 typedef struct {
 	SetBackColor(0xffc090);
 
-	u1 unknown;
+	u1 volume;
 	u4 off_clip;
-	u4 unknown;
+	u2 filter_enable: 1;
+	enum <u2> {fLOW, fBAND, fHIGH} filter_type: 2;
+	u2 filter_q: 13 <format=decimal>;
+	u2 filter_freq <format=decimal>;
 
 	local int cur_pos = FTell();
 	FSeek(off_clip);
@@ -132,14 +162,18 @@ typedef struct {
 
 	local int cur_pos = FTell();
 
-	u1 flags;
+	u1 has_clips: 1;
+	u1 has_rpc: 3;
+	u1 has_dsp: 1;
+	u1 unknown_flags: 3;
+	Assert(unknown_flags == 0, "Unknown flags in XSB_SOUND");
 	u2 category;
-	u1 unknown;
-	u2 volume;
-	u1 unknown;
+	u1 volume;
+	s2 pitch <format=decimal>;
+	u1 priority;
 	u2 entry_len;
 
-	if (flags & 1) {
+	if (has_clips) {
 		u1 num_clip;
 	}
 	else {
@@ -147,13 +181,13 @@ typedef struct {
 		u1 wavebank;
 	}
 
-	if (flags & 0xe) {
+	if (has_rpc) {
 		SetBackColor(0xff90c0);
 		u2 rpc_extra;
 		u1 rpc[rpc_extra - 2];
 	}
 
-	if (flags & 16) {
+	if (has_dsp) {
 		SetBackColor(0xffa0f0);
 		u2 dsp_extra;
 		u1 dsp_num;
@@ -161,7 +195,7 @@ typedef struct {
 		Assert(dsp_extra == 2 + 1 + dsp_num * 4);
 	}
 
-	if (flags & 1) {
+	if (has_clips) {
 		XSB_CLIP clips[num_clip];
 	}
 
