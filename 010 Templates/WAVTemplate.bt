@@ -94,7 +94,7 @@ typedef struct
                  short channels[ format.wChannels ];
             else if( format.wBitsPerSample == 32 )
                  int   channels[ format.wChannels ];
-        } samples[ chunkSize / (int)format.wBlockAlign ];
+        } samples[ chunkSize / (int)format.wBlockAlign ] <optimize=true>;
     }
 
     // Padding so the next chunk starts on an even byte
