@@ -182,53 +182,53 @@ XGS_HEADER h;
 
 local int i;
 
-if (h.num_category) {
+if (h.num_category && h.off_category >= 0) {
 	FSeek(h.off_category);
 	for (i = 0; i < h.num_category; i++) {
 		XGS_CATEGORY c(i);
 	}
 }
 
-if (h.num_category_name_hash) {
+if (h.num_category_name_hash && h.off_category_name_hash >= 0) {
 	FSeek(h.off_category_name_hash);
 	SetBackColor(0xc0c0c0);
 	s2 cnh[h.num_category_name_hash] <format=decimal,hidden=true>;
 }
 
-if (h.num_category) {
+if (h.num_category && h.off_category_name_table >= 0) {
 	FSeek(h.off_category_name_table);
 	NAME_HASH cn[h.num_category] <hidden=true>;
 }
 
-if (h.num_variable) {
+if (h.num_variable && h.off_variable >= 0) {
 	FSeek(h.off_variable);
 	for (i = 0; i < h.num_variable; i++) {
 		XGS_VARIABLE v(i);
 	}
 }
 
-if (h.num_variable_name_hash) {
+if (h.num_variable_name_hash && h.off_variable_name_hash >= 0) {
 	FSeek(h.off_variable_name_hash);
 	SetBackColor(0xc0c0c0);
 	s2 vnh[h.num_variable_name_hash] <format=decimal,hidden=true>;
 }
 
-if (h.num_variable) {
+if (h.num_variable && h.off_variable_name_table >= 0) {
 	FSeek(h.off_variable_name_table);
 	NAME_HASH vn[h.num_variable] <hidden=true>;
 }
 
-if (h.num_rpc) {
+if (h.num_rpc && h.off_rp >= 0) {
 	FSeek(h.off_rpc);
 	XGS_RPC_CURVE r[h.num_rpc];
 }
 
-if (h.num_dsp) {
+if (h.num_dsp && h.off_dsp >= 0) {
 	FSeek(h.off_dsp);
 	XGS_DSP d[h.num_dsp];
 }
 
-if (h.num_dsp_param) {
+if (h.num_dsp_param && h.off_dsp_param >= 0) {
 	FSeek(h.off_dsp_param);
 	XGS_DSP_PARAM dp[h.num_dsp_param];
 }

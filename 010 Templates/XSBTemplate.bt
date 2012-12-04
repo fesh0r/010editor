@@ -179,7 +179,12 @@ typedef struct (int index) {
 } XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE>;
 
 string read_XSB_SIMPLE_CUE(XSB_SIMPLE_CUE &in) {
-	return cn[in.name_index].name;
+	if (h.cue_names_len) {
+		return cn[in.name_index].name;
+	}
+	else {
+		return "";
+	}
 }
 
 
@@ -197,7 +202,12 @@ typedef struct (int index) {
 } XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE>;
 
 string read_XSB_COMPLEX_CUE(XSB_COMPLEX_CUE &in) {
-	return cn[in.name_index].name;
+	if (h.cue_names_len) {
+		return cn[in.name_index].name;
+	}
+	else {
+		return "";
+	}
 }
 
 
@@ -226,39 +236,39 @@ XSB_HEADER h;
 
 local int i;
 
-if (h.num_wavebank) {
+if (h.num_wavebank && h.off_wavebank_name >= 0) {
 	FSeek(h.off_wavebank_name);
 	SetBackColor(0xd8d8d8);
 	NAME wn[h.num_wavebank];
 }
 
-if (h.num_sound) {
+if (h.num_sound && h.off_sound >= 0) {
 	FSeek(h.off_sound);
 	XSB_SOUND s[h.num_sound];
 }
 
 local int cur_name_index = 0;
-if (h.num_simple_cue) {
+if (h.num_simple_cue && h.off_simple_cue >= 0) {
 	FSeek(h.off_simple_cue);
 	for (i = 0; i < h.num_simple_cue; i++, cur_name_index++) {
 		XSB_SIMPLE_CUE cs(cur_name_index);
 	}
 }
 
-if (h.num_complex_cue) {
+if (h.num_complex_cue && h.off_complex_cue >= 0) {
 	FSeek(h.off_complex_cue);
 	for (i = 0; i < h.num_complex_cue; i++, cur_name_index++) {
 		XSB_COMPLEX_CUE cc(cur_name_index);
 	}
 }
 
-if (h.num_cue_hash) {
+if (h.num_cue_hash && h.off_cue_name_hash >= 0) {
 	FSeek(h.off_cue_name_hash);
 	SetBackColor(0xc0c0c0);
 	s2 ch[h.num_cue_hash] <format=decimal,hidden=true>;
 }
 
-if (h.num_simple_cue + h.num_complex_cue) {
+if (h.cue_names_len && h.off_cue_name_table >= 0) {
 	FSeek(h.off_cue_name_table);
 	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue] <hidden=true>;
 }
