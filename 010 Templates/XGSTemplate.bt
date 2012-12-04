@@ -81,7 +81,8 @@ typedef struct (int index) {
 	u1 volume;
 	u1 bg_music: 1;
 	u1 public: 1;
-	u1 unknown: 6;
+	u1 unknown_flags: 6;
+	Assert(unknown_flags == 0, "Unknown flags in XGS_CATEGORY");
 } XGS_CATEGORY <read=read_XGS_CATEGORY>;
 
 string read_CATEGORY_parent(s2 &in) {
@@ -106,7 +107,8 @@ typedef struct (int index) {
 	u1 read_only: 1;
 	u1 cue_instance: 1;
 	u1 reserved: 1;
-	u1 unknown: 4;
+	u1 unknown_flags: 4;
+	Assert(unknown_flags == 0, "Unknown flags in XGS_VARIABLE");
 
 	float init_val;
 	float min_val;
@@ -218,7 +220,7 @@ if (h.num_variable && h.off_variable_name_table >= 0) {
 	NAME_HASH vn[h.num_variable] <hidden=true>;
 }
 
-if (h.num_rpc && h.off_rp >= 0) {
+if (h.num_rpc && h.off_rpc >= 0) {
 	FSeek(h.off_rpc);
 	XGS_RPC_CURVE r[h.num_rpc];
 }
