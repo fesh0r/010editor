@@ -36,8 +36,14 @@ typedef struct {
 
 	char signature[4];
 
-	u2 content_version <format=decimal>;
-	u2 header_version <format=decimal>;
+	local u2 ver = ReadUShort(FTell());
+	if (ver > 41) {
+		u2 content_version <format=decimal>;
+		u2 header_version <format=decimal>;
+	}
+	else {
+		u2 header_version <format=decimal>;
+	}
 
 	u2 crc;
 
@@ -53,14 +59,14 @@ typedef struct {
 	u2 num_dsp <format=decimal>;
 	u2 num_dsp_param <format=decimal>;
 
-    s4 off_category;
-    s4 off_variable;
-    s4 off_category_name_hash;
-    s4 off_category_name_table;
-    s4 off_variable_name_hash;
-    s4 off_variable_name_table;
-    s4 off_category_names;
-    s4 off_variable_names;
+	s4 off_category;
+	s4 off_variable;
+	s4 off_category_name_hash;
+	s4 off_category_name_table;
+	s4 off_variable_name_hash;
+	s4 off_variable_name_table;
+	s4 off_category_names;
+	s4 off_variable_names;
 	s4 off_rpc;
 	s4 off_dsp;
 	s4 off_dsp_param;
@@ -132,7 +138,10 @@ typedef struct {
 
 	u2 var_index <read=read_RPC_var>;
 	u1 point_count;
-	u2 param;
+	enum <u2> {pVOLUME=0x0, pPITCH, pREVERB_SEND, pFILTER_FREQ, pFILTER_Q, pR_REF_DELAY, pR_REV_DELAY, pR_POS_LEFT, 
+			   pR_POS_RIGHT=0x8, pR_POS_LEFTM, pR_POS_RIGHTM, pR_EARLY_DIFF, pR_LATE_DIFF, pR_LOEQ_GAIN, pR_LOEQ_CUT, pR_HIEQ_GAIN, 
+			   pR_HIEQ_CUT=0x10, pR_REAR_DELAY, pR_ROOM_FREQ, pR_ROOM_MAIN, pR_ROOM_HFREQ, pR_REF_GAIN, pR_REV_GAIN, pR_DECAY, 
+			   pR_DENSITY=0x18, pR_ROOM_SIZE, pR_MIX} param;
 	RPC_POINT points[point_count];
 } XGS_RPC_CURVE <optimize=false>;
 
@@ -143,20 +152,22 @@ string read_RPC_var(u2 &in) {
 
 typedef struct {
 	SetBackColor(0x90ffff);
-	u1 unknown;
+	u1 global;
+	u2 num_param;
 	u2 unknown;
-	u2 unknown;
-} XGS_DSP;
+	Assert(unknown == 0);
+} XGS_DSP <optimize=true>;
 
 
 typedef struct {
 	SetBackColor(0xffff90);
-	u1 unknown;
+	u1 type;
 	float init_val;
 	float min_val;
 	float max_val;
 	u2 unknown;
-} XGS_DSP_PARAM;
+	Assert(unknown == 0);
+} XGS_DSP_PARAM <optimize=true>;
 
 
 DisplayFormatHex();

@@ -82,12 +82,17 @@ typedef struct {
 	u1 unknown;
 	u1 unknown;
 	u1 unknown;
-	u1 unknown;
+	u1 loop_play_release: 1;
+	u1 pan_enable: 1;
+	u1 pan_center: 1;
+	u1 pan_new: 1;
+	u1 unknown_flags: 4;
 	u2 track;
 	u1 wavebank;
 	u1 loop_count;
-	u2 unknown;
-	u2 unknown;
+	u2 pan_angle <format=decimal>;
+	u2 pan_arc <format=decimal>;
+	Assert(unknown_flags == 0);
 } CLIP_EVENT_1;
 
 
@@ -100,13 +105,22 @@ typedef struct {
 	float freq_max;
 	float q_min;
 	float q_max;
-	u1 unknown;
-	u1 unknown_flags: 4;
+	u1 vol_add: 1;
+	u1 unknown: 1;
+	u1 pitch_add: 1;
+	u1 unknown: 1;
+	u1 freq_add: 1;
+	u1 unknown: 1;
+	u1 q_add: 1;
+	u1 unknown: 1;
+	u1 pitch_new: 1;
+	u1 vol_new: 1;
+	u1 freq_new: 1;
+	u1 q_new: 1;
 	u1 pitch_var: 1;
 	u1 vol_var: 1;
 	u1 freq_var: 1;
 	u1 q_var: 1;
-	Assert(unknown_flags == 0, "Unknown flags in CLIP_EVENT_4");
 } CLIP_EVENT_4;
 
 
@@ -156,6 +170,12 @@ typedef struct {
 	FSeek(cur_pos);
 } XSB_CLIP <optimize=false>;
 
+typedef struct {
+	u1 var_num;
+	u4 var_offset[var_num];
+	cur_size += 1 + 4 * var_num;
+} VAR_OFFSETS <optimize=false>;
+
 
 typedef struct {
 	SetBackColor(0xff9090);
@@ -181,18 +201,25 @@ typedef struct {
 		u1 wavebank;
 	}
 
+	local int cur_size = 0;
 	if (has_rpc) {
+		local int rpc_pos = FTell();
 		SetBackColor(0xff90c0);
 		u2 rpc_extra;
-		u1 rpc[rpc_extra - 2];
+		cur_size = 2;
+		VAR_OFFSETS rpc[rpc_count];
+		//Assert(rpc_extra == cur_size);
+		FSeek(rpc_pos + rpc_extra);
 	}
 
 	if (has_dsp) {
+		local int dsp_pos = FTell();
 		SetBackColor(0xffa0f0);
 		u2 dsp_extra;
-		u1 dsp_num;
-		u4 dsp_param[dsp_num];
-		Assert(dsp_extra == 2 + 1 + dsp_num * 4);
+		cur_size = 2;
+		VAR_OFFSETS dsp;
+		Assert(dsp_extra == cur_size);
+		FSeek(dsp_pos + dsp_extra);
 	}
 
 	if (has_clips) {
