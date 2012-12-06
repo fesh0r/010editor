@@ -66,7 +66,7 @@ typedef struct {
 	local int i;
 	TAG_TYPE tagType <hidden=true>;
 	TAG_Int length <hidden=true>;
-	
+
 	for (i = 0; i < length; i++) {
 		TAG(tagType);
 	}
@@ -82,7 +82,7 @@ string read_TAG_LIST(TAG_List &in) {
 
 typedef struct {
 	TAG_TYPE tagType <hidden=true>;
-	
+
 	if (tagType != 0) {
 		TAG_String name <hidden=true>;
 		TAG(tagType);
@@ -104,7 +104,7 @@ string read_TAG_Named(TAG_Named &in) {
 typedef struct {
 	local int found_end = 0;
 	local int tag_count = 0;
-	
+
 	while (!found_end) {
 		found_end = (ReadByte(FTell()) == 0);
 

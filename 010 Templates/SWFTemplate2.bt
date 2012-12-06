@@ -8,7 +8,7 @@
  * the file format specification for Flash 9. This is most
  * compatible with Actionscript 1 and 2 as the Actionscript
  * Byte Code has not been templated in.
- * Changes: 1.1 - Updated email address 
+ * Changes: 1.1 - Updated email address
  *************************************************************/
 
 
@@ -76,7 +76,7 @@ typedef struct {
 	switch (ActionCode) {
 		/************************
 		 *  SWF 3 Action Model	*
-		 ************************/ 
+		 ************************/
 		case 0x81:		/* ActionGotoFrame */
 			if (Length != 2) {
 				Warning("ActionGotoFrame: Length must be 2.");
@@ -110,7 +110,7 @@ typedef struct {
 
 		/************************
 		 *  SWF 4 Action Model	*
-		 ************************/ 
+		 ************************/
 		case 0x96:		/* ActionPush */
 			do {
 				TYPECONST TypeConst;
@@ -181,7 +181,7 @@ typedef struct {
 
 		/************************
 		 *  SWF 5 Action Model	*
-		 ************************/ 
+		 ************************/
 		case 0x3d:		/* ActionCallFunction */
 		case 0x52:		/* ActionCallMethod */
 			break;
@@ -240,7 +240,7 @@ typedef struct {
 
 		/************************
 		 *  SWF 6 Action Model	*
-		 ************************/ 
+		 ************************/
 		case 0x55:		/* ActionEnumerate2 */
 		case 0x66:		/* ActionStrictEquals */
 		case 0x67:		/* ActionGreater */
@@ -249,7 +249,7 @@ typedef struct {
 
 		/************************
 		 *  SWF 7 Action Model	*
-		 ************************/ 
+		 ************************/
 		case 0x8e:		/* ActionDefineFunction2 */
 			string FunctionName;
 			ushort NumParams;
@@ -290,14 +290,14 @@ typedef struct {
 			}
 			if (TrySize) ubyte TryBody[TrySize];
 			if (CatchSize) ubyte CatchBody[CatchSize];
-			if (FinallySize) ubyte FinallyBody[FinallySize]; 
+			if (FinallySize) ubyte FinallyBody[FinallySize];
 			break;
 		case 0x2a:		/* ActionThrow */
 			break;
 
 		/************************
 		 *  SWF 9 Action Model	*
-		 ************************/ 
+		 ************************/
 
 		default:		/* Undefined Behavior */
 			if (ActionCode>=0x80) {
@@ -312,7 +312,7 @@ typedef struct {
 	 * parsing correctly. This may be due to
 	 * my code, obfuscation techniques or
 	 * other unknown circumstances.
-	 *****************************************/ 
+	 *****************************************/
 	if (ActionCode>=0x80) {
 		if (ActionTagEnd>FTell()) {
 			ubyte Padding[ActionTagEnd-FTell()];
@@ -433,7 +433,7 @@ string GetActionType(ACTIONRECORD &ActionTag)
 
 		case 0x00:		return "END";
 		default:		SPrintf(action, "%02Xh", ActionType);
-					
+
 	}
 	return action;
 }
@@ -722,7 +722,7 @@ typedef struct {
 	ubyte Knockout          	: 1;
 	ubyte CompositeSource   	: 1;
 	ubyte Passes            	: 5;
-} GLOWFILTER;   
+} GLOWFILTER;
 
 typedef struct {
 	RGBA ShadowColor;
@@ -741,11 +741,11 @@ typedef struct {
 
 typedef struct {
 	ubyte Ratio;
-	if ((CurrentTag == 2)		/* DefineShape 	*/ 
+	if ((CurrentTag == 2)		/* DefineShape 	*/
 	|| (CurrentTag == 22)) { 	/* DefineShape2 */
 		RGB Color;
 	}
-	else {				/* DefineShape3 */	
+	else {				/* DefineShape3 */
 		RGBA Color;
 	}
 } GRADRECORD;
@@ -808,7 +808,7 @@ typedef struct {
 typedef struct {
 	ushort FilterId;
 	switch (FilterId) {
-		case 0: 
+		case 0:
 			DROPSHADOWFILTER DropShadowFilter;
 			break;
 		case 1:
@@ -848,7 +848,7 @@ typedef struct {
 	switch (FillStyleType) {
 		case 0x00:
 			if ((CurrentTag == 2) 		/* DefineShape  */
-			|| (CurrentTag == 22)) { 	/* DefineShape2 */  
+			|| (CurrentTag == 22)) { 	/* DefineShape2 */
 				RGB Color;
 			}
 			else {				/* DefineShape3 */
@@ -893,7 +893,7 @@ typedef struct {
 
 typedef struct {
 	ushort Width;
-	if ((CurrentTag == 2)		/* DefineShape  */ 
+	if ((CurrentTag == 2)		/* DefineShape  */
 	|| (CurrentTag == 22)) { 	/* DefineShape2 */
 		RGB Color;
 	}
@@ -931,21 +931,21 @@ typedef struct {
 	if (LineStyleCount == 0xff) {
 		UI16 LineStyleCountExtended;
 		for (i=0; i<LineStyleCountExtended; i++) {
-			if ((CurrentTag == 2)		/* DefineShape  */ 
+			if ((CurrentTag == 2)		/* DefineShape  */
 			|| (CurrentTag == 22) 		/* DefineShape2 */
-			|| (CurrentTag == 32)) {	/* DefineShape3 */ 
+			|| (CurrentTag == 32)) {	/* DefineShape3 */
 				LINESTYLE LineStyle;
 			}
 			else if (CurrentTag == 83) {	/* DefineShape4 */
 				LINESTYLE2 LineStyle;
-			}	
+			}
 		}
 	}
 	else {
 		for (i=0; i<LineStyleCount; i++) {
-			if ((CurrentTag == 2)		/* DefineShape  */ 
+			if ((CurrentTag == 2)		/* DefineShape  */
 			|| (CurrentTag == 22) 		/* DefineShape2 */
-			|| (CurrentTag == 32)) {	/* DefineShape3 */ 
+			|| (CurrentTag == 32)) {	/* DefineShape3 */
 				LINESTYLE LineStyle;
 			}
 			else if (CurrentTag == 83) {	/* DefineShape4 */
@@ -968,7 +968,7 @@ typedef struct {
 				int DeltaX		: NumBits+2;
 				int DeltaY		: NumBits+2;
 			}
-			else { 
+			else {
 				ubyte VertLineFlag	: 1;
 				if (VertLineFlag) {
 					int DeltaY	: NumBits+2;
@@ -979,12 +979,12 @@ typedef struct {
 			}
 		}
 		else {				/* CurvedEdgeRecord */
-			ubyte NumBits		: 4;	
+			ubyte NumBits		: 4;
 			int ControlDeltaX	: NumBits+2;
 			int ControlDeltaY	: NumBits+2;
 			int AnchorDeltaX	: NumBits+2;
 			int AnchorDeltaY	: NumBits+2;
-		}	
+		}
 	}
 	else {				/* StyleChangeRecord & EndShapeRecord */
 		ubyte StateNewStyles		: 1;
@@ -1006,7 +1006,7 @@ typedef struct {
 		if (StateLineStyle) {
 			int LineStyle		: LineBits;
 		}
-		if ((CurrentTag == 22 || CurrentTag == 32) && StateNewStyles) { 
+		if ((CurrentTag == 22 || CurrentTag == 32) && StateNewStyles) {
 			FILLSTYLEARRAY FillStyles;
 			LINESTYLEARRAY LineStyles;
 			ubyte NumFillBits	: 4;
@@ -1023,23 +1023,23 @@ typedef struct {
  * do with them generating this error
  * if a structure is not at least one
  * byte in length. This particular
- * structure is an unpadded 6 bits in 
+ * structure is an unpadded 6 bits in
  * length when generating an
  * EndShapeRecord.
  ***************************************/
-} SHAPERECORD <read=GetShapeRecordType>; 
+} SHAPERECORD <read=GetShapeRecordType>;
 
 string GetShapeRecordType(SHAPERECORD &ShapeRecord)
 {
 	if (ShapeRecord.TypeFlag) {
-		if (ShapeRecord.StraightFlag) {	
+		if (ShapeRecord.StraightFlag) {
 			return "StraightEdgeRecord";
 		}
 		else {
 			return "CurvedEdgeRecord";
-		}	
+		}
 	}
-	else if (ShapeRecord.TypeFlag 
+	else if (ShapeRecord.TypeFlag
 		|| ShapeRecord.StateNewStyles
 		|| ShapeRecord.StateLineStyle
 		|| ShapeRecord.StateFillStyle1
@@ -1050,7 +1050,7 @@ string GetShapeRecordType(SHAPERECORD &ShapeRecord)
 	else {
 		return "EndShapeRecord";
 	}
-	
+
 }
 
 typedef struct {
@@ -1060,9 +1060,9 @@ typedef struct {
 	local ubyte FillBits = NumFillBits;
 	local ubyte LineBits = NumLineBits;
 	BitfieldDisablePadding();
- 	do {
-		SHAPERECORD ShapeRecord; 
-	} while (ShapeRecord.TypeFlag 
+	do {
+		SHAPERECORD ShapeRecord;
+	} while (ShapeRecord.TypeFlag
 		|| ShapeRecord.StateNewStyles
 		|| ShapeRecord.StateLineStyle
 		|| ShapeRecord.StateFillStyle1
@@ -1081,8 +1081,8 @@ typedef struct {
 	local ubyte LineBits = NumLineBits;
 	BitfieldDisablePadding();
 	do {
-		SHAPERECORD ShapeRecord; 
-	} while (ShapeRecord.TypeFlag 
+		SHAPERECORD ShapeRecord;
+	} while (ShapeRecord.TypeFlag
 		|| ShapeRecord.StateNewStyles
 		|| ShapeRecord.StateLineStyle
 		|| ShapeRecord.StateFillStyle1
@@ -1200,7 +1200,7 @@ typedef struct {
 		}
 	}
 } MORPHFILLSTYLEARRAY;
-		
+
 typedef struct {
 	ubyte Pix15Reserved		: 1;
 	ubyte Pix15Red			: 5;
@@ -1362,7 +1362,7 @@ typedef struct {
 	switch (Header.TagType) {
 		/************************
 		 *    DoAction Tags	*
-		 ************************/ 
+		 ************************/
 		case 59:			/* DoInitAction */
 			ushort SpriteID;
 		case 12:			/* DoAction */
@@ -1373,11 +1373,11 @@ typedef struct {
 		case 82:			/* DoABC */
 			ubyte ByteCode[SWFTagEnd - FTell()];
 			break;
-			
+
 
 		/************************
 		 *  Display List Tags	*
-		 ************************/ 
+		 ************************/
 		case 4:				/* PlaceObject */
 			ushort CharacterId;
 			ushort Depth;
@@ -1425,7 +1425,7 @@ typedef struct {
 			ubyte PlaceFlagHasBlendMode		: 1;
 			ubyte PlaceFlagHasFilterList		: 1;
 			ushort Depth;
-			if (PlaceFlagHasClassName 
+			if (PlaceFlagHasClassName
 			|| (PlaceFlagHasImage && PlaceFlagHasCharacter)) {
 				string ClassName;
 			}
@@ -1467,7 +1467,7 @@ typedef struct {
 
 		/************************
 		 *     Control Tags	*
-		 ************************/ 
+		 ************************/
 		case 9:				/* SetBackgroundColor */
 			RGB BackgroundColor;
 			break;
@@ -1552,7 +1552,7 @@ typedef struct {
 
 		/************************
 		 *     Shape Tags	*
-		 ************************/ 
+		 ************************/
 		case 2:				/* DefineShape */
 			ushort ShapeId;
 			RECT ShapeBounds;
@@ -1581,7 +1581,7 @@ typedef struct {
 
 		/************************
 		 *     Bitmap Tags	*
-		 ************************/ 
+		 ************************/
 		case 6:				/* DefineBits */
 			ushort CharacterId;
 			if ((SWFTagEnd-FTell())>0) {
@@ -1639,7 +1639,7 @@ typedef struct {
 
 		/************************
 		 * Shape Morphing Tags	*
-		 ************************/ 
+		 ************************/
 		case 46:			/* DefineMorphShape */
 			ushort CharacterId;
 			RECT StartBounds;
@@ -1669,7 +1669,7 @@ typedef struct {
 
 		/************************
 		 *       Font Tags	*
-		 ************************/ 
+		 ************************/
 		case 10:			/* DefineFont */
 			ushort FontID;
 			ubyte Data[SWFTagEnd-FTell()];
@@ -1753,7 +1753,7 @@ typedef struct {
 				}
 				ushort KerningCount;
 				for (i=0; i<KerningCount; i++) {
-			 		KERNINGRECORD FontKerningTable;
+					KERNINGRECORD FontKerningTable;
 				}
 			}
 			break;
@@ -1764,7 +1764,7 @@ typedef struct {
 			if ((SWFTagEnd-FTell())>0) {
 				ubyte ZoneTable[SWFTagEnd-FTell()];
 			}
-			break;	
+			break;
 		case 88:			/* DefineFontName */
 			ushort FontID;
 			string FontName;
@@ -1778,7 +1778,7 @@ typedef struct {
 			ubyte GlyphBits;
 			ubyte AdvanceBits;
 			ubyte TextRecords[SWFTagEnd-FTell()];
-			break;	
+			break;
 		case 37:			/* DefineEditText */
 			ushort CharacterID;
 			RECT Bounds;
@@ -1838,7 +1838,7 @@ typedef struct {
 
 		/************************
 		 *      Sound Tags	*
-		 ************************/ 
+		 ************************/
 		case 14:			/* DefineSound */
 			ushort SoundId;
 			ubyte SoundFormat	: 4;
@@ -1891,7 +1891,7 @@ typedef struct {
 
 		/************************
 		 *      Button Tags	*
-		 ************************/ 
+		 ************************/
 		case 7:				/* DefineButton */
 			ushort ButtonId;
 			do {
@@ -1949,7 +1949,7 @@ typedef struct {
 
 		/************************
 		 *     Sprite Tags	*
-		 ************************/ 
+		 ************************/
 		case 39:			/* DefineSprite */
 			ushort SpriteID;
 			ushort FrameCount;
@@ -1959,7 +1959,7 @@ typedef struct {
 
 		/************************
 		 *      Video Tags	*
-		 ************************/ 
+		 ************************/
 		case 60:			/* DefineVideoSteam */
 			ushort CharacterID;
 			ushort NumFrames;
@@ -1979,7 +1979,7 @@ typedef struct {
 
 		/************************
 		 *   Binary Data Tags	*
-		 ************************/ 
+		 ************************/
 		case 87:			/* DefineBinaryData */
 			ushort Tag;
 			uint Reserved;
@@ -1989,22 +1989,22 @@ typedef struct {
 
 		/************************
 		 *   Undocumented Tags	*
-		 ************************/ 
+		 ************************/
 		case 41:	 		/* Serial Number */
 			if ((SWFTagEnd-FTell())>0) {
 				ubyte Data[SWFTagEnd-FTell()];
 			}
-			break;	
+			break;
 		case 63:	 		/* MX4 */
 			if ((SWFTagEnd-FTell())>0) {
 				ubyte Data[SWFTagEnd-FTell()];
 			}
-			break;	
+			break;
 		case 253:			/* Amayeta Encryption */
 			if ((SWFTagEnd-FTell())>0) {
 				ubyte Data[SWFTagEnd-FTell()];
 			}
-			break;	
+			break;
 		default:
 			if ((SWFTagEnd-FTell())>0) {
 				ubyte Data[SWFTagEnd-FTell()];
@@ -2034,7 +2034,7 @@ string GetTagType(SWFTAG &Tag)
 	switch (TagType) {
 		/************************
 		 *    DoAction Tags	*
-		 ************************/ 
+		 ************************/
 		case 59:	return "DoInitAction";
 		case 12:	return "DoAction";
 		case 82:	return "DoABC";
@@ -2042,7 +2042,7 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *  Display List Tags	*
-		 ************************/ 
+		 ************************/
 		case 4:		return "PlaceObject";
 		case 26:	return "PlaceObject2";
 		case 70:	return "PlaceObject3";
@@ -2053,7 +2053,7 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *     Control Tags	*
-		 ************************/ 
+		 ************************/
 		case 9:		return "SetBackgroundColor";
 		case 43:	return "FrameLabel";
 		case 24:	return "Protect";
@@ -2074,7 +2074,7 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *     Shape Tags	*
-		 ************************/ 
+		 ************************/
 		case 2:		return "DefineShape";
 		case 22:	return "DefineShape2";
 		case 32:	return "DefineShape3";
@@ -2083,7 +2083,7 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *     Bitmap Tags	*
-		 ************************/ 
+		 ************************/
 		case 6:		return "DefineBits";
 		case 8:		return "JPEGTables";
 		case 21:	return "DefineBitsJPEG2";
@@ -2094,14 +2094,14 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 * Shape Morphing Tags	*
-		 ************************/ 
+		 ************************/
 		case 46:	return "DefineMorphShape";
 		case 84:	return "DefineMorphShape2";
 
 
 		/************************
 		 *       Font Tags	*
-		 ************************/ 
+		 ************************/
 		case 10:	return "DefineFont";
 		case 13:	return "DefineFontInfo";
 		case 62:	return "DefineFontInfo2";
@@ -2117,7 +2117,7 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *      Sound Tags	*
-		 ************************/ 
+		 ************************/
 		case 14:	return "DefineSound";
 		case 15:	return "StartSound";
 		case 89:	return "StartSound2";
@@ -2128,7 +2128,7 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *      Button Tags	*
-		 ************************/ 
+		 ************************/
 		case 7:		return "DefineButton";
 		case 34:	return "DefineButton2";
 		case 23:	return "DefineButtonCxform";
@@ -2137,26 +2137,26 @@ string GetTagType(SWFTAG &Tag)
 
 		/************************
 		 *     Sprite Tags	*
-		 ************************/ 
+		 ************************/
 		case 39:	return "DefineSprite";
 
 
 		/************************
 		 *      Video Tags	*
-		 ************************/ 
+		 ************************/
 		case 60:	return "DefineVideoSteam";
 		case 61:	return "VideoFrame";
 
 
 		/************************
 		 *   Binary Data Tags	*
-		 ************************/ 
+		 ************************/
 		case 87:	return "DefineBinaryData";
 
 
 		/************************
 		 *  Undocumented Tags	*
-		 ************************/ 
+		 ************************/
 		case 41:	return "Serial Number";
 		case 63:	return "MX4";
 		case 253:	return "Amayeta Encrypt";
@@ -2182,18 +2182,18 @@ BitfieldLeftToRight();
 
 typedef struct {
 	SetBackColor(cLtGray);
-	uchar Signature[3]; 
+	uchar Signature[3];
 	uchar Version;
-	uint FileLength; 	
-	RECT Rect; 
+	uint FileLength;
+	RECT Rect;
 	BigEndian();
-	ushort FrameRate;	
+	ushort FrameRate;
 	LittleEndian();
-	ushort FrameCount; 
+	ushort FrameCount;
 
 	if (Signature[0] != 'F'
 	||  Signature[1] != 'W'
-	||  Signature[2] != 'S') 
+	||  Signature[2] != 'S')
 		Printf("WARNING: This is not a SWF file... (compressed?)");
 } SWFHEADER;
 
@@ -2206,7 +2206,7 @@ typedef struct {
 
 /************************
  *  Start File Parsing  *
- ************************/ 
+ ************************/
 
 SWF File;
 

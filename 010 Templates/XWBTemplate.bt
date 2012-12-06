@@ -19,7 +19,7 @@ typedef byte   s1;
 
 
 typedef struct {
-	char name[64];	
+	char name[64];
 } NAME <read=read_NAME,optimize=false>;
 
 string read_NAME(NAME &in) {
@@ -28,14 +28,14 @@ string read_NAME(NAME &in) {
 
 
 typedef struct {
-    u4 region_offset;
-    u4 region_size;
+	u4 region_offset;
+	u4 region_size;
 } XWB_Region <read=read_XWB_Region>;
 
 string read_XWB_Region(XWB_Region &in) {
-    string out;
-    SPrintf(out, "%Xh+%Xh", in.region_offset, in.region_size);
-    return out;
+	string out;
+	SPrintf(out, "%Xh+%Xh", in.region_offset, in.region_size);
+	return out;
 }
 
 
@@ -44,80 +44,80 @@ typedef struct {
 
 	char signature[4];
 
-    u4 content_version <format=decimal>;
-    global_version = content_version;
+	u4 content_version <format=decimal>;
+	global_version = content_version;
 
-    if (global_version <= 3) {
-        Warning("Nonhandled version");
-        Printf("Nonhandled version\n");
-        return -1;
-    }
-    
-    if (global_version >= 42) {
-        u4 header_version <format=decimal>;
-    }
+	if (global_version <= 3) {
+		Warning("Nonhandled version");
+		Printf("Nonhandled version\n");
+		return -1;
+	}
 
-    XWB_Region r[5];
+	if (global_version >= 42) {
+		u4 header_version <format=decimal>;
+	}
+
+	XWB_Region r[5];
 } XWB_Header;
 
 
 typedef struct (int size) {
 	SetBackColor(0xb0ffb0);
 
-    local quad start_pos = FTell();
+	local quad start_pos = FTell();
 
-    u4 flags;
+	u4 flags;
 
-    u4 entries;
-    global_entries = entries;
+	u4 entries;
+	global_entries = entries;
 
-    char bank_name[64];
+	char bank_name[64];
 
-    u4 entry_metadata_element_size;
-    u4 entry_name_element_size;
-    u4 alignment;
+	u4 entry_metadata_element_size;
+	u4 entry_name_element_size;
+	u4 alignment;
 
-    u4 compact_flags;
-    FILETIME build_time;
+	u4 compact_flags;
+	FILETIME build_time;
 
-    if ((FTell() - start_pos) != size) {
-        Warning("BankData size incorrect");
-        Printf("BankData size incorrect\n");
-    }
+	if ((FTell() - start_pos) != size) {
+		Warning("BankData size incorrect");
+		Printf("BankData size incorrect\n");
+	}
 } XWB_BankData <optimize=false>;
 
 
 typedef struct (int size) {
 	SetBackColor(0xffb0b0);
 
-    local quad start_pos = FTell();
-    
-    u4 flags;
-    u4 format;
+	local quad start_pos = FTell();
 
-    XWB_Region wave_data;
+	u4 flags;
+	u4 format;
+
+	XWB_Region wave_data;
 
 	SetBackColor(0xffb0b0);
-    XWB_Region loop_region;
+	XWB_Region loop_region;
 
-    if ((FTell() - start_pos) != size) {
-        Warning("EntryMetadata size incorrect");
-        Printf("EntryMetadata size incorrect\n");
-    }
+	if ((FTell() - start_pos) != size) {
+		Warning("EntryMetadata size incorrect");
+		Printf("EntryMetadata size incorrect\n");
+	}
 } EntryMetadata <optimize=false>;
 
 
 typedef struct (int size) {
 	SetBackColor(0xffb0b0);
 
-    if ((bd.entry_metadata_element_size * global_entries) != size) {
-        Warning("EntryMetadata size != size*entries");
-        Printf("EntryMetadata size != size*entries\n");
-    }
+	if ((bd.entry_metadata_element_size * global_entries) != size) {
+		Warning("EntryMetadata size != size*entries");
+		Printf("EntryMetadata size != size*entries\n");
+	}
 
-    if (global_entries > 0) {
-        EntryMetadata em(bd.entry_metadata_element_size)[global_entries];
-    }
+	if (global_entries > 0) {
+		EntryMetadata em(bd.entry_metadata_element_size)[global_entries];
+	}
 } XWB_EntryMetadata <optimize=false>;
 
 typedef struct (int pos) {
@@ -125,7 +125,7 @@ typedef struct (int pos) {
 	u4 offset;
 	local int cur_pos = FTell();
 	FSeek(pos + offset);
-	SetBackColor(0xd0d0ff);	
+	SetBackColor(0xd0d0ff);
 	u4 size;
 	if (size > 0) {
 		u4 data[size];
@@ -135,9 +135,9 @@ typedef struct (int pos) {
 } SeekTable <optimize=false>;
 
 typedef struct (int size) {
-	SetBackColor(0xb0b0ff);	
+	SetBackColor(0xb0b0ff);
 
-    if (global_entries > 0) {
+	if (global_entries > 0) {
 		local int i;
 		local int table_pos = FTell() + 4 * global_entries;
 		for (i = 0; i < global_entries; i++) {
@@ -148,35 +148,35 @@ typedef struct (int size) {
 
 
 typedef struct (int size) {
-	SetBackColor(0xb0ffff);	
+	SetBackColor(0xb0ffff);
 
-    if ((64 * global_entries) != size) {
-        Warning("EntryName size != size*entries");
-        Printf("EntryName size != size*entries\n");
-    }
+	if ((64 * global_entries) != size) {
+		Warning("EntryName size != size*entries");
+		Printf("EntryName size != size*entries\n");
+	}
 
-    if (global_entries > 0) {
-        NAME n[global_entries];
-    }
+	if (global_entries > 0) {
+		NAME n[global_entries];
+	}
 } XWB_EntryName <optimize=false>;
 
 
 typedef struct (int size) {
-    u1 d[size];
+	u1 d[size];
 } Data <optimize=false>;
 
 
 typedef struct (int size) {
 	SetBackColor(0xffb0ff);
 
-    local int start_pos = h.r[4].region_offset;
+	local int start_pos = h.r[4].region_offset;
 
-    local int i;
-    for (i = 0; i < global_entries; i++) {
-        FSeek(start_pos + em.em[i].wave_data.region_offset);
-    	SetBackColor(0xffb0ff);	
-        Data wavedata(em.em[i].wave_data.region_size);
-    }
+	local int i;
+	for (i = 0; i < global_entries; i++) {
+		FSeek(start_pos + em.em[i].wave_data.region_offset);
+		SetBackColor(0xffb0ff);
+		Data wavedata(em.em[i].wave_data.region_size);
+	}
 } XWB_EntryWaveData <optimize=false>;
 
 
@@ -204,26 +204,26 @@ if (sig != 0x444E4257) {
 XWB_Header h;
 
 if (h.r[0].region_offset > 0 && h.r[0].region_size > 0) {
-    FSeek(h.r[0].region_offset);
-    XWB_BankData bd(h.r[0].region_size);
+	FSeek(h.r[0].region_offset);
+	XWB_BankData bd(h.r[0].region_size);
 }
 
 if (h.r[1].region_offset > 0 && h.r[1].region_size > 0) {
-    FSeek(h.r[1].region_offset);
-    XWB_EntryMetadata em(h.r[1].region_size);
+	FSeek(h.r[1].region_offset);
+	XWB_EntryMetadata em(h.r[1].region_size);
 }
 
 if (h.r[2].region_offset > 0 && h.r[2].region_size > 0) {
-    FSeek(h.r[2].region_offset);
-    XWB_SeekTable st(h.r[2].region_size);
+	FSeek(h.r[2].region_offset);
+	XWB_SeekTable st(h.r[2].region_size);
 }
 
 if (h.r[3].region_offset > 0 && h.r[3].region_size > 0) {
-    FSeek(h.r[3].region_offset);
-    XWB_EntryName en(h.r[3].region_size);
+	FSeek(h.r[3].region_offset);
+	XWB_EntryName en(h.r[3].region_size);
 }
 
 if (h.r[4].region_offset > 0 && h.r[4].region_size > 0) {
-    FSeek(h.r[4].region_offset);
-    XWB_EntryWaveData wd(h.r[4].region_size);
+	FSeek(h.r[4].region_offset);
+	XWB_EntryWaveData wd(h.r[4].region_size);
 }

@@ -46,7 +46,7 @@ string read_GUID(GUID &in) {
 	local UINT32 d4a = d4 >> 32;
 	local UINT32 d4b = d4 & 0xFFFFFFFF;
 
-	     if (d1 == 0x7A9354D9 && d2 == 0x0468 && d3 == 0x444A && d4a == 0x81CE0BF6 && d4b == 0x17D890DF) {
+		 if (d1 == 0x7A9354D9 && d2 == 0x0468 && d3 == 0x444A && d4a == 0x81CE0BF6 && d4b == 0x17D890DF) {
 		out = "EFI_FIRMWARE_FILE_SYSTEM_GUID";
 	}
 	else if (d1 == 0x8C8CE578 && d2 == 0x8A3D && d3 == 0x4F1C && d4a == 0x99358961 && d4b == 0x85C32DD3) {
@@ -226,7 +226,7 @@ string read_EFI_FV_BLOCK_MAP_ENTRY(EFI_FV_BLOCK_MAP_ENTRY &in) {
 	else {
 		SPrintf(out, "%Xh x %Xh", in.NumBlocks, in.Length);
 	}
-	return out; 
+	return out;
 }
 
 
@@ -353,7 +353,7 @@ string read_EFI_FFS2_FILE_ATTRIBUTES(EFI_FFS2_FILE_ATTRIBUTES &in) {
 }
 
 
-typedef struct { 
+typedef struct {
 	local UINT8 value = ReadUByte(FTell());
 	BitfieldDisablePadding();
 
@@ -450,9 +450,9 @@ string read_EFI_FFS_FILE_HEADER(EFI_FFS_FILE_HEADER &in) {
 	else if (Size.v > 0x18) {
 		SetBackColor(0xb0e0b0);
 		EFI_COMMON_SECTION_HEADER csh;
-	
+
 		//Assert((Size.v - csh.Size.v) == 0x18, "size mismatch between ffsh and csh");
-		
+
 		if (csh.Type == EFI_SECTION_COMPRESSION) {
 			SetBackColor(0xffc0c0);
 			UINT8 data[Size.v - 0x1C];

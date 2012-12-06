@@ -127,7 +127,7 @@ string header_type(u4 header_id) {
 
 typedef struct {
 	local quad cur_pos;
-	
+
 	SetBackColor(0xb0b0b0);
 
 	u4 header_id : 24;

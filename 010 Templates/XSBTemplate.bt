@@ -32,7 +32,7 @@ typedef struct {
 
 
 typedef struct {
-	char name[64];	
+	char name[64];
 } NAME <read=read_NAME,optimize=false>;
 
 string read_NAME(NAME &in) {
@@ -146,7 +146,7 @@ typedef struct {
 
 typedef struct {
 	SetBackColor(0xfff0a0);
-	
+
 	u1 num_events;
 	Assert(num_events == 1);
 

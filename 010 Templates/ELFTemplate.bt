@@ -59,7 +59,7 @@ typedef enum <uchar> {
 typedef struct {
 	char		file_identification[4];
 	if (file_identification[0] != 0x7f || file_identification[1] != 'E'
-	    || file_identification[2] != 'L' || file_identification[3] != 'F') {
+		|| file_identification[2] != 'L' || file_identification[3] != 'F') {
 		Warning("Invalid ELF signature");
 		Exit(-1);
 	}
@@ -345,7 +345,7 @@ string e_flags32_e_READ(e_flags32_e &in) {
 	if (in.EF_MIPS_ABI2) Strcat(out, "EF_MIPS_ABI2 ");
 	if (in.EF_MIPS_OPTIONS_FIRST) Strcat(out, "EF_MIPS_OPTIONS_FIRST ");
 	if (in.EF_MIPS_32BITMODE) Strcat(out, "EF_MIPS_32BITMODE ");
-	
+
 	switch (in.EF_MIPS_ABI) {
 		case 1:
 			Strcat(out, "EF_MIPS_ABI_O32 ");
@@ -486,7 +486,7 @@ typedef struct { //64bit
 	Elf64_Xword	p_filesz_SEGMENT_FILE_LENGTH;
 	Elf64_Xword	p_memsz_SEGMENT_RAM_LENGTH;
 	Elf64_Xword	p_align;
-	
+
 	if ((p_offset_FROM_FILE_BEGIN > 0) && (p_filesz_SEGMENT_FILE_LENGTH > 0)) {
 		cur_offset = FTell();
 		FSeek(p_offset_FROM_FILE_BEGIN);
@@ -714,7 +714,7 @@ typedef struct {
 	Elf32_Word	sh_entsize;
 
 	if ((sh_offset_FROM_FILE_BEGIN > 0) &&
-	    (sh_size_SEGMENT_FILE_LENGTH > 0) && (sh_type != SHT_NOBITS)) {
+		(sh_size_SEGMENT_FILE_LENGTH > 0) && (sh_type != SHT_NOBITS)) {
 		cur_offset = FTell();
 		FSeek(sh_offset_FROM_FILE_BEGIN);
 		SetBackColor(0x9090ff);
@@ -736,7 +736,7 @@ typedef struct {
 	Elf64_Xword	sh_entsize;
 
 	if ((sh_offset_FROM_FILE_BEGIN > 0) &&
-	    (sh_size_SEGMENT_FILE_LENGTH > 0) && (sh_type != SHT_NOBITS)) {
+		(sh_size_SEGMENT_FILE_LENGTH > 0) && (sh_type != SHT_NOBITS)) {
 		cur_offset = FTell();
 		FSeek(sh_offset_FROM_FILE_BEGIN);
 		SetBackColor(0x9090ff);
@@ -838,7 +838,7 @@ struct FILE {
 		}
 	} elf_header;
 	if ((file.elf_header.e_phnum_NUMBER_OF_PROGRAM_HEADER_ENTRIES > 0) &&
-	    (file.elf_header.e_phoff_PROGRAM_HEADER_OFFSET_IN_FILE > 0)) {
+		(file.elf_header.e_phoff_PROGRAM_HEADER_OFFSET_IN_FILE > 0)) {
 		FSeek(file.elf_header.e_phoff_PROGRAM_HEADER_OFFSET_IN_FILE);
 		SetBackColor(0xffd0d0);
 		struct PROGRAM_HEADER_TABLE {
@@ -856,7 +856,7 @@ struct FILE {
 		Warning("Empty program header table");
 	}
 	if ((file.elf_header.e_shnum_NUMBER_OF_SECTION_HEADER_ENTRIES > 0) &&
-	    (file.elf_header.e_shoff_SECTION_HEADER_OFFSET_IN_FILE > 0)) {
+		(file.elf_header.e_shoff_SECTION_HEADER_OFFSET_IN_FILE > 0)) {
 		FSeek(file.elf_header.e_shoff_SECTION_HEADER_OFFSET_IN_FILE);
 		SetBackColor(0xe0e0ff);
 		struct SECTION_HEADER_TABLE {

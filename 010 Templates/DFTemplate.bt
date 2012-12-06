@@ -27,11 +27,11 @@ typedef struct {
 
 	cur_pos = FTell();
 	FSeek(Data_Offset);
-	
+
 	SetBackColor(0xffc0c0);
 	uchar Data[Data_Size];
 	SetBackColor(0xc0ffc0);
-	
+
 	FSeek(cur_pos);
 } FILE <read=READ_FILE>;
 

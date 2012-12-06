@@ -227,9 +227,9 @@ typedef struct {
 	}
 
 	GUID Guid;
-	
+
 	uint GenerationCount <format=decimal>;
-	
+
 	for (i = 0; i < GenerationCount; i++) {
 		struct {
 			uint ExportCount <format=decimal>;
@@ -263,7 +263,7 @@ typedef struct {
 			uint UncompressedSize;
 			uint CompressedOffset;
 			uint CompressedSize;
-			
+
 			switch (CompressionType) {
 				case LZO:
 				case LZX:
@@ -286,7 +286,7 @@ typedef struct {
 						uint UncompressedSize;
 
 						num_blocks = (uint)Ceil((double)UncompressedSize / (double)BlockSize);
-						
+
 						block_offset = CompressedOffset + 16 + num_blocks * 8;
 						for (j = 0; j < num_blocks; j++) {
 							FSeek(CompressedOffset + 16 + j * 8);
@@ -374,13 +374,13 @@ typedef struct {
 
 	if (Size > 0) {
 		cur_offset = FTell();
-	
+
 		FSeek(Offset);
-		
+
 		SetBackColor(0xc0ffff);
 		ubyte Data[Size];
 		SetBackColor(0xc0ffc0);
-	
+
 		FSeek(cur_offset);
 	}
 } EXPORT_ENTRY <read=EXPORT_ENTRYread>;
@@ -395,7 +395,7 @@ string EXPORT_ENTRYread(EXPORT_ENTRY &in) {
 			}
 		}
 	}
-	
+
 	return out;
 }
 
@@ -413,7 +413,7 @@ string IMPORT_ENTRYread(IMPORT_ENTRY &in) {
 	if (in.NameIndex.NameIndex > 0 && in.NameIndex.NameIndex < header.NameCount) {
 		out = ReadString(GlobalNameOffset[in.NameIndex.NameIndex]);
 	}
-	
+
 	return out;
 }
 
@@ -471,12 +471,12 @@ if (GlobalCompressionType == 0) {
 	if (header.ImportCount > 0) {
 		FSeek(header.ImportOffset);
 		SetBackColor(0xc0c0ff);
-		IMPORT_TABLE ImportTable;	
+		IMPORT_TABLE ImportTable;
 	}
 
 	if (header.ExportCount > 0) {
 		FSeek(header.ExportOffset);
 		SetBackColor(0xc0ffc0);
-		EXPORT_TABLE ExportTable;	
+		EXPORT_TABLE ExportTable;
 	}
 }

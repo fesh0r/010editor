@@ -57,23 +57,23 @@ string read_SVarCounts(SVarCounts &in) {
 typedef struct {
 	u4 sig;
 	local u4 _ver = sig & 0xffff;
-	
+
 	SVarCounts Effect;
 	SVarCounts Pool;
-	
+
 	u4 TechniqueCount;
 	u4 cbUnstructured;
-	
+
 	u4 StringCount;
 	u4 ShaderResourceCount;
-	
+
 	u4 DepthStencilBlockCount;
 	u4 BlendStateBlockCount;
 	u4 RasterizerStateBlockCount;
 	u4 SamplerCount;
 	u4 RenderTargetViewCount;
 	u4 DepthStencilViewCount;
-	
+
 	u4 TotalShaderCount;
 
 	u4 InlineShaderCount;

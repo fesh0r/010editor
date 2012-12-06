@@ -48,5 +48,5 @@ struct ESRI_INDEX {
 		int	offset <read=GetByteSize>;
 		int	contentLength <read=GetByteSize>;
 	} record [(FileSize() - 100)/8];
-		
+
 } esri_index;

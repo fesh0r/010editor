@@ -21,7 +21,7 @@ int block_type(int64 block_pos) {
 		if (cur_block[0x1E] == 0x49 && cur_block[0x1F] == 0x42 && cur_block[0x20] == 0x4D)
 			return 3;
 
-		if (cur_block[4] == 0xF1 && cur_block[5] == 0x0E) 
+		if (cur_block[4] == 0xF1 && cur_block[5] == 0x0E)
 			return 4;
 
 		return 2;
@@ -128,7 +128,7 @@ typedef struct {
 	ushort VendorID;
 	ushort DeviceID;
 	ushort ManufacturerPtr;
-	
+
 	if (Length > 1) {
 		ushort ProductNamePtr;
 		ubyte DeviceType;
@@ -149,7 +149,7 @@ typedef struct {
 	if (ManufacturerPtr) {
 		FSeek(rom_start + ManufacturerPtr);
 
-		SetBackColor(0xc0c0c0);		
+		SetBackColor(0xc0c0c0);
 		string Manufacturer;
 		SetBackColor(0xff90ff);
 	}
@@ -157,8 +157,8 @@ typedef struct {
 	if (Length > 1) {
 		if (ProductNamePtr) {
 			FSeek(rom_start + ProductNamePtr);
-			
-			SetBackColor(0xc0c0c0);		
+
+			SetBackColor(0xc0c0c0);
 			string ProductName;
 			SetBackColor(0xff90ff);
 		}
@@ -166,7 +166,7 @@ typedef struct {
 
 	if (NextHeader) {
 		ReadBytes(temp_sig, rom_start + PnPHeader, 4);
-		
+
 		if (temp_sig == "$PnP") {
 			FSeek(block_start + PnPHeader);
 
@@ -205,7 +205,7 @@ typedef struct {
 	ushort PnPHeader;
 
 	data_start = FTell();
-	
+
 	SetBackColor(0xd0d0ff);
 	ubyte data[(ROMLength*512) - (data_start - block_start)];
 	SetBackColor(0x9090ff);
@@ -425,42 +425,42 @@ local int cur_block_type;
 if (ReadUShort(0) == 0xAA55) {
 	do {
 		cur_block_type = block_type(FTell());
-	
+
 		switch (cur_block_type) {
 			case 0:
 				BLANK d;
 				break;
-	
+
 			case 1:
-				SetBackColor(0xd0d0d0);		
+				SetBackColor(0xd0d0d0);
 				RAWROM d;
 				SetBackColor(cNone);
 				break;
-			
+
 			case 2:
-				SetBackColor(0x9090ff);		
+				SetBackColor(0x9090ff);
 				OPTROM d;
 				SetBackColor(cNone);
 				break;
-	
+
 			case 3:
-				SetBackColor(0xff9090);		
+				SetBackColor(0xff9090);
 				VIDROM d;
 				SetBackColor(cNone);
 				break;
-	
+
 			case 4:
-				SetBackColor(0x90ff90);		
+				SetBackColor(0x90ff90);
 				EFIROM d;
 				SetBackColor(cNone);
 				break;
-	
+
 			case 5:
-				SetBackColor(0x90ffff);		
+				SetBackColor(0x90ffff);
 				MCCROM d;
 				SetBackColor(cNone);
 				break;
-	
+
 			default:
 				Assert(0, "Unknown block");
 				break;

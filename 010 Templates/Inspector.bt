@@ -4,11 +4,11 @@
 // File:     Inspector.bt
 // Author:   SweetScape Software
 // Revision: 1.0
-// Purpose:  This template may be used 
-//  to customize the auto tab of the 
-//  Inspector with your own variables. 
-//  See the Inspector section of the 
-//  Options dialog for more information. 
+// Purpose:  This template may be used
+//  to customize the auto tab of the
+//  Inspector with your own variables.
+//  See the Inspector section of the
+//  Options dialog for more information.
 //-----------------------------------
 RequiresVersion( 4.0 );
 
@@ -17,9 +17,9 @@ RequiresVersion( 4.0 );
 //  or at the current cursor position.
 local int64 pos;
 if( GetSelSize() > 0 )
-    pos = GetSelStart();
+	pos = GetSelStart();
 else
-    pos = GetCursorPos();
+	pos = GetCursorPos();
 
 // Define variables for the inspector
 FSeek( pos ); byte     _si8  <name="Signed Byte">;

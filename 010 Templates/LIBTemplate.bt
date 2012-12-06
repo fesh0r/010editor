@@ -21,7 +21,7 @@ typedef struct {
 	SetBackColor(0xe8e8e8);
 	if (!FEof()) {
 		local quad padding = 2 - (FTell() & 1);
-	
+
 		if (padding > 0 && padding < 2) {
 			u1 p;
 		}
@@ -76,7 +76,7 @@ typedef struct {
 	LittleEndian();
 
 	HEADER h;
-	
+
 	u4 size;
 	if (size) {
 		u4 offset[size];
@@ -95,7 +95,7 @@ string read_LINKER2(LINKER2 &in) {
 
 typedef struct {
 	LittleEndian();
-	
+
 	HEADER h;
 
 	local int64 start = FTell();
@@ -114,10 +114,10 @@ string read_LONGNAMES(LONGNAMES &in) {
 
 typedef struct {
 	LittleEndian();
-	
+
 	HEADER h;
 
-	if (h._size) {	
+	if (h._size) {
 		u1 d[h._size];
 	}
 } ENTRY <read=read_ENTRY,optimize=false>;

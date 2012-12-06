@@ -647,7 +647,7 @@ typedef struct {
 
 typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
-	
+
 	XNB_List_FEZ_Loop loops;
 	EncodedStr name;
 	s4 tempo;
@@ -742,7 +742,7 @@ typedef struct {
 	EncodedInt readerIndex <read=EncIntReaderType>;
 
 	XNB_TimeSpan duration;
-	XNB_List_Color data;	
+	XNB_List_Color data;
 } FEZ_Frame <optimize=false>;
 
 typedef struct {

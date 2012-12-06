@@ -208,72 +208,72 @@ string read_cp_info(local cp_info &i) {
 			if (i.length) {
 				s = i.bytes;
 			}
-            else {
-                s = "";
-            }
+			else {
+				s = "";
+			}
 			break;
 
 		case C_Integer:
 			SPrintf(s, "0x%X", i.bytes);
 			break;
 
-        case C_Float:
-            SPrintf(s, "%0.ff", i.bytes);
-            break;
+		case C_Float:
+			SPrintf(s, "%0.ff", i.bytes);
+			break;
 
 		case C_Long:
 			SPrintf(s, "0x%LXL", i.bytes);
 			break;
 
-        case C_Double:
-            SPrintf(s, "%0.lfd", i.bytes);
-            break;
+		case C_Double:
+			SPrintf(s, "%0.lfd", i.bytes);
+			break;
 
-        case C_Class:
-            if (get_tag_index(i.name_index) == C_Utf8) {
-                SPrintf(s, "%s", read_cp_info_index(i.name_index));
-            }
-            break;
-    
-        case C_String:
-            if (get_tag_index(i.string_index) == C_Utf8) {
-                s = read_cp_info_index(i.string_index);
-            }
-            break;
+		case C_Class:
+			if (get_tag_index(i.name_index) == C_Utf8) {
+				SPrintf(s, "%s", read_cp_info_index(i.name_index));
+			}
+			break;
+
+		case C_String:
+			if (get_tag_index(i.string_index) == C_Utf8) {
+				s = read_cp_info_index(i.string_index);
+			}
+			break;
 
 		case C_Methodref:
 		case C_Fieldref:
 		case C_InterfaceMethodref:
-            if ((get_tag_index(i.class_index) == C_Class) && (get_tag_index(i.name_and_type_index) == C_NameAndType)) {
-                SPrintf(s, "%s %s", read_cp_info_index(i.class_index), read_cp_info_index(i.name_and_type_index));
-            }
-            break;
+			if ((get_tag_index(i.class_index) == C_Class) && (get_tag_index(i.name_and_type_index) == C_NameAndType)) {
+				SPrintf(s, "%s %s", read_cp_info_index(i.class_index), read_cp_info_index(i.name_and_type_index));
+			}
+			break;
 
-        case C_NameAndType:
-            if ((get_tag_index(i.name_index) == C_Utf8) && (get_tag_index(i.descriptor_index) == C_Utf8)) {
-                SPrintf(s, "%s %s", read_cp_info_index(i.name_index), read_cp_info_index(i.descriptor_index));
-            }
-            break;
+		case C_NameAndType:
+			if ((get_tag_index(i.name_index) == C_Utf8) && (get_tag_index(i.descriptor_index) == C_Utf8)) {
+				SPrintf(s, "%s %s", read_cp_info_index(i.name_index), read_cp_info_index(i.descriptor_index));
+			}
+			break;
 	}
 
 	return s;
 }
 
 string read_full_cp_info(local cp_info &i) {
-    switch (i.tag) {
+	switch (i.tag) {
 		case C_Integer:
-        case C_Float:
+		case C_Float:
 		case C_Long:
-        case C_Double:
-            return EnumToString(i.tag) + " " + read_cp_info(i);
+		case C_Double:
+			return EnumToString(i.tag) + " " + read_cp_info(i);
 
 		case C_Utf8:
-        case C_String:
-            return EnumToString(i.tag) + " '" + read_cp_info(i) + "'";
+		case C_String:
+			return EnumToString(i.tag) + " '" + read_cp_info(i) + "'";
 
-        default:
-            return EnumToString(i.tag) + " " + read_cp_info(i);
-    }
+		default:
+			return EnumToString(i.tag) + " " + read_cp_info(i);
+	}
 }
 
 string read_full_cp_info_index(local u2 &i) {
@@ -292,24 +292,24 @@ string read_name_index(local u2 &i) {
 	if (i < 1) {
 		return "0";
 	}
-    else if (get_tag_index(i) == C_Utf8) {
-        return read_cp_info_index(i);
-    }
-    else {
-        return "!!!";
-    }
+	else if (get_tag_index(i) == C_Utf8) {
+		return read_cp_info_index(i);
+	}
+	else {
+		return "!!!";
+	}
 }
 
 string read_class_index(local u2 &i) {
-    if (i == 0) {
-        return "Object";
-    }
-    else if (get_tag_index(i) == C_Class) {
-        return read_cp_info_index(i);
-    }
-    else {
-        return "!!!";
-    }
+	if (i == 0) {
+		return "Object";
+	}
+	else if (get_tag_index(i) == C_Class) {
+		return read_cp_info_index(i);
+	}
+	else {
+		return "!!!";
+	}
 }
 
 
@@ -433,7 +433,7 @@ typedef struct {
 				u1 info[attribute_length];
 			}
 			break;
-		
+
 		case "Exceptions":
 			if (attribute_length >= 2) {
 				u2 number_of_exceptions <hidden=true>;
@@ -540,18 +540,18 @@ typedef struct {
 } attribute_info <read=read_attribute_info,optimize=false>;
 
 string read_attribute_info(local attribute_info &i) {
-    local string attrib_type = i.attrib_type;
-    
-    switch (attrib_type) {
-        case "ConstantValue":
+	local string attrib_type = i.attrib_type;
+
+	switch (attrib_type) {
+		case "ConstantValue":
 			return attrib_type + " " + read_cp_info_index(i.info);
 
-        case "SourceFile":
+		case "SourceFile":
 			return attrib_type + " " + read_name_index(i.info);
 
-        default:
-            return attrib_type;
-    }
+		default:
+			return attrib_type;
+	}
 }
 
 
@@ -561,7 +561,7 @@ typedef struct {
 	u2 name_index <read=read_name_index>;
 	u2 descriptor_index <read=read_name_index>;
 	u2 attributes_count <hidden=true>;
-	
+
 	for (i = 0; i < attributes_count; i++) {
 		attribute_info attributes;
 	}
@@ -569,7 +569,7 @@ typedef struct {
 
 
 string read_field_info(local field_info &i) {
-    return read_ACCESS_FLAGS(i.access_flags) + read_name_index(i.descriptor_index) + " " + read_name_index(i.name_index);
+	return read_ACCESS_FLAGS(i.access_flags) + read_name_index(i.descriptor_index) + " " + read_name_index(i.name_index);
 }
 
 
@@ -586,7 +586,7 @@ typedef struct {
 } method_info <read=read_method_info,optimize=false>;
 
 string read_method_info(local method_info &i) {
-    return read_m_ACCESS_FLAGS(i.access_flags) + read_name_index(i.name_index) + " " + read_name_index(i.descriptor_index);
+	return read_m_ACCESS_FLAGS(i.access_flags) + read_name_index(i.name_index) + " " + read_name_index(i.descriptor_index);
 }
 
 
@@ -597,7 +597,7 @@ typedef struct {
 		SetBackColor(cLtGray);
 		cp_info constant_pool;
 		if (constant_pool.tag == C_Long || constant_pool.tag == C_Double) {
-            cp_null constant_pool;
+			cp_null constant_pool;
 			i++;
 		}
 	};

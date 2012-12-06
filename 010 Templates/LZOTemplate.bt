@@ -24,7 +24,7 @@ typedef struct {
 	uint UncompressedSize;
 
 	num_blocks = (uint)Ceil((double)UncompressedSize / (double)BlockSize);
-	
+
 	block_offset = 16 + num_blocks * 8;
 	for (j = 0; j < num_blocks; j++) {
 		FSeek(16 + j * 8);

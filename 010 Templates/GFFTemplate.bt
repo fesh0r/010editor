@@ -29,7 +29,7 @@ string ReadUNICODE(zstringw &z) {
 }
 
 typedef enum <ushort> {
-	T_UINT8, T_INT8, T_UINT16, T_INT16, T_UINT32, T_INT32, T_UINT64, T_INT64, 
+	T_UINT8, T_INT8, T_UINT16, T_INT16, T_UINT32, T_INT32, T_UINT64, T_INT64,
 	T_FLOAT32, T_FLOAT64, T_Vector3f, T_Vector4f = 12, T_Quaternionf, T_ECString,
 	T_Color4f, T_Matrix4x4f, T_TlkString, T_Generic = 0xffff
 } FieldType;
@@ -74,7 +74,7 @@ typedef struct {
 		FIELD f;
 	}
 	SetBackColor(0xc0ffc0);
-	
+
 	FSeek(pos);
 } STRUCT <read=ReadSTRUCT>;
 

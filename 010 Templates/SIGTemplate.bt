@@ -28,7 +28,7 @@ string read_GUID(GUID &in) {
 	local UINT64 d4 = in.Data4;
 	local UINT32 d4a = d4 >> 32;
 	local UINT32 d4b = d4 & 0xFFFFFFFF;
-	     if (d1 == 0xa7717414 && d2 == 0xc616 && d3 == 0x4977 && d4a == 0x94208447 && d4b == 0x12a735bf) {
+		 if (d1 == 0xa7717414 && d2 == 0xc616 && d3 == 0x4977 && d4a == 0x94208447 && d4b == 0x12a735bf) {
 		out = "EFI_CERT_TYPE_RSA2048_SHA256_GUID";
 	}
 	else if (d1 == 0x51aa59de && d2 == 0xfdf2 && d3 == 0x4ea3 && d4a == 0xbc63875f && d4b == 0xb7842ee9) {
@@ -75,7 +75,7 @@ string read_GUID(GUID &in) {
 typedef struct (int size) {
 	GUID SignatureOwner;
 
-	SetBackColor(0xc0d8c0);	
+	SetBackColor(0xc0d8c0);
 	UINT8 SignatureData[size - 16];
 } EFI_SIGNATURE_DATA <optimize=false>;
 
@@ -91,7 +91,7 @@ typedef struct {
 		SetBackColor(0xc0c0ff);
 		UINT8 SignatureHeader[SignatureHeaderSize];
 	}
-	
+
 	local quad cur_pos = FTell();
 	while ((cur_pos - start_pos) < SignatureListSize) {
 		SetBackColor(0xc0ffc0);

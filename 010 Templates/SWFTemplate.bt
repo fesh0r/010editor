@@ -87,7 +87,7 @@ typedef struct {
 string UFIXED8read(UFIXED8 &in) {
 	local double out;
 	local string s;
-	
+
 	out = in.whole + in.decimal / 256.0;
 
 	SPrintf(s, "%lf", out);
@@ -1115,7 +1115,7 @@ typedef struct {
 	local ubyte FillBits = NumFillBits;
 	local ubyte LineBits = NumLineBits;
 	BitfieldDisablePadding();
- 	do {
+	do {
 		SHAPERECORD ShapeRecord;
 	} while (ShapeRecord.TypeFlag
 		|| ShapeRecord.StateNewStyles
@@ -1405,7 +1405,7 @@ typedef struct {
 	processed = 1;
 
 	BitfieldLeftToRight();
-	
+
 	SWFTagStart = FTell();
 
 	RECORDHEADER Header;
@@ -1824,7 +1824,7 @@ typedef struct {
 				}
 				ushort KerningCount;
 				for (i = 0; i < KerningCount; i++) {
-			 		KERNINGRECORD FontKerningTable;
+					KERNINGRECORD FontKerningTable;
 				}
 			}
 			break;

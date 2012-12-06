@@ -64,13 +64,13 @@ typedef struct {
 
 	if (file_size > 0) {
 		cur_offset = FTell();
-	
+
 		FSeek(file_offset);
-		
+
 		SetBackColor(0xc0ffff);
 		ubyte Data[file_size];
 		SetBackColor(0xc0ffc0);
-	
+
 		FSeek(cur_offset);
 	}
 } FILE_ENTRY <read=FILE_ENTRYread>;
@@ -93,12 +93,12 @@ typedef struct {
 		//Exit(-1);
 	}
 	file_encrypted = version.s[3] == 0x32;
-	
+
 	uint file_count;
 	uint build_year <format=decimal>;
 	uint build_day <format=decimal>;
 	uint desc_str_ref;
-	
+
 	if (file_encrypted) {
 		uint unknown;
 		uint unknown;

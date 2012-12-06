@@ -23,7 +23,7 @@
 //<Table-Based Image> ::=   Image Descriptor [Local Color Table] Image Data
 //<Special-Purpose Block> ::=    Application Extension | Comment Extension
 
-LittleEndian(); 
+LittleEndian();
 
 typedef struct {
 	UBYTE	R;
@@ -32,9 +32,9 @@ typedef struct {
 } RGB <read=ReadRGB>;
 string ReadRGB( RGB &color )
 {
-    string s;
-    SPrintf( s, "#%02X%02X%02X", color.R, color.G, color.B );
-    return s;
+	string s;
+	SPrintf( s, "#%02X%02X%02X", color.R, color.G, color.B );
+	return s;
 }
 typedef struct {
 	local UBYTE size = ReadUByte(FTell());
@@ -56,7 +56,7 @@ typedef struct {
 typedef struct {
 	ushort	Width;
 	ushort	Height;
-        BitfieldLeftToRight();
+		BitfieldLeftToRight();
 	struct	LOGICALSCREENDESCRIPTOR_PACKEDFIELDS {
 		UBYTE	GlobalColorTableFlag : 1;
 		UBYTE	ColorResolution : 3;

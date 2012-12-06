@@ -49,7 +49,7 @@ typedef struct {
 string readCHUNK(local CHUNK &c) {
   local string s;
   s=readCTYPE(c.type)+"  (";
-  s += (c.type.cname[0] & 0x20) ? "Ancillary, "      : "Critical, "; 
+  s += (c.type.cname[0] & 0x20) ? "Ancillary, "      : "Critical, ";
   s += (c.type.cname[1] & 0x20) ? "Private, "        : "Public, ";
   s += (c.type.cname[2] & 0x20) ? "ERROR_RESERVED, " : "";
   s += (c.type.cname[3] & 0x20) ? "Safe to Copy)"    : "Unsafe to Copy)";

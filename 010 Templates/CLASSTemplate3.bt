@@ -161,72 +161,72 @@ string read_cp_info(local cp_info &i) {
 			if (i.length) {
 				s = i.bytes;
 			}
-            else {
-                s = "";
-            }
+			else {
+				s = "";
+			}
 			break;
 
 		case C_Integer:
 			SPrintf(s, "0x%X", i.bytes);
 			break;
 
-        case C_Float:
-            SPrintf(s, "%0.ff", i.bytes);
-            break;
+		case C_Float:
+			SPrintf(s, "%0.ff", i.bytes);
+			break;
 
 		case C_Long:
 			SPrintf(s, "0x%LXL", i.bytes);
 			break;
 
-        case C_Double:
-            SPrintf(s, "%0.lfd", i.bytes);
-            break;
+		case C_Double:
+			SPrintf(s, "%0.lfd", i.bytes);
+			break;
 
-        case C_Class:
-            if (c.constant_pool[i.name_index-1].tag == C_Utf8) {
-                SPrintf(s, "%s", read_cp_info(c.constant_pool[i.name_index-1]));
-            }
-            break;
-    
-        case C_String:
-            if (c.constant_pool[i.string_index-1].tag == C_Utf8) {
-                s = read_cp_info(c.constant_pool[i.string_index-1]);
-            }
-            break;
+		case C_Class:
+			if (c.constant_pool[i.name_index-1].tag == C_Utf8) {
+				SPrintf(s, "%s", read_cp_info(c.constant_pool[i.name_index-1]));
+			}
+			break;
+
+		case C_String:
+			if (c.constant_pool[i.string_index-1].tag == C_Utf8) {
+				s = read_cp_info(c.constant_pool[i.string_index-1]);
+			}
+			break;
 
 		case C_Methodref:
 		case C_Fieldref:
 		case C_InterfaceMethodref:
-            if ((c.constant_pool[i.class_index-1].tag == C_Class) && (c.constant_pool[i.name_and_type_index-1].tag == C_NameAndType)) {
-                SPrintf(s, "%s %s", read_cp_info(c.constant_pool[i.class_index-1]), read_cp_info(c.constant_pool[i.name_and_type_index-1]));
-            }
-            break;
+			if ((c.constant_pool[i.class_index-1].tag == C_Class) && (c.constant_pool[i.name_and_type_index-1].tag == C_NameAndType)) {
+				SPrintf(s, "%s %s", read_cp_info(c.constant_pool[i.class_index-1]), read_cp_info(c.constant_pool[i.name_and_type_index-1]));
+			}
+			break;
 
-        case C_NameAndType:
-            if ((c.constant_pool[i.name_index-1].tag == C_Utf8) && (c.constant_pool[i.descriptor_index-1].tag == C_Utf8)) {
-                SPrintf(s, "%s %s", read_cp_info(c.constant_pool[i.name_index-1]), read_cp_info(c.constant_pool[i.descriptor_index-1]));
-            }
-            break;
+		case C_NameAndType:
+			if ((c.constant_pool[i.name_index-1].tag == C_Utf8) && (c.constant_pool[i.descriptor_index-1].tag == C_Utf8)) {
+				SPrintf(s, "%s %s", read_cp_info(c.constant_pool[i.name_index-1]), read_cp_info(c.constant_pool[i.descriptor_index-1]));
+			}
+			break;
 	}
 
 	return s;
 }
 
 string read_full_cp_info(local cp_info &i) {
-    switch (i.tag) {
+	switch (i.tag) {
 		case C_Integer:
-        case C_Float:
+		case C_Float:
 		case C_Long:
-        case C_Double:
-            return EnumToString(i.tag) + " " + read_cp_info(i);
+		case C_Double:
+			return EnumToString(i.tag) + " " + read_cp_info(i);
 
 		case C_Utf8:
-        case C_String:
-            return EnumToString(i.tag) + " '" + read_cp_info(i) + "'";
+		case C_String:
+			return EnumToString(i.tag) + " '" + read_cp_info(i) + "'";
 
-        default:
-            return EnumToString(i.tag) + " " + read_cp_info(i);
-    }
+		default:
+			return EnumToString(i.tag) + " " + read_cp_info(i);
+	}
 }
 */
 typedef struct {
@@ -241,21 +241,21 @@ typedef struct {
 } attribute_info </*read=read_attribute_info,*/optimize=false>;
 /*
 string read_attribute_info(local attribute_info &i) {
-    local string attribute_name = read_name(i.attribute_name_index);
-    
-    switch (attribute_name) {
-        case "ConstantValue":
-        case "SourceFile":
-            if (i.attribute_length == 2) {
-                return attribute_name + " " + read_full_cp_info(c.constant_pool[i.info[0] * 256 + i.info[1] - 1]);
-            }
-            else {
-                return attribute_name + " !!!";
-            }
-            
-        default:
-            return attribute_name;
-    }
+	local string attribute_name = read_name(i.attribute_name_index);
+
+	switch (attribute_name) {
+		case "ConstantValue":
+		case "SourceFile":
+			if (i.attribute_length == 2) {
+				return attribute_name + " " + read_full_cp_info(c.constant_pool[i.info[0] * 256 + i.info[1] - 1]);
+			}
+			else {
+				return attribute_name + " !!!";
+			}
+
+		default:
+			return attribute_name;
+	}
 }
 */
 typedef struct {
@@ -269,28 +269,28 @@ typedef struct {
 } field_info </*read=read_field_info,*/optimize=false>;
 /*
 string read_name(local u2 &i) {
-    if (c.constant_pool[i-1].tag == C_Utf8) {
-        return read_cp_info(c.constant_pool[i-1]);
-    }
-    else {
-        return "!!!";
-    }
+	if (c.constant_pool[i-1].tag == C_Utf8) {
+		return read_cp_info(c.constant_pool[i-1]);
+	}
+	else {
+		return "!!!";
+	}
 }
 
 string read_field_info(local field_info &i) {
-    return read_ACCESS_FLAGS(i.access_flags) + read_name(i.descriptor_index) + " " + read_name(i.name_index);
+	return read_ACCESS_FLAGS(i.access_flags) + read_name(i.descriptor_index) + " " + read_name(i.name_index);
 }
 
 string read_class(local u2 &i) {
-    if (i == 0) {
-        return "Object";
-    }
-    else if (c.constant_pool[i-1].tag == C_Class) {
-        return read_cp_info(c.constant_pool[i-1]);
-    }
-    else {
-        return "!!!";
-    }
+	if (i == 0) {
+		return "Object";
+	}
+	else if (c.constant_pool[i-1].tag == C_Class) {
+		return read_cp_info(c.constant_pool[i-1]);
+	}
+	else {
+		return "!!!";
+	}
 }
 */
 typedef struct {
@@ -304,7 +304,7 @@ typedef struct {
 } method_info </*read=read_method_info,*/optimize=false>;
 /*
 string read_method_info(local method_info &i) {
-    return read_ACCESS_FLAGS(i.access_flags) + read_name(i.name_index) + " " + read_name(i.descriptor_index);
+	return read_ACCESS_FLAGS(i.access_flags) + read_name(i.name_index) + " " + read_name(i.descriptor_index);
 }
 */
 typedef struct {
@@ -324,7 +324,7 @@ typedef struct {
 	for (i = 0; i < constant_pool_count - 1; i++) {
 		cp_info constant_pool;
 		if (constant_pool.tag == C_Long || constant_pool.tag == C_Double) {
-            cp_null constant_pool;
+			cp_null constant_pool;
 			i++;
 		}
 	};

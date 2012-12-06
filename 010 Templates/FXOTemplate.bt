@@ -74,14 +74,14 @@ string read_HEADER(HEADER &in) {
 typedef struct {
 	SetBackColor(0xc0c0ff);
 	u4 size;
-	
+
 	if (size) {
 		SetBackColor(0xc0ffc0);
 		char n[size];
 
 		if (!FEof()) {
 			local quad padding = 4 - (FTell() & 3);
-		
+
 			if (padding > 0  && padding < 4) {
 				SetBackColor(0xe0ffe0);
 				u1 p[padding] <hidden=true>;

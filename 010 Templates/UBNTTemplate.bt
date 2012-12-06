@@ -54,7 +54,7 @@ local char cur_part[4];
 
 while (!FEof()) {
 	ReadBytes(cur_part, FTell(), 4);
-	
+
 	if (cur_part == "UBNT") s_HEADER p;
 	if (cur_part == "OPEN") s_HEADER p;
 	if (cur_part == "PART") s_PART p;

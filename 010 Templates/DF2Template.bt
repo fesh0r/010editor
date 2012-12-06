@@ -29,7 +29,7 @@ typedef struct {
 	ubyte data[file_size];
 	SetBackColor(0xe0e0e0);
 */
-	
+
 	FSeek(cur_pos);
 } DIR <read=READ_DIR>;
 

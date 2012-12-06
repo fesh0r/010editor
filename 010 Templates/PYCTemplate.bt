@@ -84,17 +84,17 @@ enum <ubyte> OpCode {
 	ROT_THREE	= 3,
 	DUP_TOP		= 4,
 	ROT_FOUR	= 5,
-	
+
 	UNARY_POSITIVE	= 10,
 	UNARY_NEGATIVE	= 11,
 	UNARY_NOT	= 12,
 	UNARY_CONVERT	= 13,
-	
+
 	UNARY_INVERT	= 15,
-	
+
 	LIST_APPEND	= 18,
 	BINARY_POWER	= 19,
-	
+
 	BINARY_MULTIPLY	= 20,
 	BINARY_DIVIDE	= 21,
 	BINARY_MODULO	= 22,
@@ -105,7 +105,7 @@ enum <ubyte> OpCode {
 	BINARY_TRUE_DIVIDE = 27,
 	INPLACE_FLOOR_DIVIDE = 28,
 	INPLACE_TRUE_DIVIDE = 29,
-	
+
 	SLICE		= 30,
 /* Also uses 31-33 */
 	SLICE_a		= 31,
@@ -131,7 +131,7 @@ enum <ubyte> OpCode {
 	INPLACE_MODULO	= 59,
 	STORE_SUBSCR	= 60,
 	DELETE_SUBSCR	= 61,
-	
+
 	BINARY_LSHIFT	= 62,
 	BINARY_RSHIFT	= 63,
 	BINARY_AND	= 64,
@@ -139,7 +139,7 @@ enum <ubyte> OpCode {
 	BINARY_OR	= 66,
 	INPLACE_POWER	= 67,
 	GET_ITER	= 68,
-	
+
 	PRINT_EXPR	= 70,
 	PRINT_ITEM	= 71,
 	PRINT_NEWLINE	= 72,
@@ -160,7 +160,7 @@ enum <ubyte> OpCode {
 	POP_BLOCK	= 87,
 	END_FINALLY	= 88,
 	BUILD_CLASS	= 89,
-	
+
 
 	STORE_NAME	= 90,	/* Index in name list */
 	DELETE_NAME	= 91,	/* "" */
@@ -203,11 +203,11 @@ enum <ubyte> OpCode {
 	CALL_FUNCTION	= 131,	/* #args + (#kwargs<<8) */
 	MAKE_FUNCTION	= 132,	/* #defaults */
 	BUILD_SLICE 	= 133,	/* Number of items */
-	
+
 	MAKE_CLOSURE    = 134,     /* #free vars */
 	LOAD_CLOSURE    = 135,     /* Load free variable from closure */
-	LOAD_DEREF      = 136,     /* Load and dereference from closure cell */ 
-	STORE_DEREF     = 137,     /* Store into cell */ 
+	LOAD_DEREF      = 136,     /* Load and dereference from closure cell */
+	STORE_DEREF     = 137,     /* Store into cell */
 
 /* The next 3 opcodes must be contiguous and satisfy
    (CALL_FUNCTION_VAR - CALL_FUNCTION) & 3 == 1  */
@@ -411,7 +411,7 @@ typedef struct r_object {
 			double real;
 			double imag;
 			break;
-			
+
 		case TYPE_INTERNED:
 		case TYPE_STRING:
 			r_long n;
@@ -466,7 +466,7 @@ typedef struct r_object {
 		default:
 			Warning("unknown type code");
 			Exit(1);
-	} 
+	}
 } r_object;
 
 struct {
