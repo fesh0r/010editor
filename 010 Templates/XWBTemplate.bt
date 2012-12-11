@@ -66,7 +66,15 @@ typedef struct (int size) {
 
 	local quad start_pos = FTell();
 
-	u4 flags;
+	u4 f_streaming: 1;
+	u4 f_unknown1: 15;
+	u4 f_entry_names: 1;
+	u4 f_compact: 1;
+	u4 f_sync_disabled: 1;
+	u4 f_seek_tables: 1;
+	u4 f_unknown2: 12;
+	Assert(f_unknown1 == 0);
+	Assert(f_unknown2 == 0);
 
 	u4 entries;
 	global_entries = entries;
@@ -77,7 +85,11 @@ typedef struct (int size) {
 	u4 entry_name_element_size;
 	u4 alignment;
 
-	u4 compact_flags;
+	enum <u4> {ctPCM, ctXMA, ctADPCM, ctWMA} ch_format_tag: 2;
+	u4 ch_channels: 3 <format=decimal>;
+	u4 ch_samples_per_sec: 18 <format=decimal>;
+	u4 ch_block_align: 8;
+	u4 ch_bits_per_sample: 1 <format=decimal>;
 	FILETIME build_time;
 
 	if ((FTell() - start_pos) != size) {
@@ -92,8 +104,16 @@ typedef struct (int size) {
 
 	local quad start_pos = FTell();
 
-	u4 flags;
-	u4 format;
+	u4 f_read_ahead: 1;
+	u4 f_loop_cache: 1;
+	u4 f_remove_loop_tail: 1;
+	u4 f_ignore_loop: 1;
+	u4 duration: 28 <format=decimal>;
+	enum <u4> {tPCM, tXMA, tADPCM, tWMA} h_format_tag: 2;
+	u4 h_channels: 3 <format=decimal>;
+	u4 h_samples_per_sec: 18 <format=decimal>;
+	u4 h_block_align: 8;
+	u4 h_bits_per_sample: 1 <format=decimal>;
 
 	XWB_Region wave_data;
 
@@ -192,6 +212,7 @@ sig = ReadInt(0);
 if (sig == 0x57424E44) {
 	Warning("BigEndian");
 	BigEndian();
+	BitfieldRightToLeft();
 	sig = ReadInt(0);
 }
 
