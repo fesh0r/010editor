@@ -41,11 +41,17 @@ typedef struct {
 	haveValidFormat = true;
 
 	// Unknown data at the end of the chunk
-	if( chunkSize > (FTell() - pos) )
-		uchar unknown[ chunkSize - (FTell() - pos) ];
+	if (chunkSize > (FTell() - pos)) {
+		unsigned short cbSize;
+		if (cbSize > 0)
+			uchar ext[cbSize];
+
+		if (chunkSize > (FTell() - pos))
+			uchar unknown[chunkSize - (FTell() - pos)];
+	}
 
 	// Padding so the next chunk starts on an even byte
-	if( chunkSize & 1 )
+	if (chunkSize & 1)
 		uchar padding;
 } FORMATCHUNK;
 
