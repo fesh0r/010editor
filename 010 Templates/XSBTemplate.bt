@@ -207,7 +207,7 @@ typedef struct {
 		SetBackColor(0xff90c0);
 		u2 rpc_extra;
 		cur_size = 2;
-		VAR_OFFSETS rpc[rpc_count];
+		VAR_OFFSETS rpc[has_rpc];
 		//Assert(rpc_extra == cur_size);
 		FSeek(rpc_pos + rpc_extra);
 	}
