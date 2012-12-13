@@ -79,9 +79,35 @@ typedef struct {
 
 
 typedef struct {
+	u4 sound_offset;
+	u1 weight_min;
+	u1 weight_max;
+} VARIATION;
+
+
+typedef struct {
+	SetBackColor(0x90ff90);
+	u2 count;
+	enum <u1> {tORDERED=8, tORDERED_RANDOM, tRANDOM, tRANDOM_NOREP, tSHUFFLE} order_type: 4;
+	u1 table_type: 4;
 	u1 unknown;
 	u1 unknown;
 	u1 unknown;
+	u1 unknown;
+	u1 unknown;
+
+	VARIATION t[count];
+} XSB_VARIATION;
+
+
+typedef struct {
+	u1 stop_cue: 1;
+	u1 stop_immediate: 1;
+	u1 unknown_flags: 6;
+	Assert(unknown_flags == 0);
+} CLIP_EVENT_0;
+
+typedef struct {
 	u1 loop_play_release: 1;
 	u1 pan_enable: 1;
 	u1 pan_center: 1;
@@ -89,7 +115,7 @@ typedef struct {
 	u1 unknown_flags: 4;
 	u2 track;
 	u1 wavebank;
-	u1 loop_count;
+	u1 loop_count <format=decimal>;
 	u2 pan_angle <format=decimal>;
 	u2 pan_arc <format=decimal>;
 	Assert(unknown_flags == 0);
@@ -125,18 +151,97 @@ typedef struct {
 
 
 typedef struct {
+	u1 type;
+	if (type == 0) {
+		u1 add: 1;
+		u1 random: 1;
+		u1 value: 1;
+		u1 unknown_flags: 5;
+		u2 unknown;
+		s2 min <format=decimal>;
+		u2 unknown;
+		s2 max <format=decimal>;
+		u2 unknown;
+		u2 unknown;
+		u1 unknown;
+	}
+	else {
+		s2 unknown <format=decimal>;
+		s2 initial <format=decimal>;
+		float slope;
+		float delta;
+		s2 seconds <format=decimal>;
+	}
+} CLIP_EVENT_7;
+
+
+typedef struct {
+	u1 type;
+	if (type == 0) {
+		u1 add: 1;
+		u1 random: 1;
+		u1 value: 1;
+		u1 unknown_flags: 5;
+		u2 unknown;
+		s2 min <format=decimal>;
+		u2 unknown;
+		s2 max <format=decimal>;
+		u2 unknown;
+		u2 unknown;
+		u1 unknown;
+	}
+	else {
+		s2 unknown <format=decimal>;
+		s2 initial <format=decimal>;
+		float slope;
+		float delta;
+		s2 seconds <format=decimal>;
+	}
+} CLIP_EVENT_8;
+
+
+typedef struct {
+	u4 marker;
+} CLIP_EVENT_9;
+
+
+typedef struct {
+	u2 repeats <format=decimal>;
+	u2 frequency <format=decimal>;
+} CLIP_EVENT_18;
+
+typedef struct {
 	SetBackColor(0xfff0a0);
 
 	u4 event_type: 5;
-	u4 event_info: 27;
+	u4 timestamp: 16 <format=decimal>;
+	u4 unknown: 11;
+	u2 random_offset <format=decimal>;
+	u1 unknown;
 
 	switch (event_type) {
+		case 0:
+			CLIP_EVENT_0 e;
+			break;
 		case 1:
-			CLIP_EVENT_1 event1;
+			CLIP_EVENT_1 e;
 			break;
 		case 4:
-			CLIP_EVENT_1 event1;
-			CLIP_EVENT_4 event4;
+			CLIP_EVENT_1 e;
+			CLIP_EVENT_4 e;
+			break;
+		case 7:
+			CLIP_EVENT_7 e;
+			break;
+		case 8:
+			CLIP_EVENT_8 e;
+			break;
+		case 9:
+			CLIP_EVENT_9 e;
+			break;
+		case 18:
+			CLIP_EVENT_9 e;
+			CLIP_EVENT_18 e;
 			break;
 		default:
 			break;
@@ -148,7 +253,7 @@ typedef struct {
 	SetBackColor(0xfff0a0);
 
 	u1 num_events;
-	Assert(num_events == 1);
+//	Assert(num_events == 1);
 
 	CLIP_EVENT events[num_events];
 } SOUND_CLIP <optimize=false>;
@@ -183,7 +288,7 @@ typedef struct {
 	local int cur_pos = FTell();
 
 	u1 has_clips: 1;
-	u1 has_rpc: 3;
+	u1 rpc_count: 3;
 	u1 has_dsp: 1;
 	u1 unknown_flags: 3;
 	Assert(unknown_flags == 0, "Unknown flags in XSB_SOUND");
@@ -202,12 +307,12 @@ typedef struct {
 	}
 
 	local int cur_size = 0;
-	if (has_rpc) {
+	if (rpc_count) {
 		local int rpc_pos = FTell();
 		SetBackColor(0xff90c0);
 		u2 rpc_extra;
 		cur_size = 2;
-		VAR_OFFSETS rpc[has_rpc];
+		VAR_OFFSETS rpc[rpc_count];
 		//Assert(rpc_extra == cur_size);
 		FSeek(rpc_pos + rpc_extra);
 	}
@@ -253,15 +358,27 @@ typedef struct (int index) {
 	local int name_index = index;
 	SetBackColor(0x9090ff);
 
-	u1 flags;
+	u1 has_variation: 1;
+	u1 has_transition: 1;
+	u1 unknown_flags: 6;
+	Assert(unknown_flags == 0);
+
 	s4 off_variation;
 	s4 off_transition;
 
-	u1 max_instances <format=decimal>;
-	u2 fade_in;
-	u2 fade_out;
+	u1 instance_limit <format=decimal>;
+	u2 fade_in <format=decimal>;
+	u2 fade_out <format=decimal>;
 	enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
 	enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
+	
+	local int cur_pos = FTell();
+
+	if (has_variation && off_variation >= 0) {
+		FSeek(off_variation);
+		XSB_VARIATION v;
+		FSeek(cur_pos);
+	}
 } XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE>;
 
 string read_XSB_COMPLEX_CUE(XSB_COMPLEX_CUE &in) {
