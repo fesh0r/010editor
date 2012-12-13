@@ -236,7 +236,7 @@ typedef struct (int index) {
 	SetBackColor(0x90ff90);
 
 	u1 flags;
-	u4 sound_offset;
+	s4 sound_offset;
 } XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE>;
 
 string read_XSB_SIMPLE_CUE(XSB_SIMPLE_CUE &in) {
@@ -254,12 +254,14 @@ typedef struct (int index) {
 	SetBackColor(0x9090ff);
 
 	u1 flags;
-	u4 off_variation;
-	u4 off_transition;
+	s4 off_variation;
+	s4 off_transition;
 
-	u4 unknown;
-	u1 unknown;
-	u1 unknown;
+	u1 max_instances <format=decimal>;
+	u2 fade_in;
+	u2 fade_out;
+	enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
+	enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
 } XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE>;
 
 string read_XSB_COMPLEX_CUE(XSB_COMPLEX_CUE &in) {
@@ -326,10 +328,10 @@ if (h.num_complex_cue && h.off_complex_cue >= 0) {
 if (h.num_cue_hash && h.off_cue_name_hash >= 0) {
 	FSeek(h.off_cue_name_hash);
 	SetBackColor(0xc0c0c0);
-	s2 ch[h.num_cue_hash] <format=decimal,hidden=true>;
+	s2 ch[h.num_cue_hash] <format=decimal>;
 }
 
 if (h.cue_names_len && h.off_cue_name_table >= 0) {
 	FSeek(h.off_cue_name_table);
-	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue] <hidden=true>;
+	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue];
 }
