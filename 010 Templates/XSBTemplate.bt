@@ -96,7 +96,7 @@ typedef struct {
 	u1 unknown;
 	u1 unknown;
 
-	VARIATION t[count];
+//	VARIATION t[count];
 } XSB_VARIATION;
 
 
@@ -277,7 +277,9 @@ typedef struct {
 
 typedef struct {
 	u1 var_num;
-	u4 var_offset[var_num];
+	if (var_num > 0) {
+		u4 var_offset[var_num];
+	}
 	cur_size += 1 + 4 * var_num;
 } VAR_OFFSETS <optimize=false>;
 
@@ -340,7 +342,13 @@ typedef struct (int index) {
 	local int name_index = index;
 	SetBackColor(0x90ff90);
 
-	u1 flags;
+	u1 is_complex: 1;
+	u1 has_transition: 1;
+	u1 has_sound: 1;
+	u1 unknown_flags: 5;
+	Assert(!is_complex);
+	Assert(unknown_flags == 0);
+
 	s4 sound_offset;
 } XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE>;
 
@@ -358,13 +366,26 @@ typedef struct (int index) {
 	local int name_index = index;
 	SetBackColor(0x9090ff);
 
-	u1 has_variation: 1;
+	u1 is_complex: 1;
 	u1 has_transition: 1;
-	u1 unknown_flags: 6;
+	u1 has_sound: 1;
+	u1 unknown_flags: 5;
+	Assert(is_complex);
 	Assert(unknown_flags == 0);
 
-	s4 off_variation;
-	s4 off_transition;
+	if (has_sound) {
+		s4 off_sound;
+	}
+	else {
+		s4 off_variation;
+	}
+
+	if (has_transition) {
+		s4 off_transition;
+	}
+	else {
+		s4 off_unknown;
+	}
 
 	u1 instance_limit <format=decimal>;
 	u2 fade_in <format=decimal>;
@@ -374,10 +395,19 @@ typedef struct (int index) {
 	
 	local int cur_pos = FTell();
 
-	if (has_variation && off_variation >= 0) {
-		FSeek(off_variation);
-		XSB_VARIATION v;
-		FSeek(cur_pos);
+	if (has_sound) {
+		if (off_sound >= 0) {
+			FSeek(off_sound);
+			// XSB_SOUND
+			FSeek(cur_pos);
+		}
+	}
+	else {
+		if (off_variation >= 0) {
+			FSeek(off_variation);
+			XSB_VARIATION v;
+			FSeek(cur_pos);
+		}
 	}
 } XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE>;
 
