@@ -52,7 +52,7 @@ typedef struct {
 
 	FILETIME last_modified;
 
-	u1 platform;
+	u1 flags;
 
 	u2 num_simple_cue <format=decimal>;
 	u2 num_complex_cue <format=decimal>;
@@ -71,7 +71,7 @@ typedef struct {
 	s4 off_transition;
 	s4 off_wavebank_name;
 	s4 off_cue_name_hash;
-	s4 off_cue_name_table;
+	s4 off_cue_name_hash_entry;
 	s4 off_sound;
 
 	NAME name;
@@ -86,17 +86,29 @@ typedef struct {
 
 
 typedef struct {
-	SetBackColor(0x90ff90);
-	u2 count;
-	enum <u1> {tORDERED=8, tORDERED_RANDOM, tRANDOM, tRANDOM_NOREP, tSHUFFLE} order_type: 4;
-	u1 table_type: 4;
-	u1 unknown;
-	u1 unknown;
-	u1 unknown;
-	u1 unknown;
-	u1 unknown;
+	u4 sound_offset;
+	u1 weight;
+} VARIATION_SMALL;
 
-//	VARIATION t[count];
+
+typedef struct {
+	SetBackColor(0x90ff90);
+	u4 count: 16;
+	enum <u4> {tORDERED, tORDERED_RANDOM, tRANDOM, tRANDOM_NOREP, tSHUFFLE} variation_type: 3;
+	u4 table_type: 3;
+	u4 new_var_on_loop: 1;
+	u4 unknown_flags: 9;
+	Assert(unknown_flags == 0);
+	
+	u2 variable;
+	u2 last_index;
+	
+	if (table_type) {
+		VARIATION t[count];
+	}
+	else {
+		VARIATION_SMALL t[count];
+	}
 } XSB_VARIATION;
 
 
@@ -290,7 +302,9 @@ typedef struct {
 	local int cur_pos = FTell();
 
 	u1 has_clips: 1;
-	u1 rpc_count: 3;
+	u1 has_sound_rpc: 1;
+	u1 has_track_rpc: 1;
+	u1 has_effect_rpc: 1;
 	u1 has_dsp: 1;
 	u1 unknown_flags: 3;
 	Assert(unknown_flags == 0, "Unknown flags in XSB_SOUND");
@@ -309,12 +323,20 @@ typedef struct {
 	}
 
 	local int cur_size = 0;
-	if (rpc_count) {
+	if (has_sound_rpc || has_track_rpc || has_effect_rpc) {
 		local int rpc_pos = FTell();
 		SetBackColor(0xff90c0);
 		u2 rpc_extra;
 		cur_size = 2;
-		VAR_OFFSETS rpc[rpc_count];
+		if (has_sound_rpc) {
+			VAR_OFFSETS sound_rpc;
+		}
+		if (has_track_rpc) {
+			VAR_OFFSETS track_rpc;
+		}
+		if (has_effect_rpc) {
+			VAR_OFFSETS effect_rpc;
+		}
 		//Assert(rpc_extra == cur_size);
 		FSeek(rpc_pos + rpc_extra);
 	}
@@ -478,7 +500,7 @@ if (h.num_cue_hash && h.off_cue_name_hash >= 0) {
 	s2 ch[h.num_cue_hash] <format=decimal>;
 }
 
-if (h.cue_names_len && h.off_cue_name_table >= 0) {
-	FSeek(h.off_cue_name_table);
+if (h.cue_names_len && h.off_cue_name_hash_entry >= 0) {
+	FSeek(h.off_cue_name_hash_entry);
 	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue];
 }
