@@ -227,7 +227,11 @@ typedef struct {
 
 	u4 event_type: 5;
 	u4 timestamp: 16 <format=decimal>;
-	u4 unknown: 11;
+	u4 unknown_flags: 8;
+	u4 is_absolute: 1;
+	u4 is_relative_start: 1;
+	u4 is_random_recur: 1;
+	Assert(unknown_flags == 0);
 	u2 random_offset <format=decimal>;
 	u1 unknown;
 
@@ -301,7 +305,7 @@ typedef struct {
 
 	local int cur_pos = FTell();
 
-	u1 has_clips: 1;
+	u1 is_complex: 1;
 	u1 has_sound_rpc: 1;
 	u1 has_track_rpc: 1;
 	u1 has_effect_rpc: 1;
@@ -314,8 +318,8 @@ typedef struct {
 	u1 priority;
 	u2 entry_len;
 
-	if (has_clips) {
-		u1 num_clip;
+	if (is_complex) {
+		u1 num_tracks;
 	}
 	else {
 		u2 track;
@@ -328,16 +332,18 @@ typedef struct {
 		SetBackColor(0xff90c0);
 		u2 rpc_extra;
 		cur_size = 2;
+		
+		if (has_effect_rpc) {
+			VAR_OFFSETS effect_rpc;
+		}
 		if (has_sound_rpc) {
 			VAR_OFFSETS sound_rpc;
 		}
 		if (has_track_rpc) {
-			VAR_OFFSETS track_rpc;
+			Assert(is_complex, "has_track_rpc set on simple sound");
+			VAR_OFFSETS track_rpc[num_clip];
 		}
-		if (has_effect_rpc) {
-			VAR_OFFSETS effect_rpc;
-		}
-		//Assert(rpc_extra == cur_size);
+		Assert(rpc_extra == cur_size);
 		FSeek(rpc_pos + rpc_extra);
 	}
 
@@ -351,8 +357,8 @@ typedef struct {
 		FSeek(dsp_pos + dsp_extra);
 	}
 
-	if (has_clips) {
-		XSB_CLIP clips[num_clip];
+	if (is_complex) {
+		XSB_CLIP tracks[num_tracks];
 	}
 
 	Assert(FTell() <= (cur_pos + entry_len));
