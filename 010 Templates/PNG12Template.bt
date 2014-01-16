@@ -388,6 +388,17 @@ struct PngFile {
 		  DWORD iendCrc <format=hex>;
 	  } chunk_iend;
 	}
+	else if (Strncmp(chunkHdr.btChunkType, "iCCP", 4) == 0)
+	{
+	  SetForeColor(cBlue);
+	  struct PNG_CHUNK_ICCP
+	  {
+		  BYTE genChunkData[chunkHdr.btChunkLen];
+
+		  SetForeColor(cBlue);
+		  DWORD genCrc <format=hex>;
+	  } chunk_iccp;
+	}
 	else
 	{
 	  SetForeColor(cBlack);
