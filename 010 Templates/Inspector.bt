@@ -3,12 +3,15 @@
 //
 // File:     Inspector.bt
 // Author:   SweetScape Software
-// Revision: 1.0
-// Purpose:  This template may be used
-//  to customize the auto tab of the
-//  Inspector with your own variables.
-//  See the Inspector section of the
-//  Options dialog for more information.
+// Revision: 1.1
+// Purpose:  This template may be used 
+//  to customize the auto tab of the 
+//  Inspector with your own variables. 
+//  See the Inspector section of the 
+//  Options dialog for more information. 
+// Changes:  
+// 1.1 (SweetScape): 
+//   - Added hfloat data type.
 //-----------------------------------
 RequiresVersion( 4.0 );
 
@@ -17,9 +20,9 @@ RequiresVersion( 4.0 );
 //  or at the current cursor position.
 local int64 pos;
 if( GetSelSize() > 0 )
-	pos = GetSelStart();
+    pos = GetSelStart();
 else
-	pos = GetCursorPos();
+    pos = GetCursorPos();
 
 // Define variables for the inspector
 FSeek( pos ); byte     _si8  <name="Signed Byte">;
@@ -32,6 +35,7 @@ FSeek( pos ); int64    _si64 <name="Signed Int64">;
 FSeek( pos ); uint64   _ui64 <name="Unsigned Int64">;
 FSeek( pos ); float    _f    <name="Float">;
 FSeek( pos ); double   _d    <name="Double">;
+FSeek( pos ); hfloat   _hf   <name="Half Float">;
 FSeek( pos ); char     _s [ReadStringLength(pos,256)]  <name="String">;  // limit to 256 characters
 FSeek( pos ); wchar_t  _ws[ReadWStringLength(pos,256)] <name="Unicode">; // limit to 256 characters
 FSeek( pos ); DOSDATE  _dd   <name="DOS Date">;
