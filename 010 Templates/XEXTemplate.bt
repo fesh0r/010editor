@@ -18,186 +18,180 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 string header_type(u4 header_id) {
-	string out;
-	switch (header_id) {
-		case 0x000002:
-			out = "ResourceInfo";
-			break;
-		case 0x000003:
-			out = "BaseFileFormat";
-			break;
-		case 0x000004:
-			out = "BaseReference";
-			break;
-		case 0x000005:
-			out = "DeltaPatchDescriptor";
-			break;
-		case 0x000080:
-			out = "BoundingPath";
-			break;
-		case 0x000081:
-			out = "DeviceId";
-			break;
-		case 0x000100:
-			out = "OriginalBaseAddress";
-			break;
-		case 0x000101:
-			out = "EntryPoint";
-			break;
-		case 0x000102:
-			out = "ImageBaseAddress";
-			break;
-		case 0x000103:
-			out = "ImportLibraries";
-			break;
-		case 0x000180:
-			out = "ImageChecksumTimestamp";
-			break;
-		case 0x000181:
-			out = "EnabledForCallcap";
-			break;
-		case 0x000182:
-			out = "EnabledForFastcap";
-			break;
-		case 0x000183:
-			out = "OriginalPEImageName";
-			break;
-		case 0x000200:
-			out = "StaticLibraries";
-			break;
-		case 0x000201:
-			out = "TLSInfo";
-			break;
-		case 0x000202:
-			out = "DefaultStackSize";
-			break;
-		case 0x000203:
-			out = "DefaultFilesystemCacheSize";
-			break;
-		case 0x000204:
-			out = "DefaultHeapSize";
-			break;
-		case 0x000280:
-			out = "PageHeapSizeAndflags";
-			break;
-		case 0x000300:
-			out = "SystemFlags";
-			break;
-		case 0x000400:
-			out = "ExecutionID";
-			break;
-		case 0x000401:
-			out = "ServiceIDList";
-			break;
-		case 0x000402:
-			out = "TitleWorkspaceSize";
-			break;
-		case 0x000403:
-			out = "GameRatingsSpecified";
-			break;
-		case 0x000404:
-			out = "LANKey";
-			break;
-		case 0x000405:
-			out = "IncludesXbox360Logo";
-			break;
-		case 0x000406:
-			out = "MultidiscMediaIDs";
-			break;
-		case 0x000407:
-			out = "AlternateTitleIDs";
-			break;
-		case 0x000408:
-			out = "AdditionalTitleMemory";
-			break;
-		case 0x00E104:
-			out = "IncludesExportsByName";
-			break;
-		default:
-			SPrintf(out, "%X", header_id);
-			break;
-	}
+    string out;
+    switch (header_id) {
+        case 0x000002:
+            out = "ResourceInfo";
+            break;
+        case 0x000003:
+            out = "BaseFileFormat";
+            break;
+        case 0x000004:
+            out = "BaseReference";
+            break;
+        case 0x000005:
+            out = "DeltaPatchDescriptor";
+            break;
+        case 0x000080:
+            out = "BoundingPath";
+            break;
+        case 0x000081:
+            out = "DeviceId";
+            break;
+        case 0x000100:
+            out = "OriginalBaseAddress";
+            break;
+        case 0x000101:
+            out = "EntryPoint";
+            break;
+        case 0x000102:
+            out = "ImageBaseAddress";
+            break;
+        case 0x000103:
+            out = "ImportLibraries";
+            break;
+        case 0x000180:
+            out = "ImageChecksumTimestamp";
+            break;
+        case 0x000181:
+            out = "EnabledForCallcap";
+            break;
+        case 0x000182:
+            out = "EnabledForFastcap";
+            break;
+        case 0x000183:
+            out = "OriginalPEImageName";
+            break;
+        case 0x000200:
+            out = "StaticLibraries";
+            break;
+        case 0x000201:
+            out = "TLSInfo";
+            break;
+        case 0x000202:
+            out = "DefaultStackSize";
+            break;
+        case 0x000203:
+            out = "DefaultFilesystemCacheSize";
+            break;
+        case 0x000204:
+            out = "DefaultHeapSize";
+            break;
+        case 0x000280:
+            out = "PageHeapSizeAndflags";
+            break;
+        case 0x000300:
+            out = "SystemFlags";
+            break;
+        case 0x000400:
+            out = "ExecutionID";
+            break;
+        case 0x000401:
+            out = "ServiceIDList";
+            break;
+        case 0x000402:
+            out = "TitleWorkspaceSize";
+            break;
+        case 0x000403:
+            out = "GameRatingsSpecified";
+            break;
+        case 0x000404:
+            out = "LANKey";
+            break;
+        case 0x000405:
+            out = "IncludesXbox360Logo";
+            break;
+        case 0x000406:
+            out = "MultidiscMediaIDs";
+            break;
+        case 0x000407:
+            out = "AlternateTitleIDs";
+            break;
+        case 0x000408:
+            out = "AdditionalTitleMemory";
+            break;
+        case 0x00E104:
+            out = "IncludesExportsByName";
+            break;
+        default:
+            SPrintf(out, "%X", header_id);
+            break;
+    }
 
-
-	return out;
+    return out;
 }
 
-
 typedef struct {
-	local quad cur_pos;
+    local quad cur_pos;
 
-	SetBackColor(0xb0b0b0);
+    SetBackColor(0xb0b0b0);
 
-	u4 header_id : 24;
-	u4 header_size : 8;
+    u4 header_id : 24;
+    u4 header_size : 8;
 
-	if (header_size > 1) {
-		u4 header_offset;
+    if (header_size > 1) {
+        u4 header_offset;
 
-		if (header_size < 0xff) {
-			SetBackColor(0xffa0a0);
-			cur_pos = FTell();
-			FSeek(header_offset);
-			u1 data[header_size << 2];
-			FSeek(cur_pos);
-		}
-		else {
-			cur_pos = FTell();
-			FSeek(header_offset);
-			SetBackColor(0xc0c0ff);
-			u4 full_size;
-			SetBackColor(0xa0a0ff);
-			if (full_size - 4) {
-				u1 header_data[full_size - 4];
-			}
-			FSeek(cur_pos);
-		}
-	}
-	else {
-		u4 header_data;
-	}
+        if (header_size < 0xff) {
+            SetBackColor(0xffa0a0);
+            cur_pos = FTell();
+            FSeek(header_offset);
+            u1 data[header_size << 2];
+            FSeek(cur_pos);
+        }
+        else {
+            cur_pos = FTell();
+            FSeek(header_offset);
+            SetBackColor(0xc0c0ff);
+            u4 full_size;
+            SetBackColor(0xa0a0ff);
+            if (full_size - 4) {
+                u1 header_data[full_size - 4];
+            }
+            FSeek(cur_pos);
+        }
+    }
+    else {
+        u4 header_data;
+    }
 
 } OPT_HEADER <read=read_OPT_HEADER>;
 
 string read_OPT_HEADER(OPT_HEADER &in) {
-	return header_type(in.header_id);
+    return header_type(in.header_id);
 }
 
-
 typedef struct {
-	local int i;
+    local int i;
 
-	SetBackColor(0xc0c0c0);
-	char signature[4];
-	u4 flags;
-	u4 data_offset;
-	u4 reserved;
-	u4 sec_offset;
-	u4 header_count;
+    SetBackColor(0xc0c0c0);
+    char signature[4];
+    u4 flags;
+    u4 data_offset;
+    u4 reserved;
+    u4 sec_offset;
+    u4 header_count;
 
-	for (i = 0; i < header_count; i++) {
-		OPT_HEADER opt;
-	}
+    for (i = 0; i < header_count; i++) {
+        OPT_HEADER opt;
+    }
 } XEX_HEADER <read=read_XEX_HEADER>;
 
 string read_XEX_HEADER(XEX_HEADER &in) {
-	string out;
-	return out;
+    string out;
+    return out;
 }
 
-
 typedef struct {
-	SetBackColor(0xffffc0);
-	u4 full_size;
+    SetBackColor(0xffffc0);
+    u4 full_size;
 
-	SetBackColor(0xffffa0);
-	if (full_size - 4) {
-		u1 sec_data[full_size - 4];
-	}
+    SetBackColor(0xffffa0);
+    if (full_size - 4) {
+        u1 sec_data[full_size - 4];
+    }
 } SEC_INFO;
-
 
 BigEndian();
 
@@ -205,9 +199,9 @@ local char sig[4];
 ReadBytes(sig, 0, 4);
 
 if (sig[0] != 'X' || sig[1] != 'E' || sig[2] != 'X' || sig[3] != '2') {
-	Printf("Incorrect signature\n");
-	Warning("Incorrect signature");
-	return -1;
+    Printf("Incorrect signature\n");
+    Warning("Incorrect signature");
+    return -1;
 }
 
 XEX_HEADER h;

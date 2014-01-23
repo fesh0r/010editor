@@ -11,52 +11,52 @@ DisplayFormatHex();
 LittleEndian();
 
 typedef struct {
-	local int j;
-	local uint num_blocks;
-	local quad block_offset;
+    local int j;
+    local uint num_blocks;
+    local quad block_offset;
 
-	uint Signature;
-	if (Signature != 0x9E2A83C1) {
-		Warning("Invalid signature in compressed block");
-	}
-	uint BlockSize;
-	uint CompressedSize;
-	uint UncompressedSize;
+    uint Signature;
+    if (Signature != 0x9E2A83C1) {
+        Warning("Invalid signature in compressed block");
+    }
+    uint BlockSize;
+    uint CompressedSize;
+    uint UncompressedSize;
 
-	num_blocks = (uint)Ceil((double)UncompressedSize / (double)BlockSize);
+    num_blocks = (uint)Ceil((double)UncompressedSize / (double)BlockSize);
 
-	block_offset = 16 + num_blocks * 8;
-	for (j = 0; j < num_blocks; j++) {
-		FSeek(16 + j * 8);
-		struct {
-			local quad cur_offset2;
-			uint CompressedSize2;
-			uint UncompressedSize2;
+    block_offset = 16 + num_blocks * 8;
+    for (j = 0; j < num_blocks; j++) {
+        FSeek(16 + j * 8);
+        struct {
+            local quad cur_offset2;
+            uint CompressedSize2;
+            uint UncompressedSize2;
 
-			cur_offset2 = FTell();
-			FSeek(block_offset);
-			SetBackColor(0xffc0ff);
-			ubyte Data[CompressedSize2];
-			SetBackColor(0xc0ffff);
-			FSeek(cur_offset2);
-			block_offset += CompressedSize2;
-		} Block;
-	}
+            cur_offset2 = FTell();
+            FSeek(block_offset);
+            SetBackColor(0xffc0ff);
+            ubyte Data[CompressedSize2];
+            SetBackColor(0xc0ffff);
+            FSeek(cur_offset2);
+            block_offset += CompressedSize2;
+        } Block;
+    }
 } Chunk;
 
 local uint sig;
 sig = ReadInt(0);
 
 if (sig == 0x9E2A83C1) {
-	LittleEndian();
+    LittleEndian();
 }
 else if (sig == 0xC1832A9E) {
-	Warning("BigEndian");
-	BigEndian();
+    Warning("BigEndian");
+    BigEndian();
 }
 else {
-	Warning("Invalid signature");
-	Exit(-1);
+    Warning("Invalid signature");
+    Exit(-1);
 }
 FSeek(0);
 

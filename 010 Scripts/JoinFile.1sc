@@ -8,8 +8,8 @@
 //     split back into the original file. Open the
 //     first file in the file sequence with the
 //     file dialog that is displayed. The file
-//     name must contain numbers 
-//     (e.g. 'c:\temp\file.bmp.001'). The joined 
+//     name must contain numbers
+//     (e.g. 'c:\temp\file.bmp.001'). The joined
 //     file will be created as a new file.
 //--------------------------------------
 RequiresVersion( 4.0 );
@@ -65,14 +65,14 @@ while( FileExists( filename ) )
                 // Finished
                 filename[i]++;
                 done = true;
-            }                
+            }
             else
             {
                 // Must continue and increment the previous digit too
                 filename[i] = '0';
                 i--;
             }
-        }          
+        }
         else
         {
             // Cannot increment the filename any more
@@ -85,7 +85,7 @@ while( FileExists( filename ) )
             digitpos++;
             done = true;
         }
-    }    
+    }
 
     // Update the status
     filecount++;

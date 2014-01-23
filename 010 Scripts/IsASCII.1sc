@@ -33,12 +33,12 @@ while( size > 0 )
         if( buffer[i] >= 128 )
         {
             pos += (quad)i;
-            MessageBox( idOk, GetScriptName(), 
+            MessageBox( idOk, GetScriptName(),
                "Non-ASCII character found at address %Ld [%LXh]", pos, pos );
             SetCursorPos( pos );
             return 0;
         }
-    }        
+    }
 
     // Advance to next block
     pos  += bufsize;

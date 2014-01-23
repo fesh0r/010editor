@@ -16,979 +16,940 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 string str_replace(string in, string rem, string add) {
-	local string out = "", tmp;
-	local int in_len = Strlen(in);
-	local int rem_len = Strlen(rem);
-	local int str_pos = Strstr(in, rem);
-	if (str_pos > -1) {
-		if (str_pos > 0) {
-			out = SubStr(in, 0, str_pos);
-		}
-		Strcat(out, add);
-		if ((str_pos + rem_len) < in_len) {
-			tmp = SubStr(in, str_pos + rem_len);
-			out += tmp;
-		}
-		out = str_replace(out, rem, add);
-	}
-	else {
-		out = in;
-	}
-	return out;
+    local string out = "", tmp;
+    local int in_len = Strlen(in);
+    local int rem_len = Strlen(rem);
+    local int str_pos = Strstr(in, rem);
+    if (str_pos > -1) {
+        if (str_pos > 0) {
+            out = SubStr(in, 0, str_pos);
+        }
+        Strcat(out, add);
+        if ((str_pos + rem_len) < in_len) {
+            tmp = SubStr(in, str_pos + rem_len);
+            out += tmp;
+        }
+        out = str_replace(out, rem, add);
+    }
+    else {
+        out = in;
+    }
+    return out;
 }
 
 string str_del(string in, string rem) {
-	local string out;
-	local int str_pos = Strstr(in, rem);
-	if (str_pos > -1) {
-		out = StrDel(in, str_pos, Strlen(rem));
-		out = str_del(out, rem);
-	}
-	else {
-		out = in;
-	}
-	return out;
+    local string out;
+    local int str_pos = Strstr(in, rem);
+    if (str_pos > -1) {
+        out = StrDel(in, str_pos, Strlen(rem));
+        out = str_del(out, rem);
+    }
+    else {
+        out = in;
+    }
+    return out;
 }
 
 string strip_type(string type) {
-	type += "%";
-	type = str_replace(type, ", mscorlib,", ",");
-	type = str_replace(type, ", mscorlib]", "]");
-	type = str_replace(type, ", mscorlib%", "%");
-	type = str_replace(type, ", Microsoft.Xna.Framework,", ",");
-	type = str_replace(type, ", Microsoft.Xna.Framework]", "]");
-	type = str_replace(type, ", Microsoft.Xna.Framework%", "%");
-	type = str_replace(type, ", Microsoft.Xna.Framework.Graphics,", ",");
-	type = str_replace(type, ", Microsoft.Xna.Framework.Graphics]", "]");
-	type = str_replace(type, ", Microsoft.Xna.Framework.Graphics%", "%");
-	type = str_replace(type, ", FezEngine,", ",");
-	type = str_replace(type, ", FezEngine]", "]");
-	type = str_replace(type, ", FezEngine%", "%");
-	type = str_replace(type, ", Common,", ",");
-	type = str_replace(type, ", Common]", "]");
-	type = str_replace(type, ", Common%", "%");
-	type = str_del(type, "%");
+    type += "%";
+    type = str_replace(type, ", mscorlib,", ",");
+    type = str_replace(type, ", mscorlib]", "]");
+    type = str_replace(type, ", mscorlib%", "%");
+    type = str_replace(type, ", Microsoft.Xna.Framework,", ",");
+    type = str_replace(type, ", Microsoft.Xna.Framework]", "]");
+    type = str_replace(type, ", Microsoft.Xna.Framework%", "%");
+    type = str_replace(type, ", Microsoft.Xna.Framework.Graphics,", ",");
+    type = str_replace(type, ", Microsoft.Xna.Framework.Graphics]", "]");
+    type = str_replace(type, ", Microsoft.Xna.Framework.Graphics%", "%");
+    type = str_replace(type, ", FezEngine,", ",");
+    type = str_replace(type, ", FezEngine]", "]");
+    type = str_replace(type, ", FezEngine%", "%");
+    type = str_replace(type, ", Common,", ",");
+    type = str_replace(type, ", Common]", "]");
+    type = str_replace(type, ", Common%", "%");
+    type = str_del(type, "%");
 
-	type = str_del(type, ", Version=1.0.0.0");
-	type = str_del(type, ", Version=2.0.0.0");
-	type = str_del(type, ", Version=3.1.0.0");
-	type = str_del(type, ", Version=3.5.0.0");
-	type = str_del(type, ", Version=4.0.0.0");
+    type = str_del(type, ", Version=1.0.0.0");
+    type = str_del(type, ", Version=2.0.0.0");
+    type = str_del(type, ", Version=3.1.0.0");
+    type = str_del(type, ", Version=3.5.0.0");
+    type = str_del(type, ", Version=4.0.0.0");
 
-	type = str_del(type, ", Culture=neutral");
+    type = str_del(type, ", Culture=neutral");
 
-	type = str_del(type, ", PublicKeyToken=null");
-	type = str_del(type, ", PublicKeyToken=1c9e259686f921e0");
-	type = str_del(type, ", PublicKeyToken=51c3bfb2db46012c");
-	type = str_del(type, ", PublicKeyToken=842cf8be1de50553");
-	type = str_del(type, ", PublicKeyToken=b77a5c561934e089");
+    type = str_del(type, ", PublicKeyToken=null");
+    type = str_del(type, ", PublicKeyToken=1c9e259686f921e0");
+    type = str_del(type, ", PublicKeyToken=51c3bfb2db46012c");
+    type = str_del(type, ", PublicKeyToken=842cf8be1de50553");
+    type = str_del(type, ", PublicKeyToken=b77a5c561934e089");
 
-	return type;
+    return type;
 }
 
-
 typedef struct {
-	local int v = 0;
-	local int shift = 0;
-	SetBackColor(0xc0c0ff);
-	do {
-		u1 val;
-		v |= (val & 0x7F) << shift;
-		shift += 7;
-	} while (val & 0x80);
+    local int v = 0;
+    local int shift = 0;
+    SetBackColor(0xc0c0ff);
+    do {
+        u1 val;
+        v |= (val & 0x7F) << shift;
+        shift += 7;
+    } while (val & 0x80);
 } EncodedInt <read=read_EncodedInt,optimize=false>;
 
 string read_EncodedInt(EncodedInt &in) {
-	string out;
-//	SPrintf(out, "%Xh", in.v);
-	SPrintf(out, "%d", in.v);
-	return out;
+    string out;
+//  SPrintf(out, "%Xh", in.v);
+    SPrintf(out, "%d", in.v);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt length;
-	SetBackColor(0xc0ffc0);
-	if (length.v) {
-		char v[length.v];
-	}
+    EncodedInt length;
+    SetBackColor(0xc0ffc0);
+    if (length.v) {
+        char v[length.v];
+    }
 } EncodedStr <read=read_EncodedStr,optimize=false>;
 
 string read_EncodedStr(EncodedStr &in) {
-	if (in.length.v) {
-		return in.v;
-	}
-	else {
-		return "";
-	}
+    if (in.length.v) {
+        return in.v;
+    }
+    else {
+        return "";
+    }
 }
 
-
 typedef struct {
-	char signature[3];
+    char signature[3];
 
-	enum <char> Platform { MOBILE = 'm', WINDOWS = 'w', XBOX = 'x' } platform;
-	global_platform = platform;
+    enum <char> Platform { MOBILE = 'm', WINDOWS = 'w', XBOX = 'x' } platform;
+    global_platform = platform;
 
-	enum <u1> Version { V1_0 = 1, V2_0 = 2, V3_0 = 3, V3_1 = 4, V4_0 = 5 } version;
-	global_version = version;
+    enum <u1> Version { V1_0 = 1, V2_0 = 2, V3_0 = 3, V3_1 = 4, V4_0 = 5 } version;
+    global_version = version;
 
-	if (global_version >= 5) {
-		enum <u1> GraphicsProfile { REACH = 0, HIDEF = 1 } graphics_profile : 7;
-	}
-	else if (global_version >= 3) {
-		u1 unused : 7 <hidden=true>;
-	}
+    if (global_version >= 5) {
+        enum <u1> GraphicsProfile { REACH = 0, HIDEF = 1 } graphics_profile : 7;
+    }
+    else if (global_version >= 3) {
+        u1 unused : 7 <hidden=true>;
+    }
 
-	if (global_version >= 3) {
-		u1 compressed : 1;
-	}
-	else {
-		u1 unused <hidden=true>;
-		local u1 compressed = 0;
-	}
+    if (global_version >= 3) {
+        u1 compressed : 1;
+    }
+    else {
+        u1 unused <hidden=true>;
+        local u1 compressed = 0;
+    }
 
-	u4 size;
-	if (FileSize() != size) {
-		Printf("Filesize incorrect\n");
-		Warning("Filesize incorrect");
-		return -1;
-	}
+    u4 size;
+    if (FileSize() != size) {
+        Printf("Filesize incorrect\n");
+        Warning("Filesize incorrect");
+        return -1;
+    }
 } XNB_Header <read=read_XNB_Header>;
 
 string read_XNB_Header(XNB_Header &in) {
-	string out;
-	SPrintf(out, "%s %s", EnumToString(in.platform), EnumToString(in.version));
-	return out;
+    string out;
+    SPrintf(out, "%s %s", EnumToString(in.platform), EnumToString(in.version));
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
-	u4 d;
+    EncodedInt readerIndex <read=EncIntReaderType>;
+    u4 d;
 } XNB_Int32 <read=read_XNB_Int32,optimize=false>;
 
 string read_XNB_Int32(XNB_Int32 &in) {
-	local string out;
-	SPrintf(out, "%d", in.d);
-	return out;
+    local string out;
+    SPrintf(out, "%d", in.d);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
-	float d;
+    EncodedInt readerIndex <read=EncIntReaderType>;
+    float d;
 } XNB_Single <read=read_XNB_Single,optimize=false>;
 
 string read_XNB_Single(XNB_Single &in) {
-	local string out;
-	SPrintf(out, "%f", in.d);
-	return out;
+    local string out;
+    SPrintf(out, "%f", in.d);
+    return out;
 }
 
-
 typedef struct (int format_size) {
-	s2 wFormatTag;
-	u2 nChannels;
-	u4 nSamplesPerSec;
-	u4 nAvgBytesPerSec;
-	u2 nBlockAlign;
-	u2 wBitsPerSample;
+    s2 wFormatTag;
+    u2 nChannels;
+    u4 nSamplesPerSec;
+    u4 nAvgBytesPerSec;
+    u2 nBlockAlign;
+    u2 wBitsPerSample;
 
-	if (format_size >= 18) {
-		u2 cbSize;
+    if (format_size >= 18) {
+        u2 cbSize;
 
-		if ((format_size - 18) != cbSize) {
-			Printf("Bad cbSize in WAV header\n");
-			Warning("Bad cbSize in WAV header");
-		}
-	}
+        if ((format_size - 18) != cbSize) {
+            Printf("Bad cbSize in WAV header\n");
+            Warning("Bad cbSize in WAV header");
+        }
+    }
 
-	if (format_size >= 40) {
-		u2 wValidBitsPerSample;
-		u4 dwChannelMask;
-		u1 SubFormat[16];
-	}
+    if (format_size >= 40) {
+        u2 wValidBitsPerSample;
+        u4 dwChannelMask;
+        u1 SubFormat[16];
+    }
 
-	if (format_size > 40) {
-		u1 rest[format_size - 40];
-	}
+    if (format_size > 40) {
+        u1 rest[format_size - 40];
+    }
 } WAV_FORMAT <optimize=false>;
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 format_size;
-	if (format_size) {
-		if (global_platform == 'x') {
-			BigEndian();
-		}
-		WAV_FORMAT format(format_size);
-		if (global_platform == 'x') {
-			LittleEndian();
-		}
-	}
+    u4 format_size;
+    if (format_size) {
+        if (global_platform == 'x') {
+            BigEndian();
+        }
+        WAV_FORMAT format(format_size);
+        if (global_platform == 'x') {
+            LittleEndian();
+        }
+    }
 
-	u4 data_size;
-	if (data_size) {
-		SetBackColor(0xc0ffff);
-		u1 data[data_size];
-	}
+    u4 data_size;
+    if (data_size) {
+        SetBackColor(0xc0ffff);
+        u1 data[data_size];
+    }
 
-	u4 loop_start <format=decimal>;
-	u4 loop_length <format=decimal>;
-	u4 duration <format=decimal>;
+    u4 loop_start <format=decimal>;
+    u4 loop_length <format=decimal>;
+    u4 duration <format=decimal>;
 } XNB_SoundEffect <optimize=false>;
 
 typedef struct {
-	u4 size;
-	if (size) {
-		SetBackColor(0xc0ffff);
-		u1 data[size];
-	}
+    u4 size;
+    if (size) {
+        SetBackColor(0xc0ffff);
+        u1 data[size];
+    }
 } XNB_TextureData <read=read_TextureData,optimize=false>;
 
 string read_TextureData(XNB_TextureData &in) {
-	local string out;
-	SPrintf(out, "%d", in.size);
-	return out;
+    local string out;
+    SPrintf(out, "%d", in.size);
+    return out;
 }
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	if (global_version > 4) {
-		enum <u4> SurfaceFormat5 {
-			Color_5 = 0,
-			Bgr565_5,
-			Bgra5551_5,
-			Bgra4444_5,
-			Dxt1_5,
-			Dxt3_5,
-			Dxt5_5,
-			NormalizedByte2_5,
-			NormalizedByte4_5,
-			Rgba1010102_5,
-			Rg32_5,
-			Rgba64_5,
-			Alpha8_5,
-			Single_5,
-			Vector2_5,
-			Vector4_5,
-			HalfSingle_5,
-			HalfVector2_5,
-			HalfVector4_5,
-			HdrBlendable_5
-		} surface_format;
-	}
-	else {
-		enum <u4> SurfaceFormat3 {
-			Unknown0_3 = 0,
-			Color_3,
-			Bgr32_3,
-			Bgra1010102_3,
-			Rgba32_3,
-			Rgb32_3,
-			Rgba1010102_3,
-			Rg32_3,
-			Rgba64_3,
-			Bgr565_3,
-			Bgra5551_3,
-			Bgr555_3,
-			Bgra4444_3,
-			Bgr444_3,
-			Bgra2338_3,
-			Alpha8_3,
-			Bgr233_3,
-			Bgr24_3,
-			NormalizedByte2_3,
-			NormalizedByte4_3,
-			NormalizedShort2_3,
-			NormalizedShort4_3,
-			Single_3,
-			Vector2_3,
-			Vector4_3,
-			HalfSingle_3,
-			HalfVector2_3,
-			HalfVector4_3,
-			Dxt1_3,
-			Dxt2_3,
-			Dxt3_3,
-			Dxt4_3,
-			Dxt5_3,
-			Luminance8_3,
-			Luminance16_3,
-			LuminanceAlpha8_3,
-			LuminanceAlpha16_3,
-			Palette8_3,
-			PaletteAlpha16_3,
-			NormalizedLuminance16_3,
-			NormalizedLuminance32_3,
-			NormalizedAlpha1010102_3,
-			NormalizedByte2Computed_3,
-			VideoYuYv_3,
-			VideoUyVy_3,
-			VideoGrGb_3,
-			VideoRgBg_3,
-			Multi2Bgra32_3,
-			Depth24Stencil8_3,
-			Depth24Stencil8Single_3,
-			Depth24Stencil4_3,
-			Depth24_3,
-			Depth32_3,
-			Unknown53_3,
-			Depth16_3,
-			Unknown55_3,
-			Depth15Stencil1_3
-		} surface_format;
-	}
-	u4 width <format=decimal>;
-	u4 height <format=decimal>;
-	u4 mipmap_levels <format=decimal>;
-	if (mipmap_levels > 0) {
-		XNB_TextureData d[mipmap_levels];
-	}
+    if (global_version > 4) {
+        enum <u4> SurfaceFormat5 {
+            Color_5 = 0,
+            Bgr565_5,
+            Bgra5551_5,
+            Bgra4444_5,
+            Dxt1_5,
+            Dxt3_5,
+            Dxt5_5,
+            NormalizedByte2_5,
+            NormalizedByte4_5,
+            Rgba1010102_5,
+            Rg32_5,
+            Rgba64_5,
+            Alpha8_5,
+            Single_5,
+            Vector2_5,
+            Vector4_5,
+            HalfSingle_5,
+            HalfVector2_5,
+            HalfVector4_5,
+            HdrBlendable_5
+        } surface_format;
+    }
+    else {
+        enum <u4> SurfaceFormat3 {
+            Unknown0_3 = 0,
+            Color_3,
+            Bgr32_3,
+            Bgra1010102_3,
+            Rgba32_3,
+            Rgb32_3,
+            Rgba1010102_3,
+            Rg32_3,
+            Rgba64_3,
+            Bgr565_3,
+            Bgra5551_3,
+            Bgr555_3,
+            Bgra4444_3,
+            Bgr444_3,
+            Bgra2338_3,
+            Alpha8_3,
+            Bgr233_3,
+            Bgr24_3,
+            NormalizedByte2_3,
+            NormalizedByte4_3,
+            NormalizedShort2_3,
+            NormalizedShort4_3,
+            Single_3,
+            Vector2_3,
+            Vector4_3,
+            HalfSingle_3,
+            HalfVector2_3,
+            HalfVector4_3,
+            Dxt1_3,
+            Dxt2_3,
+            Dxt3_3,
+            Dxt4_3,
+            Dxt5_3,
+            Luminance8_3,
+            Luminance16_3,
+            LuminanceAlpha8_3,
+            LuminanceAlpha16_3,
+            Palette8_3,
+            PaletteAlpha16_3,
+            NormalizedLuminance16_3,
+            NormalizedLuminance32_3,
+            NormalizedAlpha1010102_3,
+            NormalizedByte2Computed_3,
+            VideoYuYv_3,
+            VideoUyVy_3,
+            VideoGrGb_3,
+            VideoRgBg_3,
+            Multi2Bgra32_3,
+            Depth24Stencil8_3,
+            Depth24Stencil8Single_3,
+            Depth24Stencil4_3,
+            Depth24_3,
+            Depth32_3,
+            Unknown53_3,
+            Depth16_3,
+            Unknown55_3,
+            Depth15Stencil1_3
+        } surface_format;
+    }
+    u4 width <format=decimal>;
+    u4 height <format=decimal>;
+    u4 mipmap_levels <format=decimal>;
+    if (mipmap_levels > 0) {
+        XNB_TextureData d[mipmap_levels];
+    }
 } XNB_Texture2D <read=read_Texture2D,optimize=false>;
 
 string read_Texture2D(XNB_Texture2D &in) {
-	local string out;
-	SPrintf(out, "%dx%d", in.width, in.height);
-	return out;
+    local string out;
+    SPrintf(out, "%dx%d", in.width, in.height);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 surface_format;
-	u4 width <format=decimal>;
-	u4 height <format=decimal>;
-	u4 depth <format=decimal>;
-	u4 mipmap_levels <format=decimal>;
-	if (mipmap_levels > 0) {
-		XNB_TextureData d[mipmap_levels];
-	}
+    u4 surface_format;
+    u4 width <format=decimal>;
+    u4 height <format=decimal>;
+    u4 depth <format=decimal>;
+    u4 mipmap_levels <format=decimal>;
+    if (mipmap_levels > 0) {
+        XNB_TextureData d[mipmap_levels];
+    }
 } XNB_Texture3D <read=read_Texture3D,optimize=false>;
 
 string read_Texture3D(XNB_Texture3D &in) {
-	local string out;
-	SPrintf(out, "%dx%dx%d", in.width, in.height, in.depth);
-	return out;
+    local string out;
+    SPrintf(out, "%dx%dx%d", in.width, in.height, in.depth);
+    return out;
 }
 
-
 typedef struct {
-	u4 x;
-	u4 y;
-	u4 width;
-	u4 height;
+    u4 x;
+    u4 y;
+    u4 width;
+    u4 height;
 } Rectangle <read=read_Rectangle>;
 
 string read_Rectangle(Rectangle &in) {
-	local string out;
-	SPrintf(out, "%d,%d %dx%d", in.x, in.y, in.width, in.height);
-	return out;
+    local string out;
+    SPrintf(out, "%d,%d %dx%d", in.x, in.y, in.width, in.height);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex;
+    EncodedInt readerIndex;
 
-	u4 num;
-	if (num) {
-		SetBackColor(0xc0ffff);
-		Rectangle d[num];
-	}
+    u4 num;
+    if (num) {
+        SetBackColor(0xc0ffff);
+        Rectangle d[num];
+    }
 } XNB_List_Rectangle <read=read_List_Rectangle,optimize=false>;
 
 string read_List_Rectangle(XNB_List_Rectangle &in) {
-	local string out;
-	SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
-	return out;
+    local string out;
+    SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		char d[num];
-	}
+    u4 num;
+    if (num) {
+        char d[num];
+    }
 } XNB_List_Char <read=read_List_Char,optimize=false>;
 
 string read_List_Char(XNB_List_Char &in) {
-	local string out;
-	SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
-	return out;
+    local string out;
+    SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
+    return out;
 }
 
-
 typedef struct {
-	float x;
-	float y;
-	float z;
+    float x;
+    float y;
+    float z;
 } Vector3 <read=read_Vector3>;
 
 string read_Vector3(Vector3 &in) {
-	local string out;
-	SPrintf(out, "%.2f,%.2f,%.2f", in.x, in.y, in.z);
-	return out;
+    local string out;
+    SPrintf(out, "%.2f,%.2f,%.2f", in.x, in.y, in.z);
+    return out;
 }
 
-
 typedef struct {
-	float x;
-	float y;
+    float x;
+    float y;
 } Vector2 <read=read_Vector2>;
 
 string read_Vector2(Vector2 &in) {
-	local string out;
-	SPrintf(out, "%.2f,%.2f,", in.x, in.y);
-	return out;
+    local string out;
+    SPrintf(out, "%.2f,%.2f,", in.x, in.y);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		SetBackColor(0xc0ffff);
-		Vector3 d[num];
-	}
+    u4 num;
+    if (num) {
+        SetBackColor(0xc0ffff);
+        Vector3 d[num];
+    }
 } XNB_List_Vector3 <read=read_List_Vector3,optimize=false>;
 
 string read_List_Vector3(XNB_List_Vector3 &in) {
-	local string out;
-	SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
-	return out;
+    local string out;
+    SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
-	EncodedStr d;
+    EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedStr d;
 } XNB_String <read=read_XNB_String,optimize=false>;
 
 string read_XNB_String(XNB_String &in) {
-	return read_EncodedStr(in.d);
+    return read_EncodedStr(in.d);
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		XNB_String d[num];
-	}
+    u4 num;
+    if (num) {
+        XNB_String d[num];
+    }
 } XNB_List_String <read=read_List_String,optimize=false>;
 
 string read_List_String(XNB_List_String &in) {
-	local string out;
-	SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
-	return out;
+    local string out;
+    SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	XNB_Texture2D texture;
+    XNB_Texture2D texture;
 
-	XNB_List_Rectangle glyphs;
+    XNB_List_Rectangle glyphs;
 
-	XNB_List_Rectangle cropping;
+    XNB_List_Rectangle cropping;
 
-	XNB_List_Char char_map;
+    XNB_List_Char char_map;
 
-	u4 line_spacing;
-	float spacing;
+    u4 line_spacing;
+    float spacing;
 
-	XNB_List_Vector3 kerning;
+    XNB_List_Vector3 kerning;
 
-	u1 has_default;
-	if (has_default) {
-		u1 default_char;
-	}
-	else {
-		local u1 default_char = 0;
-	}
+    u1 has_default;
+    if (has_default) {
+        u1 default_char;
+    }
+    else {
+        local u1 default_char = 0;
+    }
 } XNB_SpriteFont <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		SetBackColor(0xc0ffff);
-		u1 d[num];
-	}
+    u4 num;
+    if (num) {
+        SetBackColor(0xc0ffff);
+        u1 d[num];
+    }
 } XNB_Effect <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	XNB_String referenceName;
-	XNB_Int32 duration;
-	XNB_Int32 width;
-	XNB_Int32 height;
-	XNB_Single fps;
-	XNB_Int32 soundtrackType;
+    XNB_String referenceName;
+    XNB_Int32 duration;
+    XNB_Int32 width;
+    XNB_Int32 height;
+    XNB_Single fps;
+    XNB_Int32 soundtrackType;
 } XNB_Video <optimize=false>;
 
-
 typedef struct {
-	XNB_String k;
-	XNB_String v;
+    XNB_String k;
+    XNB_String v;
 } XNB_Dict_String_String_Entry <read=read_XNB_Dict_String_String_Entry, optimize=false>;
 
 string read_XNB_Dict_String_String_Entry(XNB_Dict_String_String_Entry &in) {
-	return read_XNB_String(in.k);
+    return read_XNB_String(in.k);
 }
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		XNB_Dict_String_String_Entry d[num];
-	}
+    u4 num;
+    if (num) {
+        XNB_Dict_String_String_Entry d[num];
+    }
 } XNB_Dict_String_String <read=read_XNB_Dict_String_String, optimize=false>;
 
 string read_XNB_Dict_String_String(XNB_Dict_String_String &in) {
-	local string out;
-	SPrintf(out, "Dict(String,String)[%d]", in.num);
-	return out;
+    local string out;
+    SPrintf(out, "Dict(String,String)[%d]", in.num);
+    return out;
 }
 
-
 typedef struct {
-	XNB_String k;
-	XNB_Dict_String_String v;
+    XNB_String k;
+    XNB_Dict_String_String v;
 } XNB_Dict_String_Dict_String_String_entry <read=read_XNB_Dict_String_Dict_String_String_entry, optimize=false>;
 
 string read_XNB_Dict_String_Dict_String_String_entry(XNB_Dict_String_Dict_String_String_entry &in) {
-	return read_XNB_String(in.k);
+    return read_XNB_String(in.k);
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		XNB_Dict_String_Dict_String_String_entry d[num];
-	}
+    u4 num;
+    if (num) {
+        XNB_Dict_String_Dict_String_String_entry d[num];
+    }
 } XNB_Dict_String_Dict_String_String <read=read_XNB_Dict_String_Dict_String_String, optimize=false>;
 
 string read_XNB_Dict_String_Dict_String_String(XNB_Dict_String_Dict_String_String &in) {
-	local string out;
-	SPrintf(out, "Dict(String,Dict(String,String))[%d]", in.num);
-	return out;
+    local string out;
+    SPrintf(out, "Dict(String,Dict(String,String))[%d]", in.num);
+    return out;
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		u4 d[num];
-	}
+    u4 num;
+    if (num) {
+        u4 d[num];
+    }
 } XNB_List_Enum <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 d;
+    u4 d;
 } XNB_Enum <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	s4 duration;
-	s4 loop_times_from;
-	s4 loop_times_to;
-	EncodedStr name;
-	s4 trigger_from;
-	s4 trigger_to;
-	s4 delay;
-	u1 night;
-	u1 day;
-	u1 dusk;
-	u1 dawn;
-	u1 frac_time;
-	u1 one_at_a_time;
-	u1 cut_off_tail;
+    s4 duration;
+    s4 loop_times_from;
+    s4 loop_times_to;
+    EncodedStr name;
+    s4 trigger_from;
+    s4 trigger_to;
+    s4 delay;
+    u1 night;
+    u1 day;
+    u1 dusk;
+    u1 dawn;
+    u1 frac_time;
+    u1 one_at_a_time;
+    u1 cut_off_tail;
 } FEZ_Loop <read=read_FEZ_Loop,optimize=false>;
 
 string read_FEZ_Loop(FEZ_Loop &in) {
-	return read_EncodedStr(in.name);
+    return read_EncodedStr(in.name);
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		FEZ_Loop d[num];
-	}
+    u4 num;
+    if (num) {
+        FEZ_Loop d[num];
+    }
 } XNB_List_FEZ_Loop <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	XNB_List_FEZ_Loop loops;
-	EncodedStr name;
-	s4 tempo;
-	s4 time_sig;
-	XNB_List_Enum notes;
-	XNB_Enum assemble_chord;
-	u1 random_ordering;
+    XNB_List_FEZ_Loop loops;
+    EncodedStr name;
+    s4 tempo;
+    s4 time_sig;
+    XNB_List_Enum notes;
+    XNB_Enum assemble_chord;
+    u1 random_ordering;
 } FEZ_TrackedSong <read=read_FEZ_TrackedSong,optimize=false>;
 
 string read_FEZ_TrackedSong(FEZ_TrackedSong &in) {
-	return read_EncodedStr(in.name);
+    return read_EncodedStr(in.name);
 }
 
-
 typedef struct {
-	Vector3 position;
-	s1 normal;
-	Vector2 texture_coord;
+    Vector3 position;
+    s1 normal;
+    Vector2 texture_coord;
 } FEZ_VertexPos;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		FEZ_VertexPos d[num];
-	}
+    u4 num;
+    if (num) {
+        FEZ_VertexPos d[num];
+    }
 } FEZ_List_VertexPos <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		s2 d[num];
-	}
+    u4 num;
+    if (num) {
+        s2 d[num];
+    }
 } XNB_List_UInt16 <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	XNB_Enum primitive_type;
-	FEZ_List_VertexPos vertices;
-	XNB_List_UInt16 indices;
+    XNB_Enum primitive_type;
+    FEZ_List_VertexPos vertices;
+    XNB_List_UInt16 indices;
 } FEZ_SIIP_VertexPos <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 d;
+    u4 d;
 } FEZ_ActorType <optimize=false>;
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	EncodedStr name;
-	EncodedStr cubemap_path;
-	Vector3 size;
-	FEZ_SIIP_VertexPos geometry;
-	FEZ_ActorType actor_type;
-	u1 no_silhouette;
+    EncodedStr name;
+    EncodedStr cubemap_path;
+    Vector3 size;
+    FEZ_SIIP_VertexPos geometry;
+    FEZ_ActorType actor_type;
+    u1 no_silhouette;
 
-	EncodedInt readerIndex2 <read=EncIntReaderType>;
+    EncodedInt readerIndex2 <read=EncIntReaderType>;
 } FEZ_ArtObject <read=read_FEZ_ArtObject,optimize=false>;
 
 string read_FEZ_ArtObject(FEZ_ArtObject &in) {
-	return read_EncodedStr(in.name);
+    return read_EncodedStr(in.name);
 }
 
-
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		u4 c[num];
-	}
+    u4 num;
+    if (num) {
+        u4 c[num];
+    }
 } XNB_List_Color <optimize=false>;
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	s8 time;
+    s8 time;
 } XNB_TimeSpan;
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	XNB_TimeSpan duration;
-	XNB_List_Color data;
+    XNB_TimeSpan duration;
+    XNB_List_Color data;
 } FEZ_Frame <optimize=false>;
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	u4 num;
-	if (num) {
-		FEZ_Frame f[num];
-	}
+    u4 num;
+    if (num) {
+        FEZ_Frame f[num];
+    }
 } XNB_List_Frame <optimize=false>;
 
 typedef struct {
-	EncodedInt readerIndex <read=EncIntReaderType>;
+    EncodedInt readerIndex <read=EncIntReaderType>;
 
-	s4 width;
-	s4 height;
-	s4 actual_width;
-	s4 actual_height;
-	XNB_List_Frame frames;
+    s4 width;
+    s4 height;
+    s4 actual_width;
+    s4 actual_height;
+    XNB_List_Frame frames;
 } FEZ_AnimatedTexture <read=read_FEZ_AnimatedTexture,optimize=false>;
 
 string read_FEZ_AnimatedTexture(FEZ_AnimatedTexture &in) {
-	local string out;
-	SPrintf(out, "FEZ_AnimatedTexture(%dx%d,%d)", in.actual_width, in.actual_height, in.frames.num);
-	return out;
+    local string out;
+    SPrintf(out, "FEZ_AnimatedTexture(%dx%d,%d)", in.actual_width, in.actual_height, in.frames.num);
+    return out;
 }
 
-
 typedef struct {
-	EncodedStr type;
-	u4 version;
+    EncodedStr type;
+    u4 version;
 } XNB_Reader <read=read_XNB_Reader,optimize=false>;
 
 string read_XNB_Reader(XNB_Reader &in) {
-	return ReaderType((string)in.type.v);
+    return ReaderType((string)in.type.v);
 }
-
 
 string EncIntReaderType(EncodedInt &in) {
-	return read_XNB_Reader(r[in.v-1]);
+    return read_XNB_Reader(r[in.v-1]);
 }
-
 
 string ReaderType(string type) {
-	local string out;
+    local string out;
 
-	type = strip_type(type);
-	switch (type) {
-		case "Microsoft.Xna.Framework.Content.SoundEffectReader":
-			out = "SoundEffect";
-			break;
+    type = strip_type(type);
+    switch (type) {
+        case "Microsoft.Xna.Framework.Content.SoundEffectReader":
+            out = "SoundEffect";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.SpriteFontReader":
-			out = "SpriteFont";
-			break;
+        case "Microsoft.Xna.Framework.Content.SpriteFontReader":
+            out = "SpriteFont";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.Texture2DReader":
-			out = "Texture2D";
-			break;
+        case "Microsoft.Xna.Framework.Content.Texture2DReader":
+            out = "Texture2D";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.Texture3DReader":
-			out = "Texture3D";
-			break;
+        case "Microsoft.Xna.Framework.Content.Texture3DReader":
+            out = "Texture3D";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.TextureReader":
-			out = "Texture";
-			break;
+        case "Microsoft.Xna.Framework.Content.TextureReader":
+            out = "Texture";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.ExternalReferenceReader":
-			out = "ExternalReference";
-			break;
+        case "Microsoft.Xna.Framework.Content.ExternalReferenceReader":
+            out = "ExternalReference";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.CharReader":
-			out = "Char";
-			break;
+        case "Microsoft.Xna.Framework.Content.CharReader":
+            out = "Char";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.RectangleReader":
-			out = "Rectangle";
-			break;
+        case "Microsoft.Xna.Framework.Content.RectangleReader":
+            out = "Rectangle";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.Vector3Reader":
-			out = "Vector3";
-			break;
+        case "Microsoft.Xna.Framework.Content.Vector3Reader":
+            out = "Vector3";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.EffectReader":
-			out = "Effect";
-			break;
+        case "Microsoft.Xna.Framework.Content.EffectReader":
+            out = "Effect";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.ModelReader":
-			out = "Model";
-			break;
+        case "Microsoft.Xna.Framework.Content.ModelReader":
+            out = "Model";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.StringReader":
-			out = "String";
-			break;
+        case "Microsoft.Xna.Framework.Content.StringReader":
+            out = "String";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.VertexDeclarationReader":
-			out = "VertexDeclaration";
-			break;
+        case "Microsoft.Xna.Framework.Content.VertexDeclarationReader":
+            out = "VertexDeclaration";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.IndexBufferReader":
-			out = "IndexBuffer";
-			break;
+        case "Microsoft.Xna.Framework.Content.IndexBufferReader":
+            out = "IndexBuffer";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.VertexBufferReader":
-			out = "VertexBuffer";
-			break;
+        case "Microsoft.Xna.Framework.Content.VertexBufferReader":
+            out = "VertexBuffer";
+            break;
 
-		case "PolygonHead.Pipeline.BitmapFontReader":
-			out = "BitmapFontReader (PolygonHead)";
-			break;
+        case "PolygonHead.Pipeline.BitmapFontReader":
+            out = "BitmapFontReader (PolygonHead)";
+            break;
 
-		case "PolygonHead.Pipeline.RenderDeferredEffectReader":
-			out = "RenderDeferredEffect (PolygonHead)";
-			break;
+        case "PolygonHead.Pipeline.RenderDeferredEffectReader":
+            out = "RenderDeferredEffect (PolygonHead)";
+            break;
 
-		case "PolygonHead.Pipeline.AdditiveEffectReader":
-			out = "AdditiveEffect (PolygonHead)";
-			break;
+        case "PolygonHead.Pipeline.AdditiveEffectReader":
+            out = "AdditiveEffect (PolygonHead)";
+            break;
 
-		case "XNAnimation.Pipeline.SkinnedModelReader":
-			out = "SkinnedModelReader (XNAnimation)";
-			break;
+        case "XNAnimation.Pipeline.SkinnedModelReader":
+            out = "SkinnedModelReader (XNAnimation)";
+            break;
 
-		case "XNAnimation.Pipeline.SkinnedModelBasicEffectReader":
-			out = "SkinnedModelBasicEffect (XNAnimation)";
-			break;
+        case "XNAnimation.Pipeline.SkinnedModelBasicEffectReader":
+            out = "SkinnedModelBasicEffect (XNAnimation)";
+            break;
 
-		case "XNAnimation.Pipeline.SkinnedModelBoneReader":
-			out = "SkinnedModelBone (XNAnimation)";
-			break;
+        case "XNAnimation.Pipeline.SkinnedModelBoneReader":
+            out = "SkinnedModelBone (XNAnimation)";
+            break;
 
-		case "XNAnimation.Pipeline.AnimationClipReader":
-			out = "AnimationClip (XNAnimation)";
-			break;
+        case "XNAnimation.Pipeline.AnimationClipReader":
+            out = "AnimationClip (XNAnimation)";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.VideoReader":
-			out = "Video";
-			break;
+        case "Microsoft.Xna.Framework.Content.VideoReader":
+            out = "Video";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.Int32Reader":
-			out = "Int32";
-			break;
+        case "Microsoft.Xna.Framework.Content.Int32Reader":
+            out = "Int32";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.SingleReader":
-			out = "Single";
-			break;
+        case "Microsoft.Xna.Framework.Content.SingleReader":
+            out = "Single";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.ListReader`1[[Microsoft.Xna.Framework.Rectangle]]":
-			out = "List(Rectangle)";
-			break;
+        case "Microsoft.Xna.Framework.Content.ListReader`1[[Microsoft.Xna.Framework.Rectangle]]":
+            out = "List(Rectangle)";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.ListReader`1[[System.Char]]":
-			out = "List(Char)";
-			break;
+        case "Microsoft.Xna.Framework.Content.ListReader`1[[System.Char]]":
+            out = "List(Char)";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.ListReader`1[[Microsoft.Xna.Framework.Vector3]]":
-			out = "List(Vector3)";
-			break;
+        case "Microsoft.Xna.Framework.Content.ListReader`1[[Microsoft.Xna.Framework.Vector3]]":
+            out = "List(Vector3)";
+            break;
 
-		case "Microsoft.Xna.Framework.Content.ListReader`1[[System.Int32]]":
-			out = "List(Int32)";
-			break;
+        case "Microsoft.Xna.Framework.Content.ListReader`1[[System.Int32]]":
+            out = "List(Int32)";
+            break;
 
-		case "FezEngine.Readers.TrackedSongReader":
-			out = "TrackedSong (FEZ)";
-			break;
+        case "FezEngine.Readers.TrackedSongReader":
+            out = "TrackedSong (FEZ)";
+            break;
 
-		case "FezEngine.Readers.ArtObjectReader":
-			out = "ArtObject (FEZ)";
-			break;
+        case "FezEngine.Readers.ArtObjectReader":
+            out = "ArtObject (FEZ)";
+            break;
 
-		case "FezEngine.Readers.AnimatedTextureReader":
-			out = "AnimatedTexture (FEZ)";
-			break;
+        case "FezEngine.Readers.AnimatedTextureReader":
+            out = "AnimatedTexture (FEZ)";
+            break;
 
-		default:
-			out = type;
+        default:
+            out = type;
 /*
-			if (Strstr(type, "Microsoft.Xna.Framework.Content.ListReader") == 0) {
-				out = "List";
-			}
-			else if (Strstr(type, "Microsoft.Xna.Framework.Content.DictionaryReader") == 0) {
-				out = "Dict";
-			}
+            if (Strstr(type, "Microsoft.Xna.Framework.Content.ListReader") == 0) {
+                out = "List";
+            }
+            else if (Strstr(type, "Microsoft.Xna.Framework.Content.DictionaryReader") == 0) {
+                out = "Dict";
+            }
 */
-			break;
-	}
-	return out;
+            break;
+    }
+    return out;
 }
 
-
 typedef struct {
-	if (ReadUByte(FTell()) == 0xff) {
-		u1 flag;
-		u2 frame_size;
-		u2 block_size;
-	}
-	else {
-		local u2 frame_size = 0x8000;
-		u2 block_size;
-	}
+    if (ReadUByte(FTell()) == 0xff) {
+        u1 flag;
+        u2 frame_size;
+        u2 block_size;
+    }
+    else {
+        local u2 frame_size = 0x8000;
+        u2 block_size;
+    }
 
-	if (block_size && frame_size) {
-		SetBackColor(0xffe0ff);
-		u1 d[block_size];
-	}
-	else {
-		parentof(this).eof = 1;
-	}
+    if (block_size && frame_size) {
+        SetBackColor(0xffe0ff);
+        u1 d[block_size];
+    }
+    else {
+        parentof(this).eof = 1;
+    }
 } LZX_Block <read=read_LZX_Block,optimize=false>;
 
 string read_LZX_Block(LZX_Block &in) {
-	string out;
-	if (in.block_size && in.frame_size) {
-		SPrintf(out, "%04Xh %04Xh", in.block_size, in.frame_size);
-	}
-	else {
-		SPrintf(out, "EOF");
-	}
-	return out;
+    string out;
+    if (in.block_size && in.frame_size) {
+        SPrintf(out, "%04Xh %04Xh", in.block_size, in.frame_size);
+    }
+    else {
+        SPrintf(out, "EOF");
+    }
+    return out;
 }
 
 typedef struct (int size) {
-	local int comp_size = size;
-	local int eof = 0;
+    local int comp_size = size;
+    local int eof = 0;
 
-	u4 full_size;
+    u4 full_size;
 
-	BigEndian();
-	while (!eof) {
-		LZX_Block b;
-	}
-	local int padding_bytes = comp_size - FTell() + startof(this);
-	if (padding_bytes) {
-		u1 padding[padding_bytes] <hidden=true>;
-	}
-	LittleEndian();
+    BigEndian();
+    while (!eof) {
+        LZX_Block b;
+    }
+    local int padding_bytes = comp_size - FTell() + startof(this);
+    if (padding_bytes) {
+        u1 padding[padding_bytes] <hidden=true>;
+    }
+    LittleEndian();
 } LZX_Stream <read=read_LZX_Stream,optimize=false>;
 
 string read_LZX_Stream(LZX_Stream &in) {
-	string out;
-	SPrintf(out, "%d %d", in.comp_size, in.full_size);
-	return out;
+    string out;
+    SPrintf(out, "%d %d", in.comp_size, in.full_size);
+    return out;
 }
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -1000,32 +961,32 @@ local char sig[4];
 ReadBytes(sig, 0, 4);
 
 if (sig[0] != 'X' || sig[1] != 'N' || sig[2] != 'B') {
-	Printf("Incorrect signature\n");
-	Warning("Incorrect signature");
-	return -1;
+    Printf("Incorrect signature\n");
+    Warning("Incorrect signature");
+    return -1;
 }
 
 if (sig[3] != 'w' && sig[3] != 'x') {
-	Printf("Unhandled platform\n");
-	Warning("Unhandled platform");
-	return -1;
+    Printf("Unhandled platform\n");
+    Warning("Unhandled platform");
+    return -1;
 }
 
 SetBackColor(0xe0e0e0);
 XNB_Header h;
 
 if (h.compressed) {
-	SetBackColor(0xffb0ff);
-	LZX_Stream d(h.size - sizeof(h));
+    SetBackColor(0xffb0ff);
+    LZX_Stream d(h.size - sizeof(h));
 
-	//Printf("Compressed file!\n");
-	Warning("Compressed file!");
-	return;
+    //Printf("Compressed file!\n");
+    Warning("Compressed file!");
+    return;
 }
 
 EncodedInt numberOfReaders;
 if (numberOfReaders.v) {
-	XNB_Reader r[numberOfReaders.v];
+    XNB_Reader r[numberOfReaders.v];
 }
 
 EncodedInt sharedResourceFixups;
@@ -1034,52 +995,52 @@ SetBackColor(0xffc0c0);
 local string type = r[0].type.v;
 type = strip_type(type);
 switch (type) {
-	case "Microsoft.Xna.Framework.Content.SoundEffectReader":
-		XNB_SoundEffect d;
-		break;
+    case "Microsoft.Xna.Framework.Content.SoundEffectReader":
+        XNB_SoundEffect d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.Texture2DReader":
-		XNB_Texture2D d;
-		break;
+    case "Microsoft.Xna.Framework.Content.Texture2DReader":
+        XNB_Texture2D d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.Texture3DReader":
-		XNB_Texture3D d;
-		break;
+    case "Microsoft.Xna.Framework.Content.Texture3DReader":
+        XNB_Texture3D d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.SpriteFontReader":
-		XNB_SpriteFont d;
-		break;
+    case "Microsoft.Xna.Framework.Content.SpriteFontReader":
+        XNB_SpriteFont d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.EffectReader":
-		XNB_Effect d;
-		break;
+    case "Microsoft.Xna.Framework.Content.EffectReader":
+        XNB_Effect d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.StringReader":
-		XNB_String d;
-		break;
+    case "Microsoft.Xna.Framework.Content.StringReader":
+        XNB_String d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.VideoReader":
-		XNB_Video d;
-		break;
+    case "Microsoft.Xna.Framework.Content.VideoReader":
+        XNB_Video d;
+        break;
 
-	case "Microsoft.Xna.Framework.Content.DictionaryReader`2[[System.String],[System.Collections.Generic.Dictionary`2[[System.String],[System.String]]]]":
-		XNB_Dict_String_Dict_String_String d;
-		break;
+    case "Microsoft.Xna.Framework.Content.DictionaryReader`2[[System.String],[System.Collections.Generic.Dictionary`2[[System.String],[System.String]]]]":
+        XNB_Dict_String_Dict_String_String d;
+        break;
 
-	case "FezEngine.Readers.TrackedSongReader":
-		FEZ_TrackedSong d;
-		break;
+    case "FezEngine.Readers.TrackedSongReader":
+        FEZ_TrackedSong d;
+        break;
 
-	case "FezEngine.Readers.ArtObjectReader":
-		FEZ_ArtObject d;
-		break;
+    case "FezEngine.Readers.ArtObjectReader":
+        FEZ_ArtObject d;
+        break;
 
-	case "FezEngine.Readers.AnimatedTextureReader":
-		FEZ_AnimatedTexture d;
-		break;
+    case "FezEngine.Readers.AnimatedTextureReader":
+        FEZ_AnimatedTexture d;
+        break;
 
-	default:
-		Printf("Unhandled Reader: %s\n", type);
-		Warning("Unhandled Reader");
-		return -1;
+    default:
+        Printf("Unhandled Reader: %s\n", type);
+        Warning("Unhandled Reader");
+        return -1;
 }

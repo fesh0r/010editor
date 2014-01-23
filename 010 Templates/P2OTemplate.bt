@@ -8,727 +8,727 @@
 //--------------------------------------
 
 typedef struct {
-	SetBackColor(0x0000ff);
-	ushort p;
-	Assert(p == 0);
+    SetBackColor(0x0000ff);
+    ushort p;
+    Assert(p == 0);
 } PADDING2 <hidden=true>;
 
 typedef struct {
-	SetBackColor(0x0000ff);
-	uint p;
-	Assert(p == 0);
+    SetBackColor(0x0000ff);
+    uint p;
+    Assert(p == 0);
 } PADDING4 <hidden=true>;
 
 typedef struct {
-	SetBackColor(0x0000ff);
-	ushort p;
-	Assert(p == 0xffff);
+    SetBackColor(0x0000ff);
+    ushort p;
+    Assert(p == 0xffff);
 } PADDING2F <hidden=true>;
 
 typedef struct {
-	SetBackColor(0x0000ff);
-	uint p;
-	Assert(p == 0xffffffff);
+    SetBackColor(0x0000ff);
+    uint p;
+    Assert(p == 0xffffffff);
 } PADDING4F <hidden=true>;
 
 typedef struct {
-	uint d_offset;
-	int d_count <format=decimal>;
+    uint d_offset;
+    int d_count <format=decimal>;
 
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 } DATAREF <read=DATAREFread,optimize=true>;
 
 string DATAREFread(DATAREF &in) {
-	string out;
-	if (in.d_offset && in.d_count) {
-		SPrintf(out, "%Xh, %d", in.d_offset, in.d_count);
-	}
-	else {
-		SPrintf(out, "-");
-	}
-	return out;
+    string out;
+    if (in.d_offset && in.d_count) {
+        SPrintf(out, "%Xh, %d", in.d_offset, in.d_count);
+    }
+    else {
+        SPrintf(out, "-");
+    }
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		float d[o.d_count];
+        SetBackColor(0xffc0c0);
+        float d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } FLOAT1LIST <read=FLOAT1LISTread>;
 
 string FLOAT1LISTread(FLOAT1LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	float d[2];
+    float d[2];
 
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 } FLOAT2 <read=FLOAT2read,optimize=true>;
 
 string FLOAT2read(FLOAT2 &in) {
-	string out;
-	SPrintf(out, "%f, %f", in.d[0], in.d[1]);
-	return out;
+    string out;
+    SPrintf(out, "%f, %f", in.d[0], in.d[1]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		FLOAT2 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        FLOAT2 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } FLOAT2LIST <read=FLOAT2LISTread>;
 
 string FLOAT2LISTread(FLOAT2LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	float d[4];
+    float d[4];
 } FLOAT4 <read=FLOAT4read>;
 
 string FLOAT4read(FLOAT4 &in) {
-	string out;
-	SPrintf(out, "%f, %f, %f, %f", in.d[0], in.d[1], in.d[2], in.d[3]);
-	return out;
+    string out;
+    SPrintf(out, "%f, %f, %f, %f", in.d[0], in.d[1], in.d[2], in.d[3]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		FLOAT4 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        FLOAT4 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } FLOAT4LIST <read=FLOAT4LISTread>;
 
 string FLOAT4LISTread(FLOAT4LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		uint d[o.d_count];
+        SetBackColor(0xffc0c0);
+        uint d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } INT1LIST <read=INT1LISTread>;
 
 string INT1LISTread(INT1LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	uint d[2];
+    uint d[2];
 } INT2 <read=INT2read>;
 
 string INT2read(INT2 &in) {
-	string out;
-	SPrintf(out, "%Xh, %Xh", in.d[0], in.d[1]);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %Xh", in.d[0], in.d[1]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		INT2 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        INT2 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } INT2LIST <read=INT2LISTread>;
 
 string INT2LISTread(INT2LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	uint d[4];
+    uint d[4];
 } INT4 <read=INT4read>;
 
 string INT4read(INT4 &in) {
-	string out;
-	SPrintf(out, "%Xh, %Xh, %Xh, %Xh", in.d[0], in.d[1], in.d[2], in.d[3]);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %Xh, %Xh, %Xh", in.d[0], in.d[1], in.d[2], in.d[3]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		INT4 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        INT4 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } INT4LIST <read=INT4LISTread>;
 
 string INT4LISTread(INT4LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		ushort d[o.d_count];
+        SetBackColor(0xffc0c0);
+        ushort d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } SHORT1LIST <read=SHORT1LISTread>;
 
 string SHORT1LISTread(SHORT1LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	ushort d[2];
+    ushort d[2];
 } SHORT2 <read=SHORT2read>;
 
 string SHORT2read(SHORT2 &in) {
-	string out;
-	SPrintf(out, "%Xh, %Xh", in.d[0], in.d[1]);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %Xh", in.d[0], in.d[1]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		SHORT2 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        SHORT2 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } SHORT2LIST <read=SHORT2LISTread>;
 
 string SHORT2LISTread(SHORT2LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	ushort d[4];
+    ushort d[4];
 } SHORT4 <read=SHORT4read>;
 
 string SHORT4read(SHORT4 &in) {
-	string out;
-	SPrintf(out, "%Xh, %Xh, %Xh, %Xh", in.d[0], in.d[1], in.d[2], in.d[3]);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %Xh, %Xh, %Xh", in.d[0], in.d[1], in.d[2], in.d[3]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		SHORT4 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        SHORT4 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } SHORT4LIST <read=SHORT4LISTread>;
 
 string SHORT4LISTread(SHORT4LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	ushort d[8];
+    ushort d[8];
 } SHORT8 <read=SHORT8read>;
 
 string SHORT8read(SHORT8 &in) {
-	string out;
-	SPrintf(out, "%Xh, %Xh, %Xh, %Xh, %Xh, %Xh, %Xh, %Xh", in.d[0], in.d[1], in.d[2], in.d[3], in.d[4], in.d[5], in.d[6], in.d[7]);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %Xh, %Xh, %Xh, %Xh, %Xh, %Xh, %Xh", in.d[0], in.d[1], in.d[2], in.d[3], in.d[4], in.d[5], in.d[6], in.d[7]);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xffc0c0);
-		SHORT8 d[o.d_count];
+        SetBackColor(0xffc0c0);
+        SHORT8 d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } SHORT8LIST <read=SHORT8LISTread>;
 
 string SHORT8LISTread(SHORT8LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	char name[0x80];
-	FLOAT4 v;
+    char name[0x80];
+    FLOAT4 v;
 } TEX <read=TEXread>;
 
 string TEXread(TEX &in) {
-	string out;
-	SPrintf(out, "%s, %s", in.name, FLOAT4read(in.v));
-	return out;
+    string out;
+    SPrintf(out, "%s, %s", in.name, FLOAT4read(in.v));
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
-		FSeek(o.d_offset);
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
+        FSeek(o.d_offset);
 
-		SetBackColor(0xb0b0ff);
-		TEX d[o.d_count];
+        SetBackColor(0xb0b0ff);
+        TEX d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } TEXLIST <read=TEXLISTread>;
 
 string TEXLISTread(TEXLIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	uint d0;
-	uint d1;
-	uint d2;
-	float d3;
+    uint d0;
+    uint d1;
+    uint d2;
+    float d3;
 } COL <read=COLread>;
 
 string COLread(COL &in) {
-	string out;
-	SPrintf(out, "%Xh, %Xh, %Xh, %f", in.d0, in.d1, in.d2, in.d3);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %Xh, %Xh, %f", in.d0, in.d1, in.d2, in.d3);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		SetBackColor(0xb0ffb0);
-		COL d[o.d_count];
+        SetBackColor(0xb0ffb0);
+        COL d[o.d_count];
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } COLLIST <read=COLLISTread>;
 
 string COLLISTread(COLLIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	int d0;
-	float d1;
-	int d2;
-	float d3;
+    int d0;
+    float d1;
+    int d2;
+    float d3;
 } SUBPART <read=SUBPARTread>;
 
 string SUBPARTread(SUBPART &in) {
-	string out;
-	SPrintf(out, "%Xh, %f, %Xh, %f", in.d0, in.d1, in.d2, in.d3);
-	return out;
+    string out;
+    SPrintf(out, "%Xh, %f, %Xh, %f", in.d0, in.d1, in.d2, in.d3);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
-	local int i;
+    local int64 cur_pos;
+    local int i;
 
-	uint d_offset;
-	int d_type;
+    uint d_offset;
+    int d_type;
 
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 
-	if (d_offset) {
-		cur_pos = FTell();
-		FSeek(d_offset);
+    if (d_offset) {
+        cur_pos = FTell();
+        FSeek(d_offset);
 
-		i = 0;
-		do {
-			SetBackColor(0x30ffff);
-			SUBPART d <optimize=false>;
-		} while (d[i++].d0 != -1);
+        i = 0;
+        do {
+            SetBackColor(0x30ffff);
+            SUBPART d <optimize=false>;
+        } while (d[i++].d0 != -1);
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } PART <read=PARTread>;
 
 string PARTread(PART &in) {
-	string out;
-	if (in.d_offset) {
-		SPrintf(out, "%Xh, %Xh", in.d_offset, in.d_type);
-	}
-	else {
-		SPrintf(out, "-, %Xh", in.d_offset, in.d_type);
-	}
-	return out;
+    string out;
+    if (in.d_offset) {
+        SPrintf(out, "%Xh, %Xh", in.d_offset, in.d_type);
+    }
+    else {
+        SPrintf(out, "-, %Xh", in.d_offset, in.d_type);
+    }
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
-	local int i;
+    local int64 cur_pos;
+    local int i;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		for (i = 0; i < o.d_count; i++) {
-			SetBackColor(0x70ffff);
-			PART d;
-		}
+        for (i = 0; i < o.d_count; i++) {
+            SetBackColor(0x70ffff);
+            PART d;
+        }
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } PARTLIST <read=PARTLISTread>;
 
 string PARTLISTread(PARTLIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	short d_count <format=decimal>;
+    short d_count <format=decimal>;
 
-	PADDING2F p;
-	PADDING4F p;
-	PADDING4F p;
-	PADDING4F p;
+    PADDING2F p;
+    PADDING4F p;
+    PADDING4F p;
+    PADDING4F p;
 
-	if (d_count) {
-		SetBackColor(0xff40ff);
-		SHORT8 d[d_count];
-	}
+    if (d_count) {
+        SetBackColor(0xff40ff);
+        SHORT8 d[d_count];
+    }
 } SUBPART2 <read=SUBPART2read>;
 
 string SUBPART2read(SUBPART2 &in) {
-	string out;
-	if (in.d_count) {
-		SPrintf(out, "%d", in.d_count);
-	}
-	else {
-		SPrintf(out, "-");
-	}
-	return out;
+    string out;
+    if (in.d_count) {
+        SPrintf(out, "%d", in.d_count);
+    }
+    else {
+        SPrintf(out, "-");
+    }
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
-	local int i, j, cur_count;
+    local int64 cur_pos;
+    local int i, j, cur_count;
 
-	uint d_offset;
+    uint d_offset;
 
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 
-	if (d_offset) {
-		cur_pos = FTell();
-		FSeek(d_offset);
+    if (d_offset) {
+        cur_pos = FTell();
+        FSeek(d_offset);
 
-		i = 0;
+        i = 0;
 
-		do {
-			SetBackColor(0xff60ff);
-			SUBPART2 d <optimize=false>;
-		} while (d[i++].d_count);
+        do {
+            SetBackColor(0xff60ff);
+            SUBPART2 d <optimize=false>;
+        } while (d[i++].d_count);
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } PART2 <read=PART2read>;
 
 string PART2read(PART2 &in) {
-	string out;
-	if (in.d_offset) {
-		SPrintf(out, "%Xh", in.d_offset);
-	}
-	else {
-		SPrintf(out, "-");
-	}
-	return out;
+    string out;
+    if (in.d_offset) {
+        SPrintf(out, "%Xh", in.d_offset);
+    }
+    else {
+        SPrintf(out, "-");
+    }
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
-	local int i;
+    local int64 cur_pos;
+    local int i;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		for (i = 0; i < o.d_count; i++) {
-			SetBackColor(0xffa0ff);
-			PART2 d;
-		}
+        for (i = 0; i < o.d_count; i++) {
+            SetBackColor(0xffa0ff);
+            PART2 d;
+        }
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } PART2LIST <read=PART2LISTread>;
 
 string PART2LISTread(PART2LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	float d0;
-	float d1;
-	float d2;
-	float d3;
-	int d4;
+    float d0;
+    float d1;
+    float d2;
+    float d3;
+    int d4;
 
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 } SUBPART3;
 
 typedef struct {
-	local int64 cur_pos;
-	local int i, j, cur_count;
+    local int64 cur_pos;
+    local int i, j, cur_count;
 
-	uint d_offset;
+    uint d_offset;
 
-	if (d_offset) {
-		cur_pos = FTell();
-		FSeek(d_offset);
+    if (d_offset) {
+        cur_pos = FTell();
+        FSeek(d_offset);
 
-		i = 0;
+        i = 0;
 
-		do {
-			SetBackColor(0xffff40);
-			SUBPART3 d <optimize=false>;
-		} while (d[i++].d4 != -1);
+        do {
+            SetBackColor(0xffff40);
+            SUBPART3 d <optimize=false>;
+        } while (d[i++].d4 != -1);
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } PART3 <read=PART3read>;
 
 string PART3read(PART3 &in) {
-	string out;
-	if (in.d_offset) {
-		SPrintf(out, "%Xh", in.d_offset);
-	}
-	else {
-		SPrintf(out, "-");
-	}
-	return out;
+    string out;
+    if (in.d_offset) {
+        SPrintf(out, "%Xh", in.d_offset);
+    }
+    else {
+        SPrintf(out, "-");
+    }
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
-	local int i;
+    local int64 cur_pos;
+    local int i;
 
-	DATAREF o;
+    DATAREF o;
 
-	if (o.d_offset && o.d_count) {
-		cur_pos = FTell();
+    if (o.d_offset && o.d_count) {
+        cur_pos = FTell();
 
-		FSeek(o.d_offset);
+        FSeek(o.d_offset);
 
-		for (i = 0; i < o.d_count; i++) {
-			SetBackColor(0xffffb0);
-			PART3 d;
-		}
+        for (i = 0; i < o.d_count; i++) {
+            SetBackColor(0xffffb0);
+            PART3 d;
+        }
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } PART3LIST <read=PART3LISTread>;
 
 string PART3LISTread(PART3LIST &in) {
-	string out;
-	SPrintf(out, "%s", DATAREFread(in.o));
-	return out;
+    string out;
+    SPrintf(out, "%s", DATAREFread(in.o));
+    return out;
 }
 
 typedef struct {
-	char obj_name[0x80];
-	char obj_sig[4];
+    char obj_name[0x80];
+    char obj_sig[4];
 
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 
-	FLOAT4LIST l1;  //  A0
-	FLOAT4LIST l2;  //  B0
-	FLOAT2LIST l3;  //  C0
-	INT1LIST l4;    //  D0
-	COLLIST l5;    //  E0
-	TEXLIST l6;     //  F0
-	PARTLIST l7;    // 100
-	PART2LIST l8;   // 110
+    FLOAT4LIST l1;  //  A0
+    FLOAT4LIST l2;  //  B0
+    FLOAT2LIST l3;  //  C0
+    INT1LIST l4;    //  D0
+    COLLIST l5;    //  E0
+    TEXLIST l6;     //  F0
+    PARTLIST l7;    // 100
+    PART2LIST l8;   // 110
 
-	//INT1LIST l9;    // 120
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
+    //INT1LIST l9;    // 120
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 
-	PART3LIST l10;  // 130
+    PART3LIST l10;  // 130
 
-	FLOAT4 v[4];    // 140
+    FLOAT4 v[4];    // 140
 
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
-	PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
+    PADDING4 p;
 } OBJECT <read=OBJECTread>;
 
 string OBJECTread(OBJECT &in) {
-	string out;
-	SPrintf(out, "%s", in.obj_name);
-	return out;
+    string out;
+    SPrintf(out, "%s", in.obj_name);
+    return out;
 }
 
 typedef struct {
-	local int64 cur_pos;
+    local int64 cur_pos;
 
-	uint o_offset;
+    uint o_offset;
 
-	if (o_offset) {
-		cur_pos = FTell();
+    if (o_offset) {
+        cur_pos = FTell();
 
-		FSeek(o_offset);
+        FSeek(o_offset);
 
-		SetBackColor(0xc0c0c0);
-		OBJECT o;
+        SetBackColor(0xc0c0c0);
+        OBJECT o;
 
-		FSeek(cur_pos);
-	}
+        FSeek(cur_pos);
+    }
 } OBJECTREF <read=OBJECTREFread>;
 
 string OBJECTREFread(OBJECTREF &in) {
-	string out;
-	if (in.o_offset) {
-		SPrintf(out, "%Xh", in.o_offset);
-	}
-	else {
-		SPrintf(out, "-");
-	}
-	return out;
+    string out;
+    if (in.o_offset) {
+        SPrintf(out, "%Xh", in.o_offset);
+    }
+    else {
+        SPrintf(out, "-");
+    }
+    return out;
 }
 
 typedef struct {
-	char file_sig[4];
-	uint obj_table;
-	int obj_num <format=decimal>;
-	int clst_num <format=decimal>;
-	PADDING4 p;
-	PADDING4 p;
-	char csum_sig[4];
-	uint csum;
+    char file_sig[4];
+    uint obj_table;
+    int obj_num <format=decimal>;
+    int clst_num <format=decimal>;
+    PADDING4 p;
+    PADDING4 p;
+    char csum_sig[4];
+    uint csum;
 } HEADER;
 
 DisplayFormatHex();
@@ -740,11 +740,10 @@ SetBackColor(0xe0e0e0);
 HEADER h;
 
 if (h.obj_num && h.obj_table) {
-	FSeek(h.obj_table);
+    FSeek(h.obj_table);
 
-	for (i = 0; i < h.obj_num; i++) {
-		SetBackColor(0xe0e0e0);
-		OBJECTREF objects;
-	}
+    for (i = 0; i < h.obj_num; i++) {
+        SetBackColor(0xe0e0e0);
+        OBJECTREF objects;
+    }
 }
-

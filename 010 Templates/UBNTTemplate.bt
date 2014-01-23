@@ -11,52 +11,52 @@ DisplayFormatHex();
 BigEndian();
 
 typedef struct {
-	char magic[4];
-	char name[16];
-	int padding1 <hidden=true>;
-	int padding2 <hidden=true>;
-	int padding3 <hidden=true>;
-	int load_addr;
-	int index;
-	int base_addr;
-	int entry_addr;
-	int length;
-	int max_size;
+    char magic[4];
+    char name[16];
+    int padding1 <hidden=true>;
+    int padding2 <hidden=true>;
+    int padding3 <hidden=true>;
+    int load_addr;
+    int index;
+    int base_addr;
+    int entry_addr;
+    int length;
+    int max_size;
 
-	char data[length];
+    char data[length];
 
-	int crc;
-	int padding4 <hidden=true>;
+    int crc;
+    int padding4 <hidden=true>;
 } s_PART <read=PART_read>;
 
 string PART_read(s_PART &i) {
-	return i.name;
+    return i.name;
 }
 
 typedef struct {
-	char magic[4];
-	char version[256];
-	int crc;
-	int padding1 <hidden=true>;
+    char magic[4];
+    char version[256];
+    int crc;
+    int padding1 <hidden=true>;
 } s_HEADER <read=HEADER_read>;
 
 string HEADER_read(s_HEADER &i) {
-	return i.version;
+    return i.version;
 }
 
 typedef struct {
-	char magic[4];
-	int crc;
-	int padding1 <hidden=true>;
+    char magic[4];
+    int crc;
+    int padding1 <hidden=true>;
 } s_END;
 
 local char cur_part[4];
 
 while (!FEof()) {
-	ReadBytes(cur_part, FTell(), 4);
+    ReadBytes(cur_part, FTell(), 4);
 
-	if (cur_part == "UBNT") s_HEADER p;
-	if (cur_part == "OPEN") s_HEADER p;
-	if (cur_part == "PART") s_PART p;
-	if (cur_part == "END.") s_END p;
+    if (cur_part == "UBNT") s_HEADER p;
+    if (cur_part == "OPEN") s_HEADER p;
+    if (cur_part == "PART") s_PART p;
+    if (cur_part == "END.") s_END p;
 }

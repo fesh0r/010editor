@@ -7,7 +7,7 @@
 // Purpose:  Randomizes all the selected
 //    bytes. If not bytes are selected,
 //    the whole file is randomized. A
-//    minimum and maximum byte value 
+//    minimum and maximum byte value
 //    can be entered.
 //-----------------------------------
 RequiresVersion( 4.0 );
@@ -61,10 +61,10 @@ while( size > 0 )
     for( i = 0; i < bufsize; i++ )
     {
         buffer[i] = (uchar)( Random( range ) + minvalue );
-    }        
+    }
 
     // Write and advance to next block
-    WriteBytes( buffer, pos, bufsize );    
+    WriteBytes( buffer, pos, bufsize );
     pos  += bufsize;
     size -= bufsize;
 }

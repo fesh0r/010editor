@@ -8,42 +8,42 @@
 //--------------------------------------
 
 string read_Filename(char &in) {
-	return in;
+    return in;
 }
 
 typedef struct {
-	local quad cur_pos;
-	uint Unknown;
-	uint Unknown;
-	uint Unknown;
-	uint Data_Size <format=decimal>;
-	string Filename;
-	uchar Padding[512 - Strlen(Filename) - 1];
-	uint Unknown;
-	uint Data_Offset;
-	uint Padding;
-	uint Padding;
-	uint Padding;
+    local quad cur_pos;
+    uint Unknown;
+    uint Unknown;
+    uint Unknown;
+    uint Data_Size <format=decimal>;
+    string Filename;
+    uchar Padding[512 - Strlen(Filename) - 1];
+    uint Unknown;
+    uint Data_Offset;
+    uint Padding;
+    uint Padding;
+    uint Padding;
 
-	cur_pos = FTell();
-	FSeek(Data_Offset);
+    cur_pos = FTell();
+    FSeek(Data_Offset);
 
-	SetBackColor(0xffc0c0);
-	uchar Data[Data_Size];
-	SetBackColor(0xc0ffc0);
+    SetBackColor(0xffc0c0);
+    uchar Data[Data_Size];
+    SetBackColor(0xc0ffc0);
 
-	FSeek(cur_pos);
+    FSeek(cur_pos);
 } FILE <read=READ_FILE>;
 
 string READ_FILE(FILE &in) {
-	return in.Filename;
+    return in.Filename;
 }
 
 typedef struct {
-	uint File_Count <format=decimal>;
-	uint Data_Offset;
-	uint Padding;
-	uint Padding;
+    uint File_Count <format=decimal>;
+    uint Data_Offset;
+    uint Padding;
+    uint Padding;
 } HEADER;
 
 DisplayFormatHex();
@@ -56,5 +56,5 @@ HEADER h;
 
 SetBackColor(0xc0ffc0);
 for (i = 0; i < h.File_Count; i++) {
-	FILE f;
+    FILE f;
 }

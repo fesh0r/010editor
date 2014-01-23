@@ -16,159 +16,148 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 typedef struct {
-	SetBackColor(0xff90ff);
-	u4 name_offset;
-	s2 hash <format=decimal>;
+    SetBackColor(0xff90ff);
+    u4 name_offset;
+    s2 hash <format=decimal>;
 
-	local int cur_pos = FTell();
-	FSeek(name_offset);
-	SetBackColor(0xffc0ff);
-	string name;
-	FSeek(cur_pos);
+    local int cur_pos = FTell();
+    FSeek(name_offset);
+    SetBackColor(0xffc0ff);
+    string name;
+    FSeek(cur_pos);
 } NAME_HASH <optimize=false>;
 
-
-
 typedef struct {
-	SetBackColor(0xb8b8b8);
+    SetBackColor(0xb8b8b8);
 
-	char signature[4];
+    char signature[4];
 
-	local u2 ver = ReadUShort(FTell());
-	if (ver > 41) {
-		u2 content_version <format=decimal>;
-		u2 header_version <format=decimal>;
-	}
-	else {
-		u2 header_version <format=decimal>;
-	}
+    local u2 ver = ReadUShort(FTell());
+    if (ver > 41) {
+        u2 content_version <format=decimal>;
+        u2 header_version <format=decimal>;
+    }
+    else {
+        u2 header_version <format=decimal>;
+    }
 
-	u2 crc;
+    u2 crc;
 
-	FILETIME last_modified;
+    FILETIME last_modified;
 
-	u1 platform;
+    u1 platform;
 
-	u2 num_category <format=decimal>;
-	u2 num_variable <format=decimal>;
-	u2 num_category_name_hash <format=decimal>;
-	u2 num_variable_name_hash <format=decimal>;
-	u2 num_rpc <format=decimal>;
-	u2 num_dsp <format=decimal>;
-	u2 num_dsp_param <format=decimal>;
+    u2 num_category <format=decimal>;
+    u2 num_variable <format=decimal>;
+    u2 num_category_name_hash <format=decimal>;
+    u2 num_variable_name_hash <format=decimal>;
+    u2 num_rpc <format=decimal>;
+    u2 num_dsp <format=decimal>;
+    u2 num_dsp_param <format=decimal>;
 
-	s4 off_category;
-	s4 off_variable;
-	s4 off_category_name_hash;
-	s4 off_category_name_table;
-	s4 off_variable_name_hash;
-	s4 off_variable_name_table;
-	s4 off_category_names;
-	s4 off_variable_names;
-	s4 off_rpc;
-	s4 off_dsp;
-	s4 off_dsp_param;
+    s4 off_category;
+    s4 off_variable;
+    s4 off_category_name_hash;
+    s4 off_category_name_table;
+    s4 off_variable_name_hash;
+    s4 off_variable_name_table;
+    s4 off_category_names;
+    s4 off_variable_names;
+    s4 off_rpc;
+    s4 off_dsp;
+    s4 off_dsp_param;
 } XGS_HEADER;
 
-
-
 typedef struct (int index) {
-	local int name_index = index;
-	SetBackColor(0xff9090);
+    local int name_index = index;
+    SetBackColor(0xff9090);
 
-	u1 max_instances <format=decimal>;
-	u2 fade_in;
-	u2 fade_out;
-	enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
-	enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
-	s2 parent <read=read_CATEGORY_parent>;
-	u1 volume;
-	u1 bg_music: 1;
-	u1 public: 1;
-	u1 unknown_flags: 6;
-	Assert(unknown_flags == 0, "Unknown flags in XGS_CATEGORY");
+    u1 max_instances <format=decimal>;
+    u2 fade_in;
+    u2 fade_out;
+    enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
+    enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
+    s2 parent <read=read_CATEGORY_parent>;
+    u1 volume;
+    u1 bg_music: 1;
+    u1 public: 1;
+    u1 unknown_flags: 6;
+    Assert(unknown_flags == 0, "Unknown flags in XGS_CATEGORY");
 } XGS_CATEGORY <read=read_XGS_CATEGORY>;
 
 string read_CATEGORY_parent(s2 &in) {
-	if (in >= 0) {
-		return cn[in].name;
-	}
-	else {
-		return "<root>";
-	}
+    if (in >= 0) {
+        return cn[in].name;
+    }
+    else {
+        return "<root>";
+    }
 }
 
 string read_XGS_CATEGORY(XGS_CATEGORY &in) {
-	return cn[in.name_index].name;
+    return cn[in.name_index].name;
 }
 
-
 typedef struct (int index) {
-	local int name_index = index;
-	SetBackColor(0x90ff90);
+    local int name_index = index;
+    SetBackColor(0x90ff90);
 
-	u1 public: 1;
-	u1 read_only: 1;
-	u1 cue_instance: 1;
-	u1 reserved: 1;
-	u1 unknown_flags: 4;
-	Assert(unknown_flags == 0, "Unknown flags in XGS_VARIABLE");
+    u1 public: 1;
+    u1 read_only: 1;
+    u1 cue_instance: 1;
+    u1 reserved: 1;
+    u1 unknown_flags: 4;
+    Assert(unknown_flags == 0, "Unknown flags in XGS_VARIABLE");
 
-	float init_val;
-	float min_val;
-	float max_val;
+    float init_val;
+    float min_val;
+    float max_val;
 } XGS_VARIABLE <read=read_XGS_VARIABLE>;
 
 string read_XGS_VARIABLE(XGS_VARIABLE &in) {
-	return vn[in.name_index].name;
+    return vn[in.name_index].name;
 }
 
-
 typedef struct {
-	float x;
-	float y;
-	enum <u1> {cLINEAR, cFAST, cSLOW, cSINCOS} type;
+    float x;
+    float y;
+    enum <u1> {cLINEAR, cFAST, cSLOW, cSINCOS} type;
 } RPC_POINT;
 
-
 typedef struct {
-	SetBackColor(0x9090ff);
+    SetBackColor(0x9090ff);
 
-	u2 var_index <read=read_RPC_var>;
-	u1 point_count;
-	enum <u2> {pVOLUME=0x0, pPITCH, pREVERB_SEND, pFILTER_FREQ, pFILTER_Q, pR_REF_DELAY, pR_REV_DELAY, pR_POS_LEFT,
-			   pR_POS_RIGHT=0x8, pR_POS_LEFTM, pR_POS_RIGHTM, pR_EARLY_DIFF, pR_LATE_DIFF, pR_LOEQ_GAIN, pR_LOEQ_CUT, pR_HIEQ_GAIN,
-			   pR_HIEQ_CUT=0x10, pR_REAR_DELAY, pR_ROOM_FREQ, pR_ROOM_MAIN, pR_ROOM_HFREQ, pR_REF_GAIN, pR_REV_GAIN, pR_DECAY,
-			   pR_DENSITY=0x18, pR_ROOM_SIZE, pR_MIX} param;
-	RPC_POINT points[point_count];
+    u2 var_index <read=read_RPC_var>;
+    u1 point_count;
+    enum <u2> {pVOLUME=0x0, pPITCH, pREVERB_SEND, pFILTER_FREQ, pFILTER_Q, pR_REF_DELAY, pR_REV_DELAY, pR_POS_LEFT,
+               pR_POS_RIGHT=0x8, pR_POS_LEFTM, pR_POS_RIGHTM, pR_EARLY_DIFF, pR_LATE_DIFF, pR_LOEQ_GAIN, pR_LOEQ_CUT, pR_HIEQ_GAIN,
+               pR_HIEQ_CUT=0x10, pR_REAR_DELAY, pR_ROOM_FREQ, pR_ROOM_MAIN, pR_ROOM_HFREQ, pR_REF_GAIN, pR_REV_GAIN, pR_DECAY,
+               pR_DENSITY=0x18, pR_ROOM_SIZE, pR_MIX} param;
+    RPC_POINT points[point_count];
 } XGS_RPC_CURVE <optimize=false>;
 
 string read_RPC_var(u2 &in) {
-	return vn[in].name;
+    return vn[in].name;
 }
 
-
 typedef struct {
-	SetBackColor(0x90ffff);
-	u1 global;
-	u2 num_param;
-	u2 unknown;
-	Assert(unknown == 0);
+    SetBackColor(0x90ffff);
+    u1 global;
+    u2 num_param;
+    u2 unknown;
+    Assert(unknown == 0);
 } XGS_DSP <optimize=true>;
 
-
 typedef struct {
-	SetBackColor(0xffff90);
-	u1 type;
-	float init_val;
-	float min_val;
-	float max_val;
-	u2 unknown;
-	Assert(unknown == 0);
+    SetBackColor(0xffff90);
+    u1 type;
+    float init_val;
+    float min_val;
+    float max_val;
+    u2 unknown;
+    Assert(unknown == 0);
 } XGS_DSP_PARAM <optimize=true>;
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -178,70 +167,69 @@ local uint sig;
 sig = ReadInt(0);
 
 if (sig == 0x58475346) {
-	Warning("BigEndian");
-	BigEndian();
-	BitfieldRightToLeft();
-	sig = ReadInt(0);
+    Warning("BigEndian");
+    BigEndian();
+    BitfieldRightToLeft();
+    sig = ReadInt(0);
 }
 
 if (sig != 0x46534758) {
-	Printf("Incorrect signature\n");
-	Warning("Incorrect signature");
-	return -1;
+    Printf("Incorrect signature\n");
+    Warning("Incorrect signature");
+    return -1;
 }
-
 
 XGS_HEADER h;
 
 local int i;
 
 if (h.num_category && h.off_category >= 0) {
-	FSeek(h.off_category);
-	for (i = 0; i < h.num_category; i++) {
-		XGS_CATEGORY c(i);
-	}
+    FSeek(h.off_category);
+    for (i = 0; i < h.num_category; i++) {
+        XGS_CATEGORY c(i);
+    }
 }
 
 if (h.num_category_name_hash && h.off_category_name_hash >= 0) {
-	FSeek(h.off_category_name_hash);
-	SetBackColor(0xc0c0c0);
-	s2 cnh[h.num_category_name_hash] <format=decimal,hidden=true>;
+    FSeek(h.off_category_name_hash);
+    SetBackColor(0xc0c0c0);
+    s2 cnh[h.num_category_name_hash] <format=decimal,hidden=true>;
 }
 
 if (h.num_category && h.off_category_name_table >= 0) {
-	FSeek(h.off_category_name_table);
-	NAME_HASH cn[h.num_category] <hidden=true>;
+    FSeek(h.off_category_name_table);
+    NAME_HASH cn[h.num_category] <hidden=true>;
 }
 
 if (h.num_variable && h.off_variable >= 0) {
-	FSeek(h.off_variable);
-	for (i = 0; i < h.num_variable; i++) {
-		XGS_VARIABLE v(i);
-	}
+    FSeek(h.off_variable);
+    for (i = 0; i < h.num_variable; i++) {
+        XGS_VARIABLE v(i);
+    }
 }
 
 if (h.num_variable_name_hash && h.off_variable_name_hash >= 0) {
-	FSeek(h.off_variable_name_hash);
-	SetBackColor(0xc0c0c0);
-	s2 vnh[h.num_variable_name_hash] <format=decimal,hidden=true>;
+    FSeek(h.off_variable_name_hash);
+    SetBackColor(0xc0c0c0);
+    s2 vnh[h.num_variable_name_hash] <format=decimal,hidden=true>;
 }
 
 if (h.num_variable && h.off_variable_name_table >= 0) {
-	FSeek(h.off_variable_name_table);
-	NAME_HASH vn[h.num_variable] <hidden=true>;
+    FSeek(h.off_variable_name_table);
+    NAME_HASH vn[h.num_variable] <hidden=true>;
 }
 
 if (h.num_rpc && h.off_rpc >= 0) {
-	FSeek(h.off_rpc);
-	XGS_RPC_CURVE r[h.num_rpc];
+    FSeek(h.off_rpc);
+    XGS_RPC_CURVE r[h.num_rpc];
 }
 
 if (h.num_dsp && h.off_dsp >= 0) {
-	FSeek(h.off_dsp);
-	XGS_DSP d[h.num_dsp];
+    FSeek(h.off_dsp);
+    XGS_DSP d[h.num_dsp];
 }
 
 if (h.num_dsp_param && h.off_dsp_param >= 0) {
-	FSeek(h.off_dsp_param);
-	XGS_DSP_PARAM dp[h.num_dsp_param];
+    FSeek(h.off_dsp_param);
+    XGS_DSP_PARAM dp[h.num_dsp_param];
 }

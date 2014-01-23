@@ -11,11 +11,11 @@ DisplayFormatHex();
 BigEndian();
 
 typedef struct {
-	string s;
+    string s;
 } ENTRY <read=ENTRY_read>;
 
 string ENTRY_read(ENTRY &in) {
-	return in.s;
+    return in.s;
 }
 
 SetBackColor(0xe0e0e0);
@@ -27,7 +27,7 @@ UINT32 DataOffset;
 
 SetBackColor(0xffc0c0);
 while (FTell() < DataOffset) {
-	ENTRY e;
+    ENTRY e;
 }
 
 FSeek(DataOffset+8);

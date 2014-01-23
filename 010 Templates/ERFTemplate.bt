@@ -12,104 +12,104 @@ local int file_encrypted;
 // UNICODE support
 // Thanks to Graeme Sweet for pointing this out!
 int CalcUnicodeLen() {
-	local quad pos = FTell();
-	local quad base = pos;
-	while ((ReadUShort(pos) != 0) && (pos - base < 65535)) {
-		pos += 2;
-	}
-	return (pos - base + 2) / 2;
+    local quad pos = FTell();
+    local quad base = pos;
+    while ((ReadUShort(pos) != 0) && (pos - base < 65535)) {
+        pos += 2;
+    }
+    return (pos - base + 2) / 2;
 }
 
 typedef struct {
-	ushort s[CalcUnicodeLen()];
+    ushort s[CalcUnicodeLen()];
 } zstringw <read=ReadUNICODE>;
 
 string ReadUNICODE(zstringw &z) {
-	local int len = sizeof(z.s) / 2;
-	char s[len];
-	ConvertUNICODEToASCIIW(len, z.s, s);
-	return s;
+    local int len = sizeof(z.s) / 2;
+    char s[len];
+    ConvertUNICODEToASCIIW(len, z.s, s);
+    return s;
 }
 
 typedef struct {
-	ushort s[4];
+    ushort s[4];
 } stringw4 <read=ReadUNICODE4>;
 
 string ReadUNICODE4(stringw4 &z) {
-	local int len = 4;
-	char s[len];
-	ConvertUNICODEToASCIIW(len, z.s, s);
-	return s;
+    local int len = 4;
+    char s[len];
+    ConvertUNICODEToASCIIW(len, z.s, s);
+    return s;
 }
 
 typedef struct {
-	ushort s[32];
+    ushort s[32];
 } zstringw32 <read=ReadUNICODE32>;
 
 string ReadUNICODE32(zstringw32 &z) {
-	local int len = sizeof(z.s) / 2;
-	char s[len];
-	ConvertUNICODEToASCIIW(len, z.s, s);
-	return s;
+    local int len = sizeof(z.s) / 2;
+    char s[len];
+    ConvertUNICODEToASCIIW(len, z.s, s);
+    return s;
 }
 
 typedef struct {
-	local uint cur_offset;
-	zstringw32 file_name;
-	uint file_offset;
-	uint file_size;
-	if (file_encrypted) {
-		uint unknown;
-	}
+    local uint cur_offset;
+    zstringw32 file_name;
+    uint file_offset;
+    uint file_size;
+    if (file_encrypted) {
+        uint unknown;
+    }
 
-	if (file_size > 0) {
-		cur_offset = FTell();
+    if (file_size > 0) {
+        cur_offset = FTell();
 
-		FSeek(file_offset);
+        FSeek(file_offset);
 
-		SetBackColor(0xc0ffff);
-		ubyte Data[file_size];
-		SetBackColor(0xc0ffc0);
+        SetBackColor(0xc0ffff);
+        ubyte Data[file_size];
+        SetBackColor(0xc0ffc0);
 
-		FSeek(cur_offset);
-	}
+        FSeek(cur_offset);
+    }
 } FILE_ENTRY <read=FILE_ENTRYread>;
 
 string FILE_ENTRYread(FILE_ENTRY &in) {
-	return ReadUNICODE32(in.file_name);
+    return ReadUNICODE32(in.file_name);
 }
 
 typedef struct {
-	local int i;
+    local int i;
 
-	stringw4 type;
-	if (type.s[0] != 0x45 || type.s[1] != 0x52 || type.s[2] != 0x46 || type.s[3] != 0x20) {
-		Warning("Invalid signature");
-		Exit(-1);
-	}
-	stringw4 version;
-	if (version.s[0] != 0x56 || version.s[1] != 0x32 || version.s[2] != 0x2e || !(version.s[3] == 0x30 || version.s[3] == 0x32)) {
-		Warning("Unknown version");
-		//Exit(-1);
-	}
-	file_encrypted = version.s[3] == 0x32;
+    stringw4 type;
+    if (type.s[0] != 0x45 || type.s[1] != 0x52 || type.s[2] != 0x46 || type.s[3] != 0x20) {
+        Warning("Invalid signature");
+        Exit(-1);
+    }
+    stringw4 version;
+    if (version.s[0] != 0x56 || version.s[1] != 0x32 || version.s[2] != 0x2e || !(version.s[3] == 0x30 || version.s[3] == 0x32)) {
+        Warning("Unknown version");
+        //Exit(-1);
+    }
+    file_encrypted = version.s[3] == 0x32;
 
-	uint file_count;
-	uint build_year <format=decimal>;
-	uint build_day <format=decimal>;
-	uint desc_str_ref;
+    uint file_count;
+    uint build_year <format=decimal>;
+    uint build_day <format=decimal>;
+    uint desc_str_ref;
 
-	if (file_encrypted) {
-		uint unknown;
-		uint unknown;
-		uint key_md5[4];
-	}
+    if (file_encrypted) {
+        uint unknown;
+        uint unknown;
+        uint key_md5[4];
+    }
 
-	SetBackColor(0xc0ffc0);
-	for (i = 0; i < file_count; i++) {
-		FILE_ENTRY f;
-	}
-	SetBackColor(0xe0e0e0);
+    SetBackColor(0xc0ffc0);
+    for (i = 0; i < file_count; i++) {
+        FILE_ENTRY f;
+    }
+    SetBackColor(0xe0e0e0);
 } HEADER;
 
 DisplayFormatHex();

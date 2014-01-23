@@ -6,132 +6,132 @@ typedef uint16 u2;
 typedef ubyte  u1;
 
 typedef struct {
-	enum <u1> {
-		CONSTANT_Utf8 = 1,
-		CONSTANT_Integer = 3,
-		CONSTANT_Float = 4,
-		CONSTANT_Long = 5,
-		CONSTANT_Double = 6,
-		CONSTANT_Class = 7,
-		CONSTANT_String = 8,
-		CONSTANT_Fieldref = 9,
-		CONSTANT_Methodref = 10,
-		CONSTANT_InterfaceMethodref = 11,
-		CONSTANT_NameAndType = 12
-	} tag;
+    enum <u1> {
+        CONSTANT_Utf8 = 1,
+        CONSTANT_Integer = 3,
+        CONSTANT_Float = 4,
+        CONSTANT_Long = 5,
+        CONSTANT_Double = 6,
+        CONSTANT_Class = 7,
+        CONSTANT_String = 8,
+        CONSTANT_Fieldref = 9,
+        CONSTANT_Methodref = 10,
+        CONSTANT_InterfaceMethodref = 11,
+        CONSTANT_NameAndType = 12
+    } tag;
 
-	switch (tag) {
-		case 1:
-			u2 length;
-			char utf8_value[length];
-			break;
+    switch (tag) {
+        case 1:
+            u2 length;
+            char utf8_value[length];
+            break;
 
-		case 3:
-			u4 int_value;
-			break;
+        case 3:
+            u4 int_value;
+            break;
 
-		case 4:
-			float float_value;
-			break;
+        case 4:
+            float float_value;
+            break;
 
-		case 5:
-			u8 long_value;
-			break;
+        case 5:
+            u8 long_value;
+            break;
 
-		case 6:
-			double double_value;
-			break;
+        case 6:
+            double double_value;
+            break;
 
-		case 7:
-			u2 name_index;
-			break;
+        case 7:
+            u2 name_index;
+            break;
 
-		case 8:
-			u2 string_index;
-			break;
+        case 8:
+            u2 string_index;
+            break;
 
-		case 9:
-			u2 class_index;
-			u2 name_and_type_index;
-			break;
+        case 9:
+            u2 class_index;
+            u2 name_and_type_index;
+            break;
 
-		case 10:
-			u2 class_index;
-			u2 name_and_type_index;
-			break;
+        case 10:
+            u2 class_index;
+            u2 name_and_type_index;
+            break;
 
-		case 11:
-			u2 class_index;
-			u2 name_and_type_index;
-			break;
+        case 11:
+            u2 class_index;
+            u2 name_and_type_index;
+            break;
 
-		case 12:
-			u2 name_index;
-			u2 descriptor_index;
-			break;
-	}
+        case 12:
+            u2 name_index;
+            u2 descriptor_index;
+            break;
+    }
 } cp_info;
 
 typedef struct {
-	u2 attribute_name_index;
-	u4 attribute_length;
-	char info[attribute_length];
+    u2 attribute_name_index;
+    u4 attribute_length;
+    char info[attribute_length];
 } attribute_info;
 
 typedef struct {
-	u2 access_flags <format = binary>;
-	u2 name_index;
-	u2 descriptor_index;
-	u2 attributes_count;
-	local int i_att2 = 0;
-	for (i_att2 = 0; i_att2 < attributes_count; i_att2++) {
-		attribute_info attributes;
-	}
+    u2 access_flags <format = binary>;
+    u2 name_index;
+    u2 descriptor_index;
+    u2 attributes_count;
+    local int i_att2 = 0;
+    for (i_att2 = 0; i_att2 < attributes_count; i_att2++) {
+        attribute_info attributes;
+    }
 } field_info, method_info;
 
 typedef struct {
-	u4 magic <format = hex>;
-	if (magic != 0xCAFEBABE) {
-		Warning ("Invalid Class File.");
-		return -1;
-	}
-	u2 minor_version;
-	u2 major_version;
-	u2 constant_pool_count;
-	local int i_cp = 0;
-	for (i_cp = 1; i_cp < constant_pool_count; i_cp++) {
-		cp_info constant_pool;
-		if (constant_pool.tag == 5 || constant_pool.tag == 6) {
-			i_cp++;
-		}
-	}
-	u2 access_flags <format = binary>;
-	u2 this_class;
-	u2 super_class;
-	u2 interfaces_count;
-	local int i_if = 0;
-	for (i_if = 0; i_if < interfaces_count; i_if++) {
-		uint16 interfaces;
-	}
-	u2 fields_count;
-	local int i_fld = 0;
-	for (i_fld = 0; i_fld < fields_count; i_fld++) {
-		field_info fields;
-	}
-	u2 methods_count;
-	local int i_m = 0;
-	for (i_m = 0; i_m < methods_count; i_m++) {
-		method_info methods;
-	}
-	u2 attributes_count;
-	local int i_att = 0;
-	for (i_att = 0; i_att < attributes_count; i_att++) {
-		attribute_info attributes;
-	}
+    u4 magic <format = hex>;
+    if (magic != 0xCAFEBABE) {
+        Warning ("Invalid Class File.");
+        return -1;
+    }
+    u2 minor_version;
+    u2 major_version;
+    u2 constant_pool_count;
+    local int i_cp = 0;
+    for (i_cp = 1; i_cp < constant_pool_count; i_cp++) {
+        cp_info constant_pool;
+        if (constant_pool.tag == 5 || constant_pool.tag == 6) {
+            i_cp++;
+        }
+    }
+    u2 access_flags <format = binary>;
+    u2 this_class;
+    u2 super_class;
+    u2 interfaces_count;
+    local int i_if = 0;
+    for (i_if = 0; i_if < interfaces_count; i_if++) {
+        uint16 interfaces;
+    }
+    u2 fields_count;
+    local int i_fld = 0;
+    for (i_fld = 0; i_fld < fields_count; i_fld++) {
+        field_info fields;
+    }
+    u2 methods_count;
+    local int i_m = 0;
+    for (i_m = 0; i_m < methods_count; i_m++) {
+        method_info methods;
+    }
+    u2 attributes_count;
+    local int i_att = 0;
+    for (i_att = 0; i_att < attributes_count; i_att++) {
+        attribute_info attributes;
+    }
 } class_file;
 
 class_file file;
 
 if (!FEof()) {
-	Warning("File is not properly ended.");
+    Warning("File is not properly ended.");
 }

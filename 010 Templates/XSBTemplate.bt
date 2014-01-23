@@ -16,438 +16,420 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 typedef struct {
-	SetBackColor(0xff90ff);
-	u4 name_offset;
-	s2 hash <format=decimal>;
+    SetBackColor(0xff90ff);
+    u4 name_offset;
+    s2 hash <format=decimal>;
 
-	local int cur_pos = FTell();
-	FSeek(name_offset);
-	SetBackColor(0xffc0ff);
-	string name;
-	FSeek(cur_pos);
+    local int cur_pos = FTell();
+    FSeek(name_offset);
+    SetBackColor(0xffc0ff);
+    string name;
+    FSeek(cur_pos);
 } NAME_HASH <optimize=false>;
 
-
-
 typedef struct {
-	char name[64];
+    char name[64];
 } NAME <read=read_NAME,optimize=false>;
 
 string read_NAME(NAME &in) {
-	return in.name;
+    return in.name;
 }
 
-
 typedef struct {
-	SetBackColor(0xb8b8b8);
+    SetBackColor(0xb8b8b8);
 
-	char signature[4];
+    char signature[4];
 
-	u2 content_version <format=decimal>;
+    u2 content_version <format=decimal>;
 
-	u2 header_version <format=decimal>;
-	u2 crc;
+    u2 header_version <format=decimal>;
+    u2 crc;
 
-	FILETIME last_modified;
+    FILETIME last_modified;
 
-	u1 flags;
+    u1 flags;
 
-	u2 num_simple_cue <format=decimal>;
-	u2 num_complex_cue <format=decimal>;
-	u2 num_unknown1 <format=decimal>;
-	u2 num_cue_hash <format=decimal>;
-	u1 num_wavebank <format=decimal>;
-	u2 num_sound <format=decimal>;
+    u2 num_simple_cue <format=decimal>;
+    u2 num_complex_cue <format=decimal>;
+    u2 num_unknown1 <format=decimal>;
+    u2 num_cue_hash <format=decimal>;
+    u1 num_wavebank <format=decimal>;
+    u2 num_sound <format=decimal>;
 
-	u4 cue_names_len;
+    u4 cue_names_len;
 
-	s4 off_simple_cue;
-	s4 off_complex_cue;
-	s4 off_cue_names;
-	s4 off_unknown1;
-	s4 off_variation;
-	s4 off_transition;
-	s4 off_wavebank_name;
-	s4 off_cue_name_hash;
-	s4 off_cue_name_hash_entry;
-	s4 off_sound;
+    s4 off_simple_cue;
+    s4 off_complex_cue;
+    s4 off_cue_names;
+    s4 off_unknown1;
+    s4 off_variation;
+    s4 off_transition;
+    s4 off_wavebank_name;
+    s4 off_cue_name_hash;
+    s4 off_cue_name_hash_entry;
+    s4 off_sound;
 
-	NAME name;
+    NAME name;
 } XSB_HEADER;
 
-
 typedef struct {
-	u4 sound_offset;
-	u1 weight_min;
-	u1 weight_max;
+    u4 sound_offset;
+    u1 weight_min;
+    u1 weight_max;
 } VARIATION;
 
-
 typedef struct {
-	u4 sound_offset;
-	u1 weight;
+    u4 sound_offset;
+    u1 weight;
 } VARIATION_SMALL;
 
-
 typedef struct {
-	SetBackColor(0x90ff90);
-	u4 count: 16;
-	enum <u4> {tORDERED, tORDERED_RANDOM, tRANDOM, tRANDOM_NOREP, tSHUFFLE} variation_type: 3;
-	u4 table_type: 3;
-	u4 new_var_on_loop: 1;
-	u4 unknown_flags: 9;
-	Assert(unknown_flags == 0);
-	
-	u2 variable;
-	u2 last_index;
-	
-	if (table_type) {
-		VARIATION t[count];
-	}
-	else {
-		VARIATION_SMALL t[count];
-	}
+    SetBackColor(0x90ff90);
+    u4 count: 16;
+    enum <u4> {tORDERED, tORDERED_RANDOM, tRANDOM, tRANDOM_NOREP, tSHUFFLE} variation_type: 3;
+    u4 table_type: 3;
+    u4 new_var_on_loop: 1;
+    u4 unknown_flags: 9;
+    Assert(unknown_flags == 0);
+
+    u2 variable;
+    u2 last_index;
+
+    if (table_type) {
+        VARIATION t[count];
+    }
+    else {
+        VARIATION_SMALL t[count];
+    }
 } XSB_VARIATION;
 
-
 typedef struct {
-	u1 stop_cue: 1;
-	u1 stop_immediate: 1;
-	u1 unknown_flags: 6;
-	Assert(unknown_flags == 0);
+    u1 stop_cue: 1;
+    u1 stop_immediate: 1;
+    u1 unknown_flags: 6;
+    Assert(unknown_flags == 0);
 } CLIP_EVENT_0;
 
 typedef struct {
-	u1 loop_play_release: 1;
-	u1 pan_enable: 1;
-	u1 pan_center: 1;
-	u1 pan_new: 1;
-	u1 unknown_flags: 4;
-	u2 track;
-	u1 wavebank;
-	u1 loop_count <format=decimal>;
-	u2 pan_angle <format=decimal>;
-	u2 pan_arc <format=decimal>;
-	Assert(unknown_flags == 0);
+    u1 loop_play_release: 1;
+    u1 pan_enable: 1;
+    u1 pan_center: 1;
+    u1 pan_new: 1;
+    u1 unknown_flags: 4;
+    u2 track;
+    u1 wavebank;
+    u1 loop_count <format=decimal>;
+    u2 pan_angle <format=decimal>;
+    u2 pan_arc <format=decimal>;
+    Assert(unknown_flags == 0);
 } CLIP_EVENT_1;
 
-
 typedef struct {
-	s2 pitch_min <format=decimal>;
-	s2 pitch_max <format=decimal>;
-	u1 vol_min;
-	u1 vol_max;
-	float freq_min;
-	float freq_max;
-	float q_min;
-	float q_max;
-	u1 vol_add: 1;
-	u1 unknown: 1;
-	u1 pitch_add: 1;
-	u1 unknown: 1;
-	u1 freq_add: 1;
-	u1 unknown: 1;
-	u1 q_add: 1;
-	u1 unknown: 1;
-	u1 pitch_new: 1;
-	u1 vol_new: 1;
-	u1 freq_new: 1;
-	u1 q_new: 1;
-	u1 pitch_var: 1;
-	u1 vol_var: 1;
-	u1 freq_var: 1;
-	u1 q_var: 1;
+    s2 pitch_min <format=decimal>;
+    s2 pitch_max <format=decimal>;
+    u1 vol_min;
+    u1 vol_max;
+    float freq_min;
+    float freq_max;
+    float q_min;
+    float q_max;
+    u1 vol_add: 1;
+    u1 unknown: 1;
+    u1 pitch_add: 1;
+    u1 unknown: 1;
+    u1 freq_add: 1;
+    u1 unknown: 1;
+    u1 q_add: 1;
+    u1 unknown: 1;
+    u1 pitch_new: 1;
+    u1 vol_new: 1;
+    u1 freq_new: 1;
+    u1 q_new: 1;
+    u1 pitch_var: 1;
+    u1 vol_var: 1;
+    u1 freq_var: 1;
+    u1 q_var: 1;
 } CLIP_EVENT_4;
 
-
 typedef struct {
-	u1 type;
-	if (type == 0) {
-		u1 add: 1;
-		u1 random: 1;
-		u1 value: 1;
-		u1 unknown_flags: 5;
-		u2 unknown;
-		s2 min <format=decimal>;
-		u2 unknown;
-		s2 max <format=decimal>;
-		u2 unknown;
-		u2 unknown;
-		u1 unknown;
-	}
-	else {
-		s2 unknown <format=decimal>;
-		s2 initial <format=decimal>;
-		float slope;
-		float delta;
-		s2 seconds <format=decimal>;
-	}
+    u1 type;
+    if (type == 0) {
+        u1 add: 1;
+        u1 random: 1;
+        u1 value: 1;
+        u1 unknown_flags: 5;
+        u2 unknown;
+        s2 min <format=decimal>;
+        u2 unknown;
+        s2 max <format=decimal>;
+        u2 unknown;
+        u2 unknown;
+        u1 unknown;
+    }
+    else {
+        s2 unknown <format=decimal>;
+        s2 initial <format=decimal>;
+        float slope;
+        float delta;
+        s2 seconds <format=decimal>;
+    }
 } CLIP_EVENT_7;
 
-
 typedef struct {
-	u1 type;
-	if (type == 0) {
-		u1 add: 1;
-		u1 random: 1;
-		u1 value: 1;
-		u1 unknown_flags: 5;
-		u2 unknown;
-		s2 min <format=decimal>;
-		u2 unknown;
-		s2 max <format=decimal>;
-		u2 unknown;
-		u2 unknown;
-		u1 unknown;
-	}
-	else {
-		s2 unknown <format=decimal>;
-		s2 initial <format=decimal>;
-		float slope;
-		float delta;
-		s2 seconds <format=decimal>;
-	}
+    u1 type;
+    if (type == 0) {
+        u1 add: 1;
+        u1 random: 1;
+        u1 value: 1;
+        u1 unknown_flags: 5;
+        u2 unknown;
+        s2 min <format=decimal>;
+        u2 unknown;
+        s2 max <format=decimal>;
+        u2 unknown;
+        u2 unknown;
+        u1 unknown;
+    }
+    else {
+        s2 unknown <format=decimal>;
+        s2 initial <format=decimal>;
+        float slope;
+        float delta;
+        s2 seconds <format=decimal>;
+    }
 } CLIP_EVENT_8;
 
-
 typedef struct {
-	u4 marker;
+    u4 marker;
 } CLIP_EVENT_9;
 
-
 typedef struct {
-	u2 repeats <format=decimal>;
-	u2 frequency <format=decimal>;
+    u2 repeats <format=decimal>;
+    u2 frequency <format=decimal>;
 } CLIP_EVENT_18;
 
 typedef struct {
-	SetBackColor(0xfff0a0);
+    SetBackColor(0xfff0a0);
 
-	u4 event_type: 5;
-	u4 timestamp: 16 <format=decimal>;
-	u4 unknown_flags: 8;
-	u4 is_absolute: 1;
-	u4 is_relative_start: 1;
-	u4 is_random_recur: 1;
-	Assert(unknown_flags == 0);
-	u2 random_offset <format=decimal>;
-	u1 unknown;
+    u4 event_type: 5;
+    u4 timestamp: 16 <format=decimal>;
+    u4 unknown_flags: 8;
+    u4 is_absolute: 1;
+    u4 is_relative_start: 1;
+    u4 is_random_recur: 1;
+    Assert(unknown_flags == 0);
+    u2 random_offset <format=decimal>;
+    u1 unknown;
 
-	switch (event_type) {
-		case 0:
-			CLIP_EVENT_0 e;
-			break;
-		case 1:
-			CLIP_EVENT_1 e;
-			break;
-		case 4:
-			CLIP_EVENT_1 e;
-			CLIP_EVENT_4 e;
-			break;
-		case 7:
-			CLIP_EVENT_7 e;
-			break;
-		case 8:
-			CLIP_EVENT_8 e;
-			break;
-		case 9:
-			CLIP_EVENT_9 e;
-			break;
-		case 18:
-			CLIP_EVENT_9 e;
-			CLIP_EVENT_18 e;
-			break;
-		default:
-			break;
-	}
+    switch (event_type) {
+        case 0:
+            CLIP_EVENT_0 e;
+            break;
+        case 1:
+            CLIP_EVENT_1 e;
+            break;
+        case 4:
+            CLIP_EVENT_1 e;
+            CLIP_EVENT_4 e;
+            break;
+        case 7:
+            CLIP_EVENT_7 e;
+            break;
+        case 8:
+            CLIP_EVENT_8 e;
+            break;
+        case 9:
+            CLIP_EVENT_9 e;
+            break;
+        case 18:
+            CLIP_EVENT_9 e;
+            CLIP_EVENT_18 e;
+            break;
+        default:
+            break;
+    }
 
 } CLIP_EVENT <optimize=false>;
 
 typedef struct {
-	SetBackColor(0xfff0a0);
+    SetBackColor(0xfff0a0);
 
-	u1 num_events;
-//	Assert(num_events == 1);
+    u1 num_events;
+//  Assert(num_events == 1);
 
-	CLIP_EVENT events[num_events];
+    CLIP_EVENT events[num_events];
 } SOUND_CLIP <optimize=false>;
 
-
 typedef struct {
-	SetBackColor(0xffc090);
+    SetBackColor(0xffc090);
 
-	u1 volume;
-	u4 off_clip;
-	u2 filter_enable: 1;
-	enum <u2> {fLOW, fBAND, fHIGH} filter_type: 2;
-	u2 filter_q: 13 <format=decimal>;
-	u2 filter_freq <format=decimal>;
+    u1 volume;
+    u4 off_clip;
+    u2 filter_enable: 1;
+    enum <u2> {fLOW, fBAND, fHIGH} filter_type: 2;
+    u2 filter_q: 13 <format=decimal>;
+    u2 filter_freq <format=decimal>;
 
-	local int cur_pos = FTell();
-	FSeek(off_clip);
-	SOUND_CLIP clip;
-	FSeek(cur_pos);
+    local int cur_pos = FTell();
+    FSeek(off_clip);
+    SOUND_CLIP clip;
+    FSeek(cur_pos);
 } XSB_CLIP <optimize=false>;
 
 typedef struct {
-	u1 var_num;
-	if (var_num > 0) {
-		u4 var_offset[var_num];
-	}
-	cur_size += 1 + 4 * var_num;
+    u1 var_num;
+    if (var_num > 0) {
+        u4 var_offset[var_num];
+    }
+    cur_size += 1 + 4 * var_num;
 } VAR_OFFSETS <optimize=false>;
 
-
 typedef struct {
-	SetBackColor(0xff9090);
+    SetBackColor(0xff9090);
 
-	local int cur_pos = FTell();
+    local int cur_pos = FTell();
 
-	u1 is_complex: 1;
-	u1 has_sound_rpc: 1;
-	u1 has_track_rpc: 1;
-	u1 has_effect_rpc: 1;
-	u1 has_dsp: 1;
-	u1 unknown_flags: 3;
-	Assert(unknown_flags == 0, "Unknown flags in XSB_SOUND");
-	u2 category;
-	u1 volume;
-	s2 pitch <format=decimal>;
-	u1 priority;
-	u2 entry_len;
+    u1 is_complex: 1;
+    u1 has_sound_rpc: 1;
+    u1 has_track_rpc: 1;
+    u1 has_effect_rpc: 1;
+    u1 has_dsp: 1;
+    u1 unknown_flags: 3;
+    Assert(unknown_flags == 0, "Unknown flags in XSB_SOUND");
+    u2 category;
+    u1 volume;
+    s2 pitch <format=decimal>;
+    u1 priority;
+    u2 entry_len;
 
-	if (is_complex) {
-		u1 num_tracks;
-	}
-	else {
-		u2 track;
-		u1 wavebank;
-	}
+    if (is_complex) {
+        u1 num_tracks;
+    }
+    else {
+        u2 track;
+        u1 wavebank;
+    }
 
-	local int cur_size = 0;
-	if (has_sound_rpc || has_track_rpc || has_effect_rpc) {
-		local int rpc_pos = FTell();
-		SetBackColor(0xff90c0);
-		u2 rpc_extra;
-		cur_size = 2;
-		
-		if (has_effect_rpc) {
-			VAR_OFFSETS effect_rpc;
-		}
-		if (has_sound_rpc) {
-			VAR_OFFSETS sound_rpc;
-		}
-		if (has_track_rpc) {
-			Assert(is_complex, "has_track_rpc set on simple sound");
-			VAR_OFFSETS track_rpc[num_clip];
-		}
-		Assert(rpc_extra == cur_size);
-		FSeek(rpc_pos + rpc_extra);
-	}
+    local int cur_size = 0;
+    if (has_sound_rpc || has_track_rpc || has_effect_rpc) {
+        local int rpc_pos = FTell();
+        SetBackColor(0xff90c0);
+        u2 rpc_extra;
+        cur_size = 2;
 
-	if (has_dsp) {
-		local int dsp_pos = FTell();
-		SetBackColor(0xffa0f0);
-		u2 dsp_extra;
-		cur_size = 2;
-		VAR_OFFSETS dsp;
-		Assert(dsp_extra == cur_size);
-		FSeek(dsp_pos + dsp_extra);
-	}
+        if (has_effect_rpc) {
+            VAR_OFFSETS effect_rpc;
+        }
+        if (has_sound_rpc) {
+            VAR_OFFSETS sound_rpc;
+        }
+        if (has_track_rpc) {
+            Assert(is_complex, "has_track_rpc set on simple sound");
+            VAR_OFFSETS track_rpc[num_clip];
+        }
+        Assert(rpc_extra == cur_size);
+        FSeek(rpc_pos + rpc_extra);
+    }
 
-	if (is_complex) {
-		XSB_CLIP tracks[num_tracks];
-	}
+    if (has_dsp) {
+        local int dsp_pos = FTell();
+        SetBackColor(0xffa0f0);
+        u2 dsp_extra;
+        cur_size = 2;
+        VAR_OFFSETS dsp;
+        Assert(dsp_extra == cur_size);
+        FSeek(dsp_pos + dsp_extra);
+    }
 
-	Assert(FTell() <= (cur_pos + entry_len));
-	FSeek(cur_pos + entry_len);
+    if (is_complex) {
+        XSB_CLIP tracks[num_tracks];
+    }
+
+    Assert(FTell() <= (cur_pos + entry_len));
+    FSeek(cur_pos + entry_len);
 } XSB_SOUND <optimize=false>;
 
-
 typedef struct (int index) {
-	local int name_index = index;
-	SetBackColor(0x90ff90);
+    local int name_index = index;
+    SetBackColor(0x90ff90);
 
-	u1 is_complex: 1;
-	u1 has_transition: 1;
-	u1 has_sound: 1;
-	u1 unknown_flags: 5;
-	Assert(!is_complex);
-	Assert(unknown_flags == 0);
+    u1 is_complex: 1;
+    u1 has_transition: 1;
+    u1 has_sound: 1;
+    u1 unknown_flags: 5;
+    Assert(!is_complex);
+    Assert(unknown_flags == 0);
 
-	s4 sound_offset;
+    s4 sound_offset;
 } XSB_SIMPLE_CUE <read=read_XSB_SIMPLE_CUE>;
 
 string read_XSB_SIMPLE_CUE(XSB_SIMPLE_CUE &in) {
-	if (h.cue_names_len) {
-		return cn[in.name_index].name;
-	}
-	else {
-		return "";
-	}
+    if (h.cue_names_len) {
+        return cn[in.name_index].name;
+    }
+    else {
+        return "";
+    }
 }
 
-
 typedef struct (int index) {
-	local int name_index = index;
-	SetBackColor(0x9090ff);
+    local int name_index = index;
+    SetBackColor(0x9090ff);
 
-	u1 is_complex: 1;
-	u1 has_transition: 1;
-	u1 has_sound: 1;
-	u1 unknown_flags: 5;
-	Assert(is_complex);
-	Assert(unknown_flags == 0);
+    u1 is_complex: 1;
+    u1 has_transition: 1;
+    u1 has_sound: 1;
+    u1 unknown_flags: 5;
+    Assert(is_complex);
+    Assert(unknown_flags == 0);
 
-	if (has_sound) {
-		s4 off_sound;
-	}
-	else {
-		s4 off_variation;
-	}
+    if (has_sound) {
+        s4 off_sound;
+    }
+    else {
+        s4 off_variation;
+    }
 
-	if (has_transition) {
-		s4 off_transition;
-	}
-	else {
-		s4 off_unknown;
-	}
+    if (has_transition) {
+        s4 off_transition;
+    }
+    else {
+        s4 off_unknown;
+    }
 
-	u1 instance_limit <format=decimal>;
-	u2 fade_in <format=decimal>;
-	u2 fade_out <format=decimal>;
-	enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
-	enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
-	
-	local int cur_pos = FTell();
+    u1 instance_limit <format=decimal>;
+    u2 fade_in <format=decimal>;
+    u2 fade_out <format=decimal>;
+    enum <u1> {fLINEAR, fLOG, fEQL_POW} fade_type: 3;
+    enum <u1> {iFAIL_TO_PLAY, iQUEUE, iREPLACE_OLDEST, iREPLACE_QUIETEST, iREPLACE_LOWEST} inst_flags: 5;
 
-	if (has_sound) {
-		if (off_sound >= 0) {
-			FSeek(off_sound);
-			// XSB_SOUND
-			FSeek(cur_pos);
-		}
-	}
-	else {
-		if (off_variation >= 0) {
-			FSeek(off_variation);
-			XSB_VARIATION v;
-			FSeek(cur_pos);
-		}
-	}
+    local int cur_pos = FTell();
+
+    if (has_sound) {
+        if (off_sound >= 0) {
+            FSeek(off_sound);
+            // XSB_SOUND
+            FSeek(cur_pos);
+        }
+    }
+    else {
+        if (off_variation >= 0) {
+            FSeek(off_variation);
+            XSB_VARIATION v;
+            FSeek(cur_pos);
+        }
+    }
 } XSB_COMPLEX_CUE <read=read_XSB_COMPLEX_CUE>;
 
 string read_XSB_COMPLEX_CUE(XSB_COMPLEX_CUE &in) {
-	if (h.cue_names_len) {
-		return cn[in.name_index].name;
-	}
-	else {
-		return "";
-	}
+    if (h.cue_names_len) {
+        return cn[in.name_index].name;
+    }
+    else {
+        return "";
+    }
 }
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -457,56 +439,55 @@ local uint sig;
 sig = ReadInt(0);
 
 if (sig == 0x5344424B) {
-	Warning("BigEndian");
-	BigEndian();
-	BitfieldRightToLeft();
-	sig = ReadInt(0);
+    Warning("BigEndian");
+    BigEndian();
+    BitfieldRightToLeft();
+    sig = ReadInt(0);
 }
 
 if (sig != 0x4B424453) {
-	Printf("Incorrect signature\n");
-	Warning("Incorrect signature");
-	return -1;
+    Printf("Incorrect signature\n");
+    Warning("Incorrect signature");
+    return -1;
 }
-
 
 XSB_HEADER h;
 
 local int i;
 
 if (h.num_wavebank && h.off_wavebank_name >= 0) {
-	FSeek(h.off_wavebank_name);
-	SetBackColor(0xd8d8d8);
-	NAME wn[h.num_wavebank];
+    FSeek(h.off_wavebank_name);
+    SetBackColor(0xd8d8d8);
+    NAME wn[h.num_wavebank];
 }
 
 if (h.num_sound && h.off_sound >= 0) {
-	FSeek(h.off_sound);
-	XSB_SOUND s[h.num_sound];
+    FSeek(h.off_sound);
+    XSB_SOUND s[h.num_sound];
 }
 
 local int cur_name_index = 0;
 if (h.num_simple_cue && h.off_simple_cue >= 0) {
-	FSeek(h.off_simple_cue);
-	for (i = 0; i < h.num_simple_cue; i++, cur_name_index++) {
-		XSB_SIMPLE_CUE cs(cur_name_index);
-	}
+    FSeek(h.off_simple_cue);
+    for (i = 0; i < h.num_simple_cue; i++, cur_name_index++) {
+        XSB_SIMPLE_CUE cs(cur_name_index);
+    }
 }
 
 if (h.num_complex_cue && h.off_complex_cue >= 0) {
-	FSeek(h.off_complex_cue);
-	for (i = 0; i < h.num_complex_cue; i++, cur_name_index++) {
-		XSB_COMPLEX_CUE cc(cur_name_index);
-	}
+    FSeek(h.off_complex_cue);
+    for (i = 0; i < h.num_complex_cue; i++, cur_name_index++) {
+        XSB_COMPLEX_CUE cc(cur_name_index);
+    }
 }
 
 if (h.num_cue_hash && h.off_cue_name_hash >= 0) {
-	FSeek(h.off_cue_name_hash);
-	SetBackColor(0xc0c0c0);
-	s2 ch[h.num_cue_hash] <format=decimal>;
+    FSeek(h.off_cue_name_hash);
+    SetBackColor(0xc0c0c0);
+    s2 ch[h.num_cue_hash] <format=decimal>;
 }
 
 if (h.cue_names_len && h.off_cue_name_hash_entry >= 0) {
-	FSeek(h.off_cue_name_hash_entry);
-	NAME_HASH cn[h.num_simple_cue + h.num_complex_cue];
+    FSeek(h.off_cue_name_hash_entry);
+    NAME_HASH cn[h.num_simple_cue + h.num_complex_cue];
 }

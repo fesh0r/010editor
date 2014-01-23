@@ -4,12 +4,12 @@
 // File:     SplitFile.1sc
 // Author:   SweetScape Software
 // Revision: 1.1
-// Purpose:  Split a large file into a number of 
-//     smaller files. The user must specify the 
-//     number of bytes per created file, and also 
-//     provide the filename of the first file. 
-//     Note that the filename must have numbers 
-//     in it (e.g. 'c:\temp\file.bmp.001', or 
+// Purpose:  Split a large file into a number of
+//     smaller files. The user must specify the
+//     number of bytes per created file, and also
+//     provide the filename of the first file.
+//     Note that the filename must have numbers
+//     in it (e.g. 'c:\temp\file.bmp.001', or
 //     'c:\temp\file0000.dat').
 //--------------------------------------
 RequiresVersion( 4.0 );
@@ -110,14 +110,14 @@ while( size > 0 )
                 // Finished
                 filename[i]++;
                 done = true;
-            }                
+            }
             else
             {
                 // Must continue and increment the previous digit too
                 filename[i] = '0';
                 i--;
             }
-        }          
+        }
         else
         {
             // Cannot increment the filename any more
@@ -130,7 +130,7 @@ while( size > 0 )
             digitpos++;
             done = true;
         }
-    }    
+    }
 
     // Update the file positions
     size -= blocksize;

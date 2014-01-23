@@ -61,7 +61,7 @@ typedef struct
             uint32 flags <name = "Component flags">;
             uint32 flags_mask <name = "Component flags mask">;
             string name <name = "Component name">;
-            break;            
+            break;
 
         case "mdhd":
             ubyte version <name = "Version">;

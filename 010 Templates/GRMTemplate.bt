@@ -8,16 +8,16 @@
 //--------------------------------------
 
 typedef struct {
-	uint hash;
-	uint offset;
-	uint packed;
-	uint unpacked;
+    uint hash;
+    uint offset;
+    uint packed;
+    uint unpacked;
 } FILE_ENTRY;
 
 typedef struct {
-	uchar signature[4];
-	uint filecount;
-	FILE_ENTRY f[filecount];
+    uchar signature[4];
+    uint filecount;
+    FILE_ENTRY f[filecount];
 } HEADER;
 
 DisplayFormatHex();

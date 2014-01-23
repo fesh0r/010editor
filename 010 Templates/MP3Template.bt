@@ -46,13 +46,11 @@
 //
 //--------------------------------------
 
-
 local uint32 bitrate, frame_size, sampling_freq, frames_count = 0;
 local quad frame_header_offset, seek_pos, sum_bitrate = 0;
 local short data;
 local byte was_bad_sync, id3v1_tag_found = 0;
 local ubyte buf[3];
-
 
 enum <ubyte> ID3_GENRES
 {
@@ -77,7 +75,6 @@ enum <ubyte> ID3_GENRES
     Christian, Heavy_Metal, Black_Metal, Crossover,
     Contemporary, Christian_Rock, Merengue, Salsa, Thrash_Metal, Anime, JPop, Synthpop // 147
 };
-
 
 struct ID3v1_TAG
 {
@@ -123,7 +120,6 @@ struct ID3v1_TAG
     ID3_GENRES genre;
 };
 
-
 struct ID3v2_HEADER
 {
     SetBackColor(0x91C4FF);
@@ -150,7 +146,6 @@ struct ID3v2_HEADER
                    // significant bit (bit 7) of each byte is set to zero
 };
 
-
 struct ID3v2_EXTENDED_HEADER
 {
     SetBackColor(0xA1D4FF);
@@ -170,7 +165,6 @@ struct ID3v2_EXTENDED_HEADER
         uint32 crc;
     }
 };
-
 
 struct ID3v2_FRAME
 {
@@ -208,7 +202,6 @@ struct ID3v2_FRAME
         ubyte frame_data [size];
     }
 };
-
 
 struct ID3v2_TAG
 {
@@ -267,7 +260,6 @@ struct ID3v2_TAG
     }
 };
 
-
 // 32-bit MPEG frame header octets:
 // AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
 //
@@ -300,7 +292,6 @@ struct MPEG_HEADER
         uint16 checksum;
     }
 };
-
 
 struct MPEG_FRAME
 {
@@ -415,9 +406,7 @@ struct MPEG_FRAME
     }
 };
 
-
 //--------------------------------------------------------------
-
 
 BigEndian();
 

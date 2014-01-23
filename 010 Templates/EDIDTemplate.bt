@@ -8,376 +8,376 @@
 //--------------------------------------
 
 typedef struct {
-	ubyte serration_vsync :1;
-	ubyte sync_on_green :1;
-	ubyte composite_sync :1;
-	ubyte seperate_syncs :1;
-	ubyte blank_to_black :1;
-	//ubyte video_level :2;
-	enum <ubyte> { L_0_7_0_3, L_0_714_0_286, L_1_0_0_4, L_0_7_0_0 } video_level :2;
-	ubyte video_format :1;
+    ubyte serration_vsync :1;
+    ubyte sync_on_green :1;
+    ubyte composite_sync :1;
+    ubyte seperate_syncs :1;
+    ubyte blank_to_black :1;
+    //ubyte video_level :2;
+    enum <ubyte> { L_0_7_0_3, L_0_714_0_286, L_1_0_0_4, L_0_7_0_0 } video_level :2;
+    ubyte video_format :1;
 
-	ubyte hor_size;
-	ubyte ver_size;
-	ubyte gamma <read=READ_gamma,write=WRITE_gamma>;
+    ubyte hor_size;
+    ubyte ver_size;
+    ubyte gamma <read=READ_gamma,write=WRITE_gamma>;
 
-	ubyte default_gtf :1;
-	ubyte preferred_timing :1;
-	ubyte standard_colorspace :1;
-	//ubyte display_type :2;
-	enum <ubyte> { D_mono, D_RGB, D_nRGB, D_undef } display_type :2;
-	ubyte power_active :1;
-	ubyte power_suspend :1;
-	ubyte power_standby: 1;
+    ubyte default_gtf :1;
+    ubyte preferred_timing :1;
+    ubyte standard_colorspace :1;
+    //ubyte display_type :2;
+    enum <ubyte> { D_mono, D_RGB, D_nRGB, D_undef } display_type :2;
+    ubyte power_active :1;
+    ubyte power_suspend :1;
+    ubyte power_standby: 1;
 } BASIC;
 
 string READ_gamma(ubyte in) {
-	string out;
-	SPrintf(out, "%0.2f", (double)in / 100.0 + 1.0);
-	return out;
+    string out;
+    SPrintf(out, "%0.2f", (double)in / 100.0 + 1.0);
+    return out;
 }
 
 int WRITE_gamma(ubyte &out, string in) {
-	double value;
-	value = Atof(in);
-	if (value != 0 && value >= (0.0 / 100.0 + 1.0) && value < (256.0 / 100.0 + 1.0)) {
-		out = (ubyte)((value - 1) * 100);
-		return 0;
-	}
-	else {
-		return -1;
-	}
+    double value;
+    value = Atof(in);
+    if (value != 0 && value >= (0.0 / 100.0 + 1.0) && value < (256.0 / 100.0 + 1.0)) {
+        out = (ubyte)((value - 1) * 100);
+        return 0;
+    }
+    else {
+        return -1;
+    }
 }
 
 typedef struct {
-	ubyte green_y_low :2;
-	ubyte green_x_low :2;
-	ubyte red_y_low :2;
-	ubyte red_x_low :2;
+    ubyte green_y_low :2;
+    ubyte green_x_low :2;
+    ubyte red_y_low :2;
+    ubyte red_x_low :2;
 
-	ubyte white_y_low :2;
-	ubyte white_x_low :2;
-	ubyte blue_y_low :2;
-	ubyte blue_x_low :2;
+    ubyte white_y_low :2;
+    ubyte white_x_low :2;
+    ubyte blue_y_low :2;
+    ubyte blue_x_low :2;
 
-	ubyte red_x_high;
-	ubyte red_y_high;
-	ubyte green_x_high;
-	ubyte green_y_high;
-	ubyte blue_x_high;
-	ubyte blue_y_high;
-	ubyte white_x_high;
-	ubyte white_y_high;
+    ubyte red_x_high;
+    ubyte red_y_high;
+    ubyte green_x_high;
+    ubyte green_y_high;
+    ubyte blue_x_high;
+    ubyte blue_y_high;
+    ubyte white_x_high;
+    ubyte white_y_high;
 
-	Printf("Rx %0.3f - Ry %0.3f\n", (double)(((int)red_x_high << 2) + red_x_low) / 1024.0, (double)(((int)red_y_high << 2) + red_y_low) / 1024.0);
-	Printf("Gx %0.3f - Gy %0.3f\n", (double)(((int)green_x_high << 2) + green_x_low) / 1024.0, (double)(((int)green_y_high << 2) + green_y_low) / 1024.0);
-	Printf("Bx %0.3f - By %0.3f\n", (double)(((int)blue_x_high << 2) + blue_x_low) / 1024.0, (double)(((int)blue_y_high << 2) + blue_y_low) / 1024.0);
-	Printf("Wx %0.3f - Wy %0.3f\n", (double)(((int)white_x_high << 2) + white_x_low) / 1024.0, (double)(((int)white_y_high << 2) + white_y_low) / 1024.0);
+    Printf("Rx %0.3f - Ry %0.3f\n", (double)(((int)red_x_high << 2) + red_x_low) / 1024.0, (double)(((int)red_y_high << 2) + red_y_low) / 1024.0);
+    Printf("Gx %0.3f - Gy %0.3f\n", (double)(((int)green_x_high << 2) + green_x_low) / 1024.0, (double)(((int)green_y_high << 2) + green_y_low) / 1024.0);
+    Printf("Bx %0.3f - By %0.3f\n", (double)(((int)blue_x_high << 2) + blue_x_low) / 1024.0, (double)(((int)blue_y_high << 2) + blue_y_low) / 1024.0);
+    Printf("Wx %0.3f - Wy %0.3f\n", (double)(((int)white_x_high << 2) + white_x_low) / 1024.0, (double)(((int)white_y_high << 2) + white_y_low) / 1024.0);
 } CHROMA;
 
 typedef struct {
-	ubyte t_720x400_70 :1;
-	ubyte t_720x400_88 :1;
-	ubyte t_640x480_60 :1;
-	ubyte t_640x480_67 :1;
-	ubyte t_640x480_72 :1;
-	ubyte t_640x480_75 :1;
-	ubyte t_800x600_56 :1;
-	ubyte t_800x600_60 :1;
+    ubyte t_720x400_70 :1;
+    ubyte t_720x400_88 :1;
+    ubyte t_640x480_60 :1;
+    ubyte t_640x480_67 :1;
+    ubyte t_640x480_72 :1;
+    ubyte t_640x480_75 :1;
+    ubyte t_800x600_56 :1;
+    ubyte t_800x600_60 :1;
 
-	ubyte t_800x600_72 :1;
-	ubyte t_800x600_75 :1;
-	ubyte t_832x624_75 :1;
-	ubyte t_1024x768_87 :1;
-	ubyte t_1024x768_60 :1;
-	ubyte t_1024x768_70 :1;
-	ubyte t_1024x768_75 :1;
-	ubyte t_1280x1024_75 :1;
+    ubyte t_800x600_72 :1;
+    ubyte t_800x600_75 :1;
+    ubyte t_832x624_75 :1;
+    ubyte t_1024x768_87 :1;
+    ubyte t_1024x768_60 :1;
+    ubyte t_1024x768_70 :1;
+    ubyte t_1024x768_75 :1;
+    ubyte t_1280x1024_75 :1;
 
-	ubyte reserved :7;
-	ubyte t_1152x870_75 :1;
+    ubyte reserved :7;
+    ubyte t_1152x870_75 :1;
 } EST_TIMING;
 
 typedef struct {
-	ubyte hor_res <read=READ_hor_res,write=WRITE_hor_res>;
-	ubyte ver_freq :6 <read=READ_ver_freq,write=WRITE_ver_freq>;
-	//ubyte aspect :2 <read=READ_aspect>;
-	enum <ubyte> { A_16_10, A_4_3, A_5_4, A_16_9 } aspect :2;
+    ubyte hor_res <read=READ_hor_res,write=WRITE_hor_res>;
+    ubyte ver_freq :6 <read=READ_ver_freq,write=WRITE_ver_freq>;
+    //ubyte aspect :2 <read=READ_aspect>;
+    enum <ubyte> { A_16_10, A_4_3, A_5_4, A_16_9 } aspect :2;
 } STD_TIMING <read=READ_STD_TIMING>;
 
 string READ_hor_res(ubyte in) {
-	string out;
-	SPrintf(out, "%d", in * 8 + 248);
-	return out;
+    string out;
+    SPrintf(out, "%d", in * 8 + 248);
+    return out;
 }
 
 int WRITE_hor_res(ubyte &out, string in) {
-	int value;
-	value = Atoi(in);
+    int value;
+    value = Atoi(in);
 
-	if (value != 0 && value >= ((int)0 * 8 + 248) && value < ((int)256 * 8 + 248)) {
-		out = (ubyte)((value - 248) / 8);
-		return 0;
-	}
-	else {
-		return -1;
-	}
+    if (value != 0 && value >= ((int)0 * 8 + 248) && value < ((int)256 * 8 + 248)) {
+        out = (ubyte)((value - 248) / 8);
+        return 0;
+    }
+    else {
+        return -1;
+    }
 }
 
 string READ_ver_freq(ubyte in) {
-	string out;
-	SPrintf(out, "%d", in + 60);
-	return out;
+    string out;
+    SPrintf(out, "%d", in + 60);
+    return out;
 }
 
 int WRITE_ver_freq(ubyte &out, string in) {
-	int value;
-	value = Atoi(in);
+    int value;
+    value = Atoi(in);
 
-	if (value != 0 && value >= ((int)0 + 60) && value < ((int)256 + 60)) {
-		out = (ubyte)(value - 60);
-		return 0;
-	}
-	else {
-		return -1;
-	}
+    if (value != 0 && value >= ((int)0 + 60) && value < ((int)256 + 60)) {
+        out = (ubyte)(value - 60);
+        return 0;
+    }
+    else {
+        return -1;
+    }
 }
 
 string READ_aspect(ubyte in) {
-	switch (in) {
-		case 0:
-			return "16:10";
-		case 1:
-			return "4:3";
-		case 2:
-			return "5:4";
-		case 3:
-			return "16:9";
-	}
+    switch (in) {
+        case 0:
+            return "16:10";
+        case 1:
+            return "4:3";
+        case 2:
+            return "5:4";
+        case 3:
+            return "16:9";
+    }
 }
 
 string READ_STD_TIMING(STD_TIMING &in) {
-	string out;
-	double hor_res;
-	double ver_res;
-	string s_aspect;
-	int ver_freq;
-	if (in.hor_res == 0x01 && in.ver_freq == 0x01 && in.aspect == 0x00) {
-	}
-	else {
-		hor_res = (double)(in.hor_res * 8 + 248);
-		ver_freq = in.ver_freq + 60;
-		switch (in.aspect) {
-			case 0:
-				ver_res = hor_res / (16.0 / 10.0);
-				s_aspect = "16:10";
-				break;
-			case 1:
-				ver_res = hor_res / (4.0 / 3.0);
-				s_aspect = "4:3";
-				break;
-			case 2:
-				ver_res = hor_res / (5.0 / 4.0);
-				s_aspect = "5:4";
-				break;
-			case 3:
-				ver_res = hor_res / (16.0 / 9.0);
-				s_aspect = "16:9";
-				break;
-		}
-		SPrintf(out, "%.0fx%.0f@%d (%s)", hor_res, ver_res, ver_freq, s_aspect);
-	}
-	return out;
+    string out;
+    double hor_res;
+    double ver_res;
+    string s_aspect;
+    int ver_freq;
+    if (in.hor_res == 0x01 && in.ver_freq == 0x01 && in.aspect == 0x00) {
+    }
+    else {
+        hor_res = (double)(in.hor_res * 8 + 248);
+        ver_freq = in.ver_freq + 60;
+        switch (in.aspect) {
+            case 0:
+                ver_res = hor_res / (16.0 / 10.0);
+                s_aspect = "16:10";
+                break;
+            case 1:
+                ver_res = hor_res / (4.0 / 3.0);
+                s_aspect = "4:3";
+                break;
+            case 2:
+                ver_res = hor_res / (5.0 / 4.0);
+                s_aspect = "5:4";
+                break;
+            case 3:
+                ver_res = hor_res / (16.0 / 9.0);
+                s_aspect = "16:9";
+                break;
+        }
+        SPrintf(out, "%.0fx%.0f@%d (%s)", hor_res, ver_res, ver_freq, s_aspect);
+    }
+    return out;
 }
 
 typedef struct {
-	ushort is_modeline;
-	ubyte zero;
-	ubyte block_type <format=hex>;
-	ubyte zero;
+    ushort is_modeline;
+    ubyte zero;
+    ubyte block_type <format=hex>;
+    ubyte zero;
 
-	SetBackColor(0xffb0ff);
-	ubyte data[13] <format=hex>;
+    SetBackColor(0xffb0ff);
+    ubyte data[13] <format=hex>;
 } D_UNKNOWN <read=READ_D_UNKNOWN>;
 
 string READ_D_UNKNOWN(D_UNKNOWN &in) {
-	string out;
-	SPrintf(out, "%02Xh", in.block_type);
-	return out;
+    string out;
+    SPrintf(out, "%02Xh", in.block_type);
+    return out;
 }
 
 typedef struct {
-	SetBackColor(0x8080ff);
-	ushort pixel_clock;
-	ubyte horz_active_low;
-	ubyte horz_blank_low;
+    SetBackColor(0x8080ff);
+    ushort pixel_clock;
+    ubyte horz_active_low;
+    ubyte horz_blank_low;
 
-	ubyte horz_blank_high :4;
-	ubyte horz_active_high :4;
+    ubyte horz_blank_high :4;
+    ubyte horz_active_high :4;
 
-	ubyte vert_active_low;
-	ubyte vert_blank_low;
+    ubyte vert_active_low;
+    ubyte vert_blank_low;
 
-	ubyte vert_blank_high :4;
-	ubyte vert_active_high :4;
+    ubyte vert_blank_high :4;
+    ubyte vert_active_high :4;
 
-	ubyte horz_sync_offset_low;
-	ubyte horz_sync_width_low;
+    ubyte horz_sync_offset_low;
+    ubyte horz_sync_width_low;
 
-	ubyte vert_sync_width_low :4;
-	ubyte vert_sync_offset_low :4;
+    ubyte vert_sync_width_low :4;
+    ubyte vert_sync_offset_low :4;
 
-	ubyte vert_sync_width_high :2;
-	ubyte vert_sync_offset_high :2;
-	ubyte horz_sync_width_high :2;
-	ubyte horz_sync_offset_high :2;
+    ubyte vert_sync_width_high :2;
+    ubyte vert_sync_offset_high :2;
+    ubyte horz_sync_width_high :2;
+    ubyte horz_sync_offset_high :2;
 
-	ubyte horz_size_low;
-	ubyte vert_size_low;
+    ubyte horz_size_low;
+    ubyte vert_size_low;
 
-	ubyte vert_size_high :4;
-	ubyte horz_size_high :4;
+    ubyte vert_size_high :4;
+    ubyte horz_size_high :4;
 
-	ubyte horz_border;
-	ubyte vert_border;
+    ubyte horz_border;
+    ubyte vert_border;
 
-	ubyte stereo_mode :1;
-	ubyte horz_sync :1;
-	ubyte vert_sync :1;
-	enum <ubyte> { S_ANALOG, S_BIPOLAR, S_DCOMP, S_DSEP } sync_mode :2;
-	//ubyte sync_mode :2;
-	ubyte stereo :2;
-	ubyte interlace :1;
+    ubyte stereo_mode :1;
+    ubyte horz_sync :1;
+    ubyte vert_sync :1;
+    enum <ubyte> { S_ANALOG, S_BIPOLAR, S_DCOMP, S_DSEP } sync_mode :2;
+    //ubyte sync_mode :2;
+    ubyte stereo :2;
+    ubyte interlace :1;
 
-	Printf("\"%d", ((int)horz_active_high << 8) + horz_active_low);
-	Printf("x%d", ((int)vert_active_high << 8) + vert_active_low);
-	Printf("@%0.2f\"", ((double)pixel_clock * 10000.0 / ((((int)horz_active_high << 8) + horz_active_low + ((int)horz_blank_high << 8) + horz_blank_low) * (((int)vert_active_high << 8) + vert_active_low + ((int)vert_blank_high << 8) + vert_blank_low))));
-	Printf(" %0.2f", (double)pixel_clock / 100);
-	Printf(" %d", ((int)horz_active_high << 8) + horz_active_low);
-	Printf(" %d", ((int)horz_active_high << 8) + horz_active_low + ((int)horz_sync_offset_high << 8) + horz_sync_offset_low);
-	Printf(" %d", ((int)horz_active_high << 8) + horz_active_low + ((int)horz_sync_offset_high << 8) + horz_sync_offset_low + ((int)horz_sync_width_high << 8) + horz_sync_width_low);
-	Printf(" %d", ((int)horz_active_high << 8) + horz_active_low + ((int)horz_blank_high << 8) + horz_blank_low);
-	Printf(" %d", ((int)vert_active_high << 8) + vert_active_low);
-	Printf(" %d", ((int)vert_active_high << 8) + vert_active_low + ((int)vert_sync_offset_high << 4) + vert_sync_offset_low);
-	Printf(" %d", ((int)vert_active_high << 8) + vert_active_low + ((int)vert_sync_offset_high << 4) + vert_sync_offset_low + ((int)vert_sync_width_high << 4) + vert_sync_width_low);
-	Printf(" %d", ((int)vert_active_high << 8) + vert_active_low + ((int)vert_blank_high << 8) + vert_blank_low);
-	if (interlace || sync_mode == 3) {
-		Printf(" %chsync %cvsync%s", horz_sync?'+':'-', vert_sync?'+':'-', interlace?" int":"");
-	}
-	Printf(" %d %d", horz_border, vert_border);
-	Printf(" %d", ((int)horz_size_high << 8) + horz_size_low);
-	Printf("x%d", ((int)vert_size_high << 8) + vert_size_low);
+    Printf("\"%d", ((int)horz_active_high << 8) + horz_active_low);
+    Printf("x%d", ((int)vert_active_high << 8) + vert_active_low);
+    Printf("@%0.2f\"", ((double)pixel_clock * 10000.0 / ((((int)horz_active_high << 8) + horz_active_low + ((int)horz_blank_high << 8) + horz_blank_low) * (((int)vert_active_high << 8) + vert_active_low + ((int)vert_blank_high << 8) + vert_blank_low))));
+    Printf(" %0.2f", (double)pixel_clock / 100);
+    Printf(" %d", ((int)horz_active_high << 8) + horz_active_low);
+    Printf(" %d", ((int)horz_active_high << 8) + horz_active_low + ((int)horz_sync_offset_high << 8) + horz_sync_offset_low);
+    Printf(" %d", ((int)horz_active_high << 8) + horz_active_low + ((int)horz_sync_offset_high << 8) + horz_sync_offset_low + ((int)horz_sync_width_high << 8) + horz_sync_width_low);
+    Printf(" %d", ((int)horz_active_high << 8) + horz_active_low + ((int)horz_blank_high << 8) + horz_blank_low);
+    Printf(" %d", ((int)vert_active_high << 8) + vert_active_low);
+    Printf(" %d", ((int)vert_active_high << 8) + vert_active_low + ((int)vert_sync_offset_high << 4) + vert_sync_offset_low);
+    Printf(" %d", ((int)vert_active_high << 8) + vert_active_low + ((int)vert_sync_offset_high << 4) + vert_sync_offset_low + ((int)vert_sync_width_high << 4) + vert_sync_width_low);
+    Printf(" %d", ((int)vert_active_high << 8) + vert_active_low + ((int)vert_blank_high << 8) + vert_blank_low);
+    if (interlace || sync_mode == 3) {
+        Printf(" %chsync %cvsync%s", horz_sync?'+':'-', vert_sync?'+':'-', interlace?" int":"");
+    }
+    Printf(" %d %d", horz_border, vert_border);
+    Printf(" %d", ((int)horz_size_high << 8) + horz_size_low);
+    Printf("x%d", ((int)vert_size_high << 8) + vert_size_low);
 
-	Printf("\n");
+    Printf("\n");
 } DTD <read=READ_DTD>;
 
 string READ_DTD(DTD &in) {
-	string out;
-	SPrintf(out, "%d", ((int)in.horz_active_high << 8) + in.horz_active_low);
-	SPrintf(out, "%sx%d", out, ((int)in.vert_active_high << 8) + in.vert_active_low);
-	SPrintf(out, "%s@%0.2f", out, ((double)in.pixel_clock * 10000.0 / ((((int)in.horz_active_high << 8) + in.horz_active_low + ((int)in.horz_blank_high << 8) + in.horz_blank_low) * (((int)in.vert_active_high << 8) + in.vert_active_low + ((int)in.vert_blank_high << 8) + in.vert_blank_low))));
-	return out;
+    string out;
+    SPrintf(out, "%d", ((int)in.horz_active_high << 8) + in.horz_active_low);
+    SPrintf(out, "%sx%d", out, ((int)in.vert_active_high << 8) + in.vert_active_low);
+    SPrintf(out, "%s@%0.2f", out, ((double)in.pixel_clock * 10000.0 / ((((int)in.horz_active_high << 8) + in.horz_active_low + ((int)in.horz_blank_high << 8) + in.horz_blank_low) * (((int)in.vert_active_high << 8) + in.vert_active_low + ((int)in.vert_blank_high << 8) + in.vert_blank_low))));
+    return out;
 }
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	char data[13] <format=hex>;
+    SetBackColor(0xffb0ff);
+    char data[13] <format=hex>;
 } D_SERIAL <read=READ_D_SERIAL>;
 
 string READ_D_SERIAL(D_SERIAL &in) {
-	return in.data;
+    return in.data;
 }
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	char data[13] <format=hex>;
+    SetBackColor(0xffb0ff);
+    char data[13] <format=hex>;
 } D_STRING <read=READ_D_STRING>;
 
 string READ_D_STRING(D_STRING &in) {
-	return in.data;
+    return in.data;
 }
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	ubyte vert_min;
-	ubyte vert_max;
-	ubyte horz_min;
-	ubyte horz_max;
-	ubyte pixel_clk;
-	ushort secondary <format=hex>;
-	ubyte horz_start;
-	ubyte f_c;
-	ushort f_m;
-	ubyte f_k;
-	ubyte f_j;
+    SetBackColor(0xffb0ff);
+    ubyte vert_min;
+    ubyte vert_max;
+    ubyte horz_min;
+    ubyte horz_max;
+    ubyte pixel_clk;
+    ushort secondary <format=hex>;
+    ubyte horz_start;
+    ubyte f_c;
+    ushort f_m;
+    ubyte f_k;
+    ubyte f_j;
 } D_RANGE <read=READ_D_RANGE>;
 
 string READ_D_RANGE(D_RANGE &in) {
-	string out;
-	SPrintf(out, "%d-%d %d-%d", in.vert_min, in.vert_max, in.horz_min, in.horz_max);
-	return out;
+    string out;
+    SPrintf(out, "%d-%d %d-%d", in.vert_min, in.vert_max, in.horz_min, in.horz_max);
+    return out;
 }
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	char data[13] <format=hex>;
+    SetBackColor(0xffb0ff);
+    char data[13] <format=hex>;
 } D_NAME <read=READ_D_NAME>;
 
 string READ_D_NAME(D_NAME &in) {
-	return in.data;
+    return in.data;
 }
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	ubyte use_w1;
-	ubyte w1_y_low :2;
-	ubyte w1_x_low :2;
-	ubyte unused: 4;
-	ubyte w1_x_high;
-	ubyte w1_y_high;
-	ubyte w1_gamma;
+    SetBackColor(0xffb0ff);
+    ubyte use_w1;
+    ubyte w1_y_low :2;
+    ubyte w1_x_low :2;
+    ubyte unused: 4;
+    ubyte w1_x_high;
+    ubyte w1_y_high;
+    ubyte w1_gamma;
 
-	ubyte use_w2;
-	ubyte w2_y_low :2;
-	ubyte w2_x_low :2;
-	ubyte unused: 4;
-	ubyte w2_x_high;
-	ubyte w2_y_high;
-	ubyte w2_gamma;
+    ubyte use_w2;
+    ubyte w2_y_low :2;
+    ubyte w2_x_low :2;
+    ubyte unused: 4;
+    ubyte w2_x_high;
+    ubyte w2_y_high;
+    ubyte w2_gamma;
 } D_COLOUR;
 
 typedef struct {
-	local int i;
-	ubyte header[5] <format=hex>;
+    local int i;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	for (i = 0; i < 6; i++) {
-		STD_TIMING t;
-	}
+    SetBackColor(0xffb0ff);
+    for (i = 0; i < 6; i++) {
+        STD_TIMING t;
+    }
 } D_TIMING;
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	ubyte data[13] <format=hex>;
+    SetBackColor(0xffb0ff);
+    ubyte data[13] <format=hex>;
 } D_UNUSED;
 
 typedef struct {
-	ubyte header[5] <format=hex>;
+    ubyte header[5] <format=hex>;
 
-	SetBackColor(0xffb0ff);
-	ubyte data[13] <format=hex>;
+    SetBackColor(0xffb0ff);
+    ubyte data[13] <format=hex>;
 } D_MFG;
 
 DisplayFormatDecimal();
@@ -385,340 +385,340 @@ LittleEndian();
 
 local int i;
 struct EDID {
-	local ushort is_modeline;
-	local ubyte block_type;
+    local ushort is_modeline;
+    local ubyte block_type;
 
-	SetBackColor(0xe0e0e0);
-	ubyte Sig[8] <format=hex>;
-	ushort Manufacturer <format=hex>;
-	ushort ProductID <format=hex>;
-	uint Serial <format=decimal>;
-	ubyte WeekOfManufacture;
-	ubyte YearOfManufacture <read=READ_YearOfManufacture,write=WRITE_YearOfManufacture>;
-	ubyte EDIDVersion;
-	ubyte EDIDRevision;
+    SetBackColor(0xe0e0e0);
+    ubyte Sig[8] <format=hex>;
+    ushort Manufacturer <format=hex>;
+    ushort ProductID <format=hex>;
+    uint Serial <format=decimal>;
+    ubyte WeekOfManufacture;
+    ubyte YearOfManufacture <read=READ_YearOfManufacture,write=WRITE_YearOfManufacture>;
+    ubyte EDIDVersion;
+    ubyte EDIDRevision;
 
-	SetBackColor(0xffd0d0);
-	BASIC b;
+    SetBackColor(0xffd0d0);
+    BASIC b;
 
-	SetBackColor(0xd0ffd0);
-	CHROMA c;
+    SetBackColor(0xd0ffd0);
+    CHROMA c;
 
-	SetBackColor(0xd0d0ff);
-	EST_TIMING e;
+    SetBackColor(0xd0d0ff);
+    EST_TIMING e;
 
-	for (i = 0; i < 8; i++) {
-		SetBackColor(0xb0b0ff);
-		STD_TIMING t;
-	}
+    for (i = 0; i < 8; i++) {
+        SetBackColor(0xb0b0ff);
+        STD_TIMING t;
+    }
 
-	for (i = 0; i < 4; i++) {
-		SetBackColor(0xffd0ff);
-		is_modeline = ReadUShort(FTell());
+    for (i = 0; i < 4; i++) {
+        SetBackColor(0xffd0ff);
+        is_modeline = ReadUShort(FTell());
 
-		if (is_modeline != 0) {
-			DTD d;
-		}
-		else {
-			block_type = ReadUByte(FTell() + 3);
+        if (is_modeline != 0) {
+            DTD d;
+        }
+        else {
+            block_type = ReadUByte(FTell() + 3);
 
-			switch (block_type) {
-				case 0xFF:
-					D_SERIAL d;
-					break;
-				case 0xFE:
-					D_STRING d;
-					break;
-				case 0xFD:
-					D_RANGE d;
-					break;
-				case 0xFC:
-					D_NAME d;
-					break;
-				case 0xFB:
-					D_COLOUR d;
-					break;
-				case 0xFA:
-					D_TIMING d;
-					break;
-				case 0xF9:
-					D_UNUSED d;
-					break;
-				case 0x0F:
-					D_MFG d;
-					break;
-				default:
-					D_UNKNOWN d;
-					break;
-			}
-		}
-	}
+            switch (block_type) {
+                case 0xFF:
+                    D_SERIAL d;
+                    break;
+                case 0xFE:
+                    D_STRING d;
+                    break;
+                case 0xFD:
+                    D_RANGE d;
+                    break;
+                case 0xFC:
+                    D_NAME d;
+                    break;
+                case 0xFB:
+                    D_COLOUR d;
+                    break;
+                case 0xFA:
+                    D_TIMING d;
+                    break;
+                case 0xF9:
+                    D_UNUSED d;
+                    break;
+                case 0x0F:
+                    D_MFG d;
+                    break;
+                default:
+                    D_UNKNOWN d;
+                    break;
+            }
+        }
+    }
 
-	SetBackColor(0xe0e0e0);
-	ubyte ext_blocks;
-	ubyte checksum <format=hex>;
+    SetBackColor(0xe0e0e0);
+    ubyte ext_blocks;
+    ubyte checksum <format=hex>;
 } e;
 
 string READ_YearOfManufacture(ubyte in) {
-	string out;
-	SPrintf(out, "%d", in + 1990);
-	return out;
+    string out;
+    SPrintf(out, "%d", in + 1990);
+    return out;
 }
 
 int WRITE_YearOfManufacture(ubyte &out, string in) {
-	int value;
-	value = Atoi(in);
+    int value;
+    value = Atoi(in);
 
-	if (value != 0 && value >= ((int)0 + 1990) && value < ((int)256 + 1990)){
-		out = (ubyte)(value - 1990);
-		return 0;
-	}
-	else {
-		return -1;
-	}
+    if (value != 0 && value >= ((int)0 + 1990) && value < ((int)256 + 1990)){
+        out = (ubyte)(value - 1990);
+        return 0;
+    }
+    else {
+        return -1;
+    }
 }
 
 typedef struct {
-	local int i;
-	local quad start_pos;
-	local int cur_pos;
+    local int i;
+    local quad start_pos;
+    local int cur_pos;
 
-	start_pos = FTell();
+    start_pos = FTell();
 
-	ubyte ext_tag <format=hex>;
+    ubyte ext_tag <format=hex>;
 
-	cur_pos = FTell() - start_pos;
+    cur_pos = FTell() - start_pos;
 
-	SetBackColor(cNone);
-	ubyte data[127 - cur_pos] <format=hex>;
+    SetBackColor(cNone);
+    ubyte data[127 - cur_pos] <format=hex>;
 
-	SetBackColor(0xa0e0a0);
-	ubyte checksum <format=hex>;
+    SetBackColor(0xa0e0a0);
+    ubyte checksum <format=hex>;
 } E_UNKNOWN;
 
 typedef struct {
-	ubyte db_size :5;
-	ubyte db_type :3;
+    ubyte db_size :5;
+    ubyte db_type :3;
 
-	ubyte data[db_size] <format=hex>;
+    ubyte data[db_size] <format=hex>;
 } DB_UNKNOWN <read=READ_DB_UNKNOWN>;
 
 string READ_DB_UNKNOWN(DB_UNKNOWN &in) {
-	string out;
-	SPrintf(out, "%01x", in.db_type);
-	return out;
+    string out;
+    SPrintf(out, "%01x", in.db_type);
+    return out;
 }
 
 typedef struct {
-	ubyte channels :3;
-	enum <ubyte> { F_RES, F_LPCM, F_AC3, F_MPEG1, F_MP3, F_MPEG2, F_AAC, F_DTS, F_ATRAC, F_SACD, F_DDP, F_DTSHD, F_DDTHD, F_DST, F_WMA, F_RES2 } format :4;
-	ubyte res :1;
+    ubyte channels :3;
+    enum <ubyte> { F_RES, F_LPCM, F_AC3, F_MPEG1, F_MP3, F_MPEG2, F_AAC, F_DTS, F_ATRAC, F_SACD, F_DDP, F_DTSHD, F_DDTHD, F_DST, F_WMA, F_RES2 } format :4;
+    ubyte res :1;
 
-	ubyte fr_32 :1;
-	ubyte fr_44 :1;
-	ubyte fr_48 :1;
-	ubyte fr_88 :1;
-	ubyte fr_96 :1;
-	ubyte fr_176 :1;
-	ubyte fr_192 :1;
-	ubyte res :1;
+    ubyte fr_32 :1;
+    ubyte fr_44 :1;
+    ubyte fr_48 :1;
+    ubyte fr_88 :1;
+    ubyte fr_96 :1;
+    ubyte fr_176 :1;
+    ubyte fr_192 :1;
+    ubyte res :1;
 
-	if (format == F_LPCM) {
-		ubyte lpcm_16 :1;
-		ubyte lpcm_20 :1;
-		ubyte lpcm_24 :1;
-		ubyte res :5;
-	}
-	else {
-		ubyte max_bitrate <read=READ_SAD_max_bitrate,write=WRITE_SAD_max_bitrate>;
-	}
+    if (format == F_LPCM) {
+        ubyte lpcm_16 :1;
+        ubyte lpcm_20 :1;
+        ubyte lpcm_24 :1;
+        ubyte res :5;
+    }
+    else {
+        ubyte max_bitrate <read=READ_SAD_max_bitrate,write=WRITE_SAD_max_bitrate>;
+    }
 } SAD;
 
 string READ_SAD_max_bitrate(ubyte in) {
-	string out;
-	SPrintf(out, "%d", in * 8);
-	return out;
+    string out;
+    SPrintf(out, "%d", in * 8);
+    return out;
 }
 
 void WRITE_SAD_max_bitrate(ubyte &out, string in) {
-	int value;
-	value = Atoi(in);
-	out = value;
+    int value;
+    value = Atoi(in);
+    out = value;
 }
 
 typedef struct {
-	local int i;
+    local int i;
 
-	ubyte db_size :5;
-	ubyte db_type :3;
+    ubyte db_size :5;
+    ubyte db_type :3;
 
-	for (i = 0; i < db_size; i += 3) {
-		SAD a;
-	}
+    for (i = 0; i < db_size; i += 3) {
+        SAD a;
+    }
 } DB_AUDIO;
 
 typedef struct {
-	ubyte db_size :5;
-	ubyte db_type :3;
+    ubyte db_size :5;
+    ubyte db_type :3;
 
-	ubyte data[db_size] <format=hex>;
+    ubyte data[db_size] <format=hex>;
 } DB_VIDEO;
 
 typedef struct {
-	ubyte db_size :5;
-	ubyte db_type :3;
+    ubyte db_size :5;
+    ubyte db_type :3;
 
-	if (db_size >= 3) {
-		ubyte reg[3] <format=hex>;
-	}
-	if (db_size >= 5) {
-		ushort address <format=hex>;
-	}
-	if (db_size >= 6) {
-		ubyte s_dvidual :1;
-		ubyte s_res :2;
-		ubyte s_dc_y444 :1;
-		ubyte s_dc_30 :1;
-		ubyte s_dc_36 :1;
-		ubyte s_dc_48 :1;
-		ubyte s_ai :1;
-	}
+    if (db_size >= 3) {
+        ubyte reg[3] <format=hex>;
+    }
+    if (db_size >= 5) {
+        ushort address <format=hex>;
+    }
+    if (db_size >= 6) {
+        ubyte s_dvidual :1;
+        ubyte s_res :2;
+        ubyte s_dc_y444 :1;
+        ubyte s_dc_30 :1;
+        ubyte s_dc_36 :1;
+        ubyte s_dc_48 :1;
+        ubyte s_ai :1;
+    }
 } DB_VENDOR;
 
 typedef struct {
-	ubyte db_size :5;
-	ubyte db_type :3;
+    ubyte db_size :5;
+    ubyte db_type :3;
 
-	ubyte s_f_lr :1;
-	ubyte s_f_lfe :1;
-	ubyte s_f_c :1;
-	ubyte s_r_lr :1;
-	ubyte s_r_c :1;
-	ubyte s_f_clr :1;
-	ubyte s_r_clr :1;
-	ubyte s_r_lfe :1;
+    ubyte s_f_lr :1;
+    ubyte s_f_lfe :1;
+    ubyte s_f_c :1;
+    ubyte s_r_lr :1;
+    ubyte s_r_c :1;
+    ubyte s_f_clr :1;
+    ubyte s_r_clr :1;
+    ubyte s_r_lfe :1;
 
-	ubyte res;
-	ubyte res;
+    ubyte res;
+    ubyte res;
 } DB_SPEAKER;
 
 typedef struct {
-	ubyte db_size :5;
-	ubyte db_type :3;
+    ubyte db_size :5;
+    ubyte db_type :3;
 
-	ubyte data[db_size] <format=hex>;
+    ubyte data[db_size] <format=hex>;
 } DB_COLOUR;
 
 typedef struct {
-	local int i;
-	local quad start_pos;
-	local int cur_pos;
-	local int db_type;
-	local int db_size;
-	local ushort dtd_start_bytes;
+    local int i;
+    local quad start_pos;
+    local int cur_pos;
+    local int db_type;
+    local int db_size;
+    local ushort dtd_start_bytes;
 
-	start_pos = FTell();
+    start_pos = FTell();
 
-	ubyte ext_tag <format=hex>;
+    ubyte ext_tag <format=hex>;
 
-	SetBackColor(0xa0c0c0);
-	ubyte revision;
-	ubyte dtd_start <format=hex>;
+    SetBackColor(0xa0c0c0);
+    ubyte revision;
+    ubyte dtd_start <format=hex>;
 
-	ubyte native_dtds :4;
-	ubyte ycbcr_422 :1;
-	ubyte ycbcr_444 :1;
-	ubyte base_audio :1;
-	ubyte underscan :1;
+    ubyte native_dtds :4;
+    ubyte ycbcr_422 :1;
+    ubyte ycbcr_444 :1;
+    ubyte base_audio :1;
+    ubyte underscan :1;
 
-	cur_pos = FTell() - start_pos;
+    cur_pos = FTell() - start_pos;
 
-	while (cur_pos < dtd_start) {
-		db_type = ReadUByte(FTell()) >> 5;
-		db_size = ReadUByte(FTell()) & 0x1f;
-		//Printf("%02x %01x:%d\n", cur_pos, db_type, db_size);
-		if ((cur_pos + db_size) < dtd_start ) {
-			SetBackColor(0xe0a0a0);
-			switch (db_type) {
-				case 1:
-					DB_AUDIO db;
-					break;
-				case 2:
-					DB_VIDEO db;
-					break;
-				case 3:
-					DB_VENDOR db;
-					break;
-				case 4:
-					DB_SPEAKER db;
-					break;
-				case 7:
-					DB_COLOUR db;
-					break;
-				default:
-					DB_UNKNOWN db;
-					break;
-			}
-			cur_pos = FTell() - start_pos;
-		}
-		else {
-			break;
-		}
-	}
+    while (cur_pos < dtd_start) {
+        db_type = ReadUByte(FTell()) >> 5;
+        db_size = ReadUByte(FTell()) & 0x1f;
+        //Printf("%02x %01x:%d\n", cur_pos, db_type, db_size);
+        if ((cur_pos + db_size) < dtd_start ) {
+            SetBackColor(0xe0a0a0);
+            switch (db_type) {
+                case 1:
+                    DB_AUDIO db;
+                    break;
+                case 2:
+                    DB_VIDEO db;
+                    break;
+                case 3:
+                    DB_VENDOR db;
+                    break;
+                case 4:
+                    DB_SPEAKER db;
+                    break;
+                case 7:
+                    DB_COLOUR db;
+                    break;
+                default:
+                    DB_UNKNOWN db;
+                    break;
+            }
+            cur_pos = FTell() - start_pos;
+        }
+        else {
+            break;
+        }
+    }
 
-	if (cur_pos != dtd_start) {
-		Warning("DB Overrun");
-		FSeek(start_pos + dtd_start);
-	}
+    if (cur_pos != dtd_start) {
+        Warning("DB Overrun");
+        FSeek(start_pos + dtd_start);
+    }
 
-	dtd_start_bytes = ReadUShort(FTell());
+    dtd_start_bytes = ReadUShort(FTell());
 
-	while ((dtd_start_bytes != 0) && (cur_pos < (127 - 18))) {
-		DTD d;
+    while ((dtd_start_bytes != 0) && (cur_pos < (127 - 18))) {
+        DTD d;
 
-		dtd_start_bytes = ReadUShort(FTell());
-		cur_pos = FTell() - start_pos;
-	}
+        dtd_start_bytes = ReadUShort(FTell());
+        cur_pos = FTell() - start_pos;
+    }
 
-	SetBackColor(cNone);
-	ubyte padding[127 - cur_pos] <format=hex>;
+    SetBackColor(cNone);
+    ubyte padding[127 - cur_pos] <format=hex>;
 
-	SetBackColor(0xa0e0a0);
-	ubyte checksum <format=hex>;
+    SetBackColor(0xa0e0a0);
+    ubyte checksum <format=hex>;
 } E_CEA;
 
 typedef struct {
-	local int i;
-	local quad start_pos;
-	local int cur_pos;
+    local int i;
+    local quad start_pos;
+    local int cur_pos;
 
-	start_pos = FTell();
+    start_pos = FTell();
 
-	ubyte ext_tag <format=hex>;
+    ubyte ext_tag <format=hex>;
 
-	cur_pos = FTell() - start_pos;
+    cur_pos = FTell() - start_pos;
 
-	SetBackColor(cNone);
-	ubyte data[127 - cur_pos] <format=hex>;
+    SetBackColor(cNone);
+    ubyte data[127 - cur_pos] <format=hex>;
 
-	SetBackColor(0xa0e0a0);
-	ubyte checksum <format=hex>;
+    SetBackColor(0xa0e0a0);
+    ubyte checksum <format=hex>;
 } E_DID;
 
 local ubyte ext_tag;
 for (i = 0; i < e.ext_blocks; i++) {
-	SetBackColor(0xa0e0a0);
-	ext_tag = ReadUByte(FTell());
+    SetBackColor(0xa0e0a0);
+    ext_tag = ReadUByte(FTell());
 
-	switch (ext_tag) {
-		case 2:
-			E_CEA ext;
-			break;
-		case 0x70:
-			E_DID ext;
-			break;
-		default:
-			E_UNKNOWN ext;
-			break;
-	}
+    switch (ext_tag) {
+        case 2:
+            E_CEA ext;
+            break;
+        case 0x70:
+            E_DID ext;
+            break;
+        default:
+            E_UNKNOWN ext;
+            break;
+    }
 }

@@ -16,189 +16,178 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
-
 typedef struct {
-	char name[64];
+    char name[64];
 } NAME <read=read_NAME,optimize=false>;
 
 string read_NAME(NAME &in) {
-	return in.name;
+    return in.name;
 }
 
-
 typedef struct {
-	u4 region_offset;
-	u4 region_size;
+    u4 region_offset;
+    u4 region_size;
 } XWB_Region <read=read_XWB_Region>;
 
 string read_XWB_Region(XWB_Region &in) {
-	string out;
-	SPrintf(out, "%Xh+%Xh", in.region_offset, in.region_size);
-	return out;
+    string out;
+    SPrintf(out, "%Xh+%Xh", in.region_offset, in.region_size);
+    return out;
 }
 
-
 typedef struct {
-	SetBackColor(0xb8b8b8);
+    SetBackColor(0xb8b8b8);
 
-	char signature[4];
+    char signature[4];
 
-	u4 content_version <format=decimal>;
-	global_version = content_version;
+    u4 content_version <format=decimal>;
+    global_version = content_version;
 
-	if (global_version <= 3) {
-		Warning("Nonhandled version");
-		Printf("Nonhandled version\n");
-		return -1;
-	}
+    if (global_version <= 3) {
+        Warning("Nonhandled version");
+        Printf("Nonhandled version\n");
+        return -1;
+    }
 
-	if (global_version >= 42) {
-		u4 header_version <format=decimal>;
-	}
+    if (global_version >= 42) {
+        u4 header_version <format=decimal>;
+    }
 
-	XWB_Region r[5];
+    XWB_Region r[5];
 } XWB_Header;
 
-
 typedef struct (int size) {
-	SetBackColor(0xb0ffb0);
+    SetBackColor(0xb0ffb0);
 
-	local quad start_pos = FTell();
+    local quad start_pos = FTell();
 
-	u4 f_streaming: 1;
-	u4 f_unknown1: 15;
-	u4 f_entry_names: 1;
-	u4 f_compact: 1;
-	u4 f_sync_disabled: 1;
-	u4 f_seek_tables: 1;
-	u4 f_unknown2: 12;
-	Assert(f_unknown1 == 0);
-	Assert(f_unknown2 == 0);
+    u4 f_streaming: 1;
+    u4 f_unknown1: 15;
+    u4 f_entry_names: 1;
+    u4 f_compact: 1;
+    u4 f_sync_disabled: 1;
+    u4 f_seek_tables: 1;
+    u4 f_unknown2: 12;
+    Assert(f_unknown1 == 0);
+    Assert(f_unknown2 == 0);
 
-	u4 entries;
-	global_entries = entries;
+    u4 entries;
+    global_entries = entries;
 
-	char bank_name[64];
+    char bank_name[64];
 
-	u4 entry_metadata_element_size;
-	u4 entry_name_element_size;
-	u4 alignment;
+    u4 entry_metadata_element_size;
+    u4 entry_name_element_size;
+    u4 alignment;
 
-	enum <u4> {ctPCM, ctXMA, ctADPCM, ctWMA} ch_format_tag: 2;
-	u4 ch_channels: 3 <format=decimal>;
-	u4 ch_samples_per_sec: 18 <format=decimal>;
-	u4 ch_block_align: 8;
-	u4 ch_bits_per_sample: 1 <format=decimal>;
-	FILETIME build_time;
+    enum <u4> {ctPCM, ctXMA, ctADPCM, ctWMA} ch_format_tag: 2;
+    u4 ch_channels: 3 <format=decimal>;
+    u4 ch_samples_per_sec: 18 <format=decimal>;
+    u4 ch_block_align: 8;
+    u4 ch_bits_per_sample: 1 <format=decimal>;
+    FILETIME build_time;
 
-	if ((FTell() - start_pos) != size) {
-		Warning("BankData size incorrect");
-		Printf("BankData size incorrect\n");
-	}
+    if ((FTell() - start_pos) != size) {
+        Warning("BankData size incorrect");
+        Printf("BankData size incorrect\n");
+    }
 } XWB_BankData <optimize=false>;
 
-
 typedef struct (int size) {
-	SetBackColor(0xffb0b0);
+    SetBackColor(0xffb0b0);
 
-	local quad start_pos = FTell();
+    local quad start_pos = FTell();
 
-	u4 f_read_ahead: 1;
-	u4 f_loop_cache: 1;
-	u4 f_remove_loop_tail: 1;
-	u4 f_ignore_loop: 1;
-	u4 duration: 28 <format=decimal>;
-	enum <u4> {tPCM, tXMA, tADPCM, tWMA} h_format_tag: 2;
-	u4 h_channels: 3 <format=decimal>;
-	u4 h_samples_per_sec: 18 <format=decimal>;
-	u4 h_block_align: 8;
-	u4 h_bits_per_sample: 1 <format=decimal>;
+    u4 f_read_ahead: 1;
+    u4 f_loop_cache: 1;
+    u4 f_remove_loop_tail: 1;
+    u4 f_ignore_loop: 1;
+    u4 duration: 28 <format=decimal>;
+    enum <u4> {tPCM, tXMA, tADPCM, tWMA} h_format_tag: 2;
+    u4 h_channels: 3 <format=decimal>;
+    u4 h_samples_per_sec: 18 <format=decimal>;
+    u4 h_block_align: 8;
+    u4 h_bits_per_sample: 1 <format=decimal>;
 
-	XWB_Region wave_data;
+    XWB_Region wave_data;
 
-	SetBackColor(0xffb0b0);
-	XWB_Region loop_region;
+    SetBackColor(0xffb0b0);
+    XWB_Region loop_region;
 
-	if ((FTell() - start_pos) != size) {
-		Warning("EntryMetadata size incorrect");
-		Printf("EntryMetadata size incorrect\n");
-	}
+    if ((FTell() - start_pos) != size) {
+        Warning("EntryMetadata size incorrect");
+        Printf("EntryMetadata size incorrect\n");
+    }
 } EntryMetadata <optimize=false>;
 
-
 typedef struct (int size) {
-	SetBackColor(0xffb0b0);
+    SetBackColor(0xffb0b0);
 
-	if ((bd.entry_metadata_element_size * global_entries) != size) {
-		Warning("EntryMetadata size != size*entries");
-		Printf("EntryMetadata size != size*entries\n");
-	}
+    if ((bd.entry_metadata_element_size * global_entries) != size) {
+        Warning("EntryMetadata size != size*entries");
+        Printf("EntryMetadata size != size*entries\n");
+    }
 
-	if (global_entries > 0) {
-		EntryMetadata em(bd.entry_metadata_element_size)[global_entries];
-	}
+    if (global_entries > 0) {
+        EntryMetadata em(bd.entry_metadata_element_size)[global_entries];
+    }
 } XWB_EntryMetadata <optimize=false>;
 
 typedef struct (int pos) {
-	SetBackColor(0xb0b0ff);
-	u4 offset;
-	local int cur_pos = FTell();
-	FSeek(pos + offset);
-	SetBackColor(0xd0d0ff);
-	u4 size;
-	if (size > 0) {
-		u4 data[size];
-	}
-	FSeek(cur_pos);
-	SetBackColor(0xb0b0ff);
+    SetBackColor(0xb0b0ff);
+    u4 offset;
+    local int cur_pos = FTell();
+    FSeek(pos + offset);
+    SetBackColor(0xd0d0ff);
+    u4 size;
+    if (size > 0) {
+        u4 data[size];
+    }
+    FSeek(cur_pos);
+    SetBackColor(0xb0b0ff);
 } SeekTable <optimize=false>;
 
 typedef struct (int size) {
-	SetBackColor(0xb0b0ff);
+    SetBackColor(0xb0b0ff);
 
-	if (global_entries > 0) {
-		local int i;
-		local int table_pos = FTell() + 4 * global_entries;
-		for (i = 0; i < global_entries; i++) {
-			SeekTable s(table_pos);
-		}
-	}
+    if (global_entries > 0) {
+        local int i;
+        local int table_pos = FTell() + 4 * global_entries;
+        for (i = 0; i < global_entries; i++) {
+            SeekTable s(table_pos);
+        }
+    }
 } XWB_SeekTable <optimize=false>;
 
-
 typedef struct (int size) {
-	SetBackColor(0xb0ffff);
+    SetBackColor(0xb0ffff);
 
-	if ((64 * global_entries) != size) {
-		Warning("EntryName size != size*entries");
-		Printf("EntryName size != size*entries\n");
-	}
+    if ((64 * global_entries) != size) {
+        Warning("EntryName size != size*entries");
+        Printf("EntryName size != size*entries\n");
+    }
 
-	if (global_entries > 0) {
-		NAME n[global_entries];
-	}
+    if (global_entries > 0) {
+        NAME n[global_entries];
+    }
 } XWB_EntryName <optimize=false>;
 
-
 typedef struct (int size) {
-	u1 d[size];
+    u1 d[size];
 } Data <optimize=false>;
 
-
 typedef struct (int size) {
-	SetBackColor(0xffb0ff);
+    SetBackColor(0xffb0ff);
 
-	local int start_pos = h.r[4].region_offset;
+    local int start_pos = h.r[4].region_offset;
 
-	local int i;
-	for (i = 0; i < global_entries; i++) {
-		FSeek(start_pos + em.em[i].wave_data.region_offset);
-		SetBackColor(0xffb0ff);
-		Data wavedata(em.em[i].wave_data.region_size);
-	}
+    local int i;
+    for (i = 0; i < global_entries; i++) {
+        FSeek(start_pos + em.em[i].wave_data.region_offset);
+        SetBackColor(0xffb0ff);
+        Data wavedata(em.em[i].wave_data.region_size);
+    }
 } XWB_EntryWaveData <optimize=false>;
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -210,41 +199,41 @@ local int sig;
 sig = ReadInt(0);
 
 if (sig == 0x57424E44) {
-	Warning("BigEndian");
-	BigEndian();
-	BitfieldRightToLeft();
-	sig = ReadInt(0);
+    Warning("BigEndian");
+    BigEndian();
+    BitfieldRightToLeft();
+    sig = ReadInt(0);
 }
 
 if (sig != 0x444E4257) {
-	Printf("Incorrect signature\n");
-	Warning("Incorrect signature");
-	return -1;
+    Printf("Incorrect signature\n");
+    Warning("Incorrect signature");
+    return -1;
 }
 
 XWB_Header h;
 
 if (h.r[0].region_offset > 0 && h.r[0].region_size > 0) {
-	FSeek(h.r[0].region_offset);
-	XWB_BankData bd(h.r[0].region_size);
+    FSeek(h.r[0].region_offset);
+    XWB_BankData bd(h.r[0].region_size);
 }
 
 if (h.r[1].region_offset > 0 && h.r[1].region_size > 0) {
-	FSeek(h.r[1].region_offset);
-	XWB_EntryMetadata em(h.r[1].region_size);
+    FSeek(h.r[1].region_offset);
+    XWB_EntryMetadata em(h.r[1].region_size);
 }
 
 if (h.r[2].region_offset > 0 && h.r[2].region_size > 0) {
-	FSeek(h.r[2].region_offset);
-	XWB_SeekTable st(h.r[2].region_size);
+    FSeek(h.r[2].region_offset);
+    XWB_SeekTable st(h.r[2].region_size);
 }
 
 if (h.r[3].region_offset > 0 && h.r[3].region_size > 0) {
-	FSeek(h.r[3].region_offset);
-	XWB_EntryName en(h.r[3].region_size);
+    FSeek(h.r[3].region_offset);
+    XWB_EntryName en(h.r[3].region_size);
 }
 
 if (h.r[4].region_offset > 0 && h.r[4].region_size > 0) {
-	FSeek(h.r[4].region_offset);
-	XWB_EntryWaveData wd(h.r[4].region_size);
+    FSeek(h.r[4].region_offset);
+    XWB_EntryWaveData wd(h.r[4].region_size);
 }

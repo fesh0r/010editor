@@ -16,128 +16,121 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 typedef struct {
-	SetBackColor(0xe8e8e8);
-	if (!FEof()) {
-		local quad padding = 2 - (FTell() & 1);
+    SetBackColor(0xe8e8e8);
+    if (!FEof()) {
+        local quad padding = 2 - (FTell() & 1);
 
-		if (padding > 0 && padding < 2) {
-			u1 p;
-		}
-	}
+        if (padding > 0 && padding < 2) {
+            u1 p;
+        }
+    }
 } PADDING2 <optimize=false,hidden=true>;
 
 typedef struct {
-	char name[16];
-	char date[12];
-	char user[6];
-	char group[6];
-	char mode[8];
-	char size[10];
-	char end[2];
-	local int _size = Atoi(size);
+    char name[16];
+    char date[12];
+    char user[6];
+    char group[6];
+    char mode[8];
+    char size[10];
+    char end[2];
+    local int _size = Atoi(size);
 } HEADER <read=read_HEADER>;
 
 string read_HEADER(HEADER &in) {
-	string out;
-	SPrintf(out, "%s %d", in.name, in._size);
-	return out;
+    string out;
+    SPrintf(out, "%s %d", in.name, in._size);
+    return out;
 }
 
-
 typedef struct {
-	string d;
+    string d;
 } str <read=read_str,optimize=false>;
 
 string read_str(str &in) {
-	return in.d;
+    return in.d;
 }
 
-
 typedef struct {
-	BigEndian();
+    BigEndian();
 
-	HEADER h;
+    HEADER h;
 
-	u4 size;
-	if (size) {
-		u4 offset[size];
-		str name[size];
-	}
+    u4 size;
+    if (size) {
+        u4 offset[size];
+        str name[size];
+    }
 } LINKER1 <read=read_LINKER1,optimize=false>;
 
 string read_LINKER1(LINKER1 &in) {
-	return read_HEADER(in.h);
+    return read_HEADER(in.h);
 }
 
-
 typedef struct {
-	LittleEndian();
+    LittleEndian();
 
-	HEADER h;
+    HEADER h;
 
-	u4 size;
-	if (size) {
-		u4 offset[size];
-	}
-	u4 symbols;
-	if (symbols) {
-		u2 index[symbols];
-		str name[symbols];
-	}
+    u4 size;
+    if (size) {
+        u4 offset[size];
+    }
+    u4 symbols;
+    if (symbols) {
+        u2 index[symbols];
+        str name[symbols];
+    }
 } LINKER2 <read=read_LINKER2,optimize=false>;
 
 string read_LINKER2(LINKER2 &in) {
-	return read_HEADER(in.h);
+    return read_HEADER(in.h);
 }
 
-
 typedef struct {
-	LittleEndian();
+    LittleEndian();
 
-	HEADER h;
+    HEADER h;
 
-	local int64 start = FTell();
-	local int64 offset = 0;
+    local int64 start = FTell();
+    local int64 offset = 0;
 
-	while (offset < h._size) {
-		str name;
-		offset = FTell() - start;
-	}
+    while (offset < h._size) {
+        str name;
+        offset = FTell() - start;
+    }
 } LONGNAMES <read=read_LONGNAMES,optimize=false>;
 
 string read_LONGNAMES(LONGNAMES &in) {
-	return read_HEADER(in.h);
+    return read_HEADER(in.h);
 }
 
-
 typedef struct {
-	LittleEndian();
+    LittleEndian();
 
-	HEADER h;
+    HEADER h;
 
-	if (h._size) {
-		u1 d[h._size];
-	}
+    if (h._size) {
+        u1 d[h._size];
+    }
 } ENTRY <read=read_ENTRY,optimize=false>;
 
 string read_ENTRY(ENTRY &in) {
-	string out;
-	string name = in.h.name;
-	int slash_pos = Strchr(name, '/');
-	int len = Strlen(name);
-	if (slash_pos > 0) {
-		name = SubStr(name, 0, slash_pos);
-	}
-	else if (slash_pos == 0) {
-		int offset = Atoi(SubStr(name, 1));
-		name = ReadString(n.start + offset);
-	}
-	SPrintf(out, "%s %d", name, in.h._size);
-	return out;
+    string out;
+    string name = in.h.name;
+    int slash_pos = Strchr(name, '/');
+    int len = Strlen(name);
+    if (slash_pos > 0) {
+        name = SubStr(name, 0, slash_pos);
+    }
+    else if (slash_pos == 0) {
+        int offset = Atoi(SubStr(name, 1));
+        name = ReadString(n.start + offset);
+    }
+    SPrintf(out, "%s %d", name, in.h._size);
+    return out;
 }
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -146,9 +139,9 @@ local uchar _sig[8];
 ReadBytes(_sig, 0, 8);
 
 if (_sig != "!<arch>\n") {
-	Printf("Invalid signature\n");
-	Warning("Invalid signature");
-	return -1;
+    Printf("Invalid signature\n");
+    Warning("Invalid signature");
+    return -1;
 }
 
 SetBackColor(0xd0d0d0);
@@ -163,8 +156,8 @@ PADDING2 p;
 LONGNAMES n;
 
 while (!FEof()) {
-	PADDING2 p;
-	if (!FEof()) {
-		ENTRY e;
-	}
+    PADDING2 p;
+    if (!FEof()) {
+        ENTRY e;
+    }
 }

@@ -11,30 +11,30 @@ DisplayFormatHex();
 LittleEndian();
 
 string read_Filename(char &in) {
-	return in;
+    return in;
 }
 
 typedef struct {
-	local quad cur_pos;
+    local quad cur_pos;
 
-	char filename[32];
-	uint file_offset;
-	uint file_size <format=decimal>;
+    char filename[32];
+    uint file_offset;
+    uint file_size <format=decimal>;
 
-	cur_pos = FTell();
-	FSeek(file_offset);
+    cur_pos = FTell();
+    FSeek(file_offset);
 
 /*
-	SetBackColor(0xc0ffc0);
-	ubyte data[file_size];
-	SetBackColor(0xe0e0e0);
+    SetBackColor(0xc0ffc0);
+    ubyte data[file_size];
+    SetBackColor(0xe0e0e0);
 */
 
-	FSeek(cur_pos);
+    FSeek(cur_pos);
 } DIR <read=READ_DIR>;
 
 string READ_DIR(DIR &in) {
-	return in.filename;
+    return in.filename;
 }
 
 local int i;
@@ -43,5 +43,5 @@ uint num_files <format=decimal>;
 
 SetBackColor(0xe0e0e0);
 for (i = 0; i < num_files; i++) {
-	DIR d;
+    DIR d;
 }

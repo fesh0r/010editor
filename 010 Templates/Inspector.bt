@@ -4,13 +4,13 @@
 // File:     Inspector.bt
 // Author:   SweetScape Software
 // Revision: 1.1
-// Purpose:  This template may be used 
-//  to customize the auto tab of the 
-//  Inspector with your own variables. 
-//  See the Inspector section of the 
-//  Options dialog for more information. 
-// Changes:  
-// 1.1 (SweetScape): 
+// Purpose:  This template may be used
+//  to customize the auto tab of the
+//  Inspector with your own variables.
+//  See the Inspector section of the
+//  Options dialog for more information.
+// Changes:
+// 1.1 (SweetScape):
 //   - Added hfloat data type.
 //-----------------------------------
 RequiresVersion( 4.0 );

@@ -11,12 +11,12 @@ DisplayFormatHex();
 LittleEndian();
 
 typedef struct {
-	uint Length;
-	char Data[Length];
+    uint Length;
+    char Data[Length];
 } DA_STRING <read=DA_STRINGread>;
 
 string DA_STRINGread(DA_STRING &in) {
-	return in.Data;
+    return in.Data;
 }
 
 SetBackColor(0xe0e0e0);

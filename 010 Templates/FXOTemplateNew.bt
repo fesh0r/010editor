@@ -16,106 +16,99 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 string read_sig(u4 &in) {
-	string out;
-	string ver;
-	switch(in & 0xffff) {
-		case 0x0901:
-			ver = "fx_2_0";
-			break;
-		case 0x1001:
-			ver = "fx_4_0";
-			break;
-		case 0x1011:
-			ver = "fx_4_1";
-			break;
-		case 0x2001:
-			ver = "fx_5_0";
-			break;
-		default:
-			SPrintf(ver, "(%04X)", in & 0xffff);
-			break;
-	}
-	SPrintf(out, "%s %s", IsBigEndian() ? "BE" : "LE", ver);
-	return out;
+    string out;
+    string ver;
+    switch(in & 0xffff) {
+        case 0x0901:
+            ver = "fx_2_0";
+            break;
+        case 0x1001:
+            ver = "fx_4_0";
+            break;
+        case 0x1011:
+            ver = "fx_4_1";
+            break;
+        case 0x2001:
+            ver = "fx_5_0";
+            break;
+        default:
+            SPrintf(ver, "(%04X)", in & 0xffff);
+            break;
+    }
+    SPrintf(out, "%s %s", IsBigEndian() ? "BE" : "LE", ver);
+    return out;
 }
 
-
 typedef struct {
-	u4 ConstantBufferCount;
-	u4 NumericVariableCount;
-	u4 ObjectVariableCount;
+    u4 ConstantBufferCount;
+    u4 NumericVariableCount;
+    u4 ObjectVariableCount;
 } SVarCounts <read=read_SVarCounts>;
 
 string read_SVarCounts(SVarCounts &in) {
-	string out;
-	SPrintf(out, "%d, %d, %d", in.ConstantBufferCount, in.NumericVariableCount, in.ObjectVariableCount);
-	return out;
+    string out;
+    SPrintf(out, "%d, %d, %d", in.ConstantBufferCount, in.NumericVariableCount, in.ObjectVariableCount);
+    return out;
 }
 
 typedef struct {
-	u4 sig;
-	local u4 _ver = sig & 0xffff;
+    u4 sig;
+    local u4 _ver = sig & 0xffff;
 
-	SVarCounts Effect;
-	SVarCounts Pool;
+    SVarCounts Effect;
+    SVarCounts Pool;
 
-	u4 TechniqueCount;
-	u4 cbUnstructured;
+    u4 TechniqueCount;
+    u4 cbUnstructured;
 
-	u4 StringCount;
-	u4 ShaderResourceCount;
+    u4 StringCount;
+    u4 ShaderResourceCount;
 
-	u4 DepthStencilBlockCount;
-	u4 BlendStateBlockCount;
-	u4 RasterizerStateBlockCount;
-	u4 SamplerCount;
-	u4 RenderTargetViewCount;
-	u4 DepthStencilViewCount;
+    u4 DepthStencilBlockCount;
+    u4 BlendStateBlockCount;
+    u4 RasterizerStateBlockCount;
+    u4 SamplerCount;
+    u4 RenderTargetViewCount;
+    u4 DepthStencilViewCount;
 
-	u4 TotalShaderCount;
+    u4 TotalShaderCount;
 
-	u4 InlineShaderCount;
+    u4 InlineShaderCount;
 
-	if (_ver >= 0x2001) {
-		u4 GroupCount;
-		u4 UnorderedAccessViewCount;
-		u4 InterfaceVariableCount;
-		u4 InterfaceVariableElementCount;
-		u4 ClassInstanceElementCount;
-	}
-	else {
-		local u4 GroupCount = 0;
-		local u4 UnorderedAccessViewCount = 0;
-		local u4 InterfaceVariableCount = 0;
-		local u4 InterfaceVariableElementCount = 0;
-		local u4 ClassInstanceElementCount = 0;
-	}
+    if (_ver >= 0x2001) {
+        u4 GroupCount;
+        u4 UnorderedAccessViewCount;
+        u4 InterfaceVariableCount;
+        u4 InterfaceVariableElementCount;
+        u4 ClassInstanceElementCount;
+    }
+    else {
+        local u4 GroupCount = 0;
+        local u4 UnorderedAccessViewCount = 0;
+        local u4 InterfaceVariableCount = 0;
+        local u4 InterfaceVariableElementCount = 0;
+        local u4 ClassInstanceElementCount = 0;
+    }
 } HEADER <read=read_HEADER>;
 
 string read_HEADER(HEADER &in) {
-	return read_sig(in.sig);
+    return read_sig(in.sig);
 }
-
 
 typedef struct {
 } ConstantBuffer;
 
-
 typedef struct {
 } ObjectVariable;
-
 
 typedef struct {
 } InterfaceVariable;
 
-
 typedef struct {
-	u4 OffsetName;
-	u4 TechniqueCount;
+    u4 OffsetName;
+    u4 TechniqueCount;
 } FxGroup;
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -124,24 +117,24 @@ local u4 _sig;
 _sig = ReadUInt(0);
 
 if ((_sig & 0xffff0000) == 0xfeff0000) {
-	LittleEndian();
+    LittleEndian();
 }
 else if ((_sig & 0xffff) == 0xfffe) {
-	BigEndian();
-	_sig = ReadUInt(0);
-	Warning("BigEndian");
+    BigEndian();
+    _sig = ReadUInt(0);
+    Warning("BigEndian");
 }
 else {
-	Warning("Bad sig!");
-	Printf("Bad sig!\n");
-	return -1;
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
 }
 _ver = _sig & 0xffff;
 
 if (_ver < 0x1001) {
-	Warning("Unsupported version!");
-	Printf("Unsupported version! %04X", _ver);
-	return -1;
+    Warning("Unsupported version!");
+    Printf("Unsupported version! %04X", _ver);
+    return -1;
 }
 
 SetBackColor(0xd0d0d0);
@@ -149,24 +142,24 @@ HEADER h;
 
 SetBackColor(0xc0c0c0);
 if (h.cbUnstructured) {
-	u1 udata[h.cbUnstructured];
+    u1 udata[h.cbUnstructured];
 }
 
 local int i;
 
 SetBackColor(0xffd0d0);
 for (i = 0; i < h.Effect.ConstantBufferCount; i++) {
-	ConstantBuffer cb;
+    ConstantBuffer cb;
 }
 
 for (i = 0; i < h.Effect.ObjectVariableCount; i++) {
-	ObjectVariable ov;
+    ObjectVariable ov;
 }
 
 for (i = 0; i < h.InterfaceVariableCount; i++) {
-	InterfaceVariable iv;
+    InterfaceVariable iv;
 }
 
 for (i = 0; i < h.GroupCount; i++) {
-	FxGroup fg;
+    FxGroup fg;
 }

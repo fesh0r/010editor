@@ -8,17 +8,17 @@
 //--------------------------------------
 
 enum <ubyte> TAG_TYPE {
-	TAG_End = 0,
-	TAG_Byte,
-	TAG_Short,
-	TAG_Int,
-	TAG_Long,
-	TAG_Float,
-	TAG_Double,
-	TAG_Byte_Array,
-	TAG_String,
-	TAG_List,
-	TAG_Compound
+    TAG_End = 0,
+    TAG_Byte,
+    TAG_Short,
+    TAG_Int,
+    TAG_Long,
+    TAG_Float,
+    TAG_Double,
+    TAG_Byte_Array,
+    TAG_String,
+    TAG_List,
+    TAG_Compound
 };
 
 typedef struct {
@@ -37,126 +37,126 @@ typedef float TAG_Float;
 typedef double TAG_Double;
 
 typedef struct {
-	TAG_Int length <hidden=true>;
-	if (length > 0) byte d[length];
+    TAG_Int length <hidden=true>;
+    if (length > 0) byte d[length];
 } TAG_Byte_Array <read=read_TAG_Byte_Array>;
 
 string read_TAG_Byte_Array(TAG_Byte_Array &in) {
-	string out;
+    string out;
 
-	SPrintf(out, "byte[%i]", in.length);
+    SPrintf(out, "byte[%i]", in.length);
 
-	return out;
+    return out;
 }
 
 typedef struct {
-	TAG_Short length <hidden=true>;
-	if (length > 0) char d[length];
+    TAG_Short length <hidden=true>;
+    if (length > 0) char d[length];
 } TAG_String <read=read_TAG_String>;
 
 string read_TAG_String(TAG_String &in) {
-	if (in.length > 0) {
-		return in.d;
-	}
+    if (in.length > 0) {
+        return in.d;
+    }
 
-	return "";
+    return "";
 }
 
 typedef struct {
-	local int i;
-	TAG_TYPE tagType <hidden=true>;
-	TAG_Int length <hidden=true>;
+    local int i;
+    TAG_TYPE tagType <hidden=true>;
+    TAG_Int length <hidden=true>;
 
-	for (i = 0; i < length; i++) {
-		TAG(tagType);
-	}
+    for (i = 0; i < length; i++) {
+        TAG(tagType);
+    }
 } TAG_List <read=read_TAG_LIST>;
 
 string read_TAG_LIST(TAG_List &in) {
-	string out;
+    string out;
 
-	SPrintf(out, "%s[%i]", EnumToString(in.tagType), in.length);
+    SPrintf(out, "%s[%i]", EnumToString(in.tagType), in.length);
 
-	return out;
+    return out;
 }
 
 typedef struct {
-	TAG_TYPE tagType <hidden=true>;
+    TAG_TYPE tagType <hidden=true>;
 
-	if (tagType != 0) {
-		TAG_String name <hidden=true>;
-		TAG(tagType);
-	}
+    if (tagType != 0) {
+        TAG_String name <hidden=true>;
+        TAG(tagType);
+    }
 } TAG_Named <read=read_TAG_Named>;
 
 string read_TAG_Named(TAG_Named &in) {
-	string out;
+    string out;
 
-	SPrintf(out, "%s", EnumToString(in.tagType));
+    SPrintf(out, "%s", EnumToString(in.tagType));
 
-	if (in.tagType != 0) {
-		SPrintf(out, "%s(\"%s\")", out, read_TAG_String(in.name));
-	}
+    if (in.tagType != 0) {
+        SPrintf(out, "%s(\"%s\")", out, read_TAG_String(in.name));
+    }
 
-	return out;
+    return out;
 }
 
 typedef struct {
-	local int found_end = 0;
-	local int tag_count = 0;
+    local int found_end = 0;
+    local int tag_count = 0;
 
-	while (!found_end) {
-		found_end = (ReadByte(FTell()) == 0);
+    while (!found_end) {
+        found_end = (ReadByte(FTell()) == 0);
 
-		TAG_Named d;
-		tag_count++;
-	}
+        TAG_Named d;
+        tag_count++;
+    }
 } TAG_Compound <read=read_TAG_Compound>;
 
 string read_TAG_Compound(TAG_Compound &in) {
-	string out;
+    string out;
 
-	SPrintf(out, "TAG_Named[%i]", in.tag_count - 1);
+    SPrintf(out, "TAG_Named[%i]", in.tag_count - 1);
 
-	return out;
+    return out;
 }
 
 void TAG(TAG_TYPE tagType) {
-	switch (tagType) {
-		case 0:
-			TAG_End d;
-			break;
-		case 1:
-			TAG_Byte d;
-			break;
-		case 2:
-			TAG_Short d;
-			break;
-		case 3:
-			TAG_Int d;
-			break;
-		case 4:
-			TAG_Long d;
-			break;
-		case 5:
-			TAG_Float d;
-			break;
-		case 6:
-			TAG_Double d;
-			break;
-		case 7:
-			TAG_Byte_Array d;
-			break;
-		case 8:
-			TAG_String d;
-			break;
-		case 9:
-			TAG_List d;
-			break;
-		case 10:
-			TAG_Compound d;
-			break;
-	}
+    switch (tagType) {
+        case 0:
+            TAG_End d;
+            break;
+        case 1:
+            TAG_Byte d;
+            break;
+        case 2:
+            TAG_Short d;
+            break;
+        case 3:
+            TAG_Int d;
+            break;
+        case 4:
+            TAG_Long d;
+            break;
+        case 5:
+            TAG_Float d;
+            break;
+        case 6:
+            TAG_Double d;
+            break;
+        case 7:
+            TAG_Byte_Array d;
+            break;
+        case 8:
+            TAG_String d;
+            break;
+        case 9:
+            TAG_List d;
+            break;
+        case 10:
+            TAG_Compound d;
+            break;
+    }
 }
 
 DisplayFormatDecimal();

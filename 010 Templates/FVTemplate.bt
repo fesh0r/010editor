@@ -7,89 +7,85 @@
 // Purpose: UEFI FV firmware file
 //--------------------------------------
 
-
 typedef ubyte UINT8;
 typedef byte INT8;
 
-
 typedef struct {
-	UINT8 a;
-	UINT8 b;
-	UINT8 c;
-	local uint v = (uint)a;
-	v |= (uint)b << 8;
-	v |= (uint)c << 16;
+    UINT8 a;
+    UINT8 b;
+    UINT8 c;
+    local uint v = (uint)a;
+    v |= (uint)b << 8;
+    v |= (uint)c << 16;
 } UINT24 <read=read_UINT24>;
 
 string read_UINT24(UINT24 &in) {
-	local string out;
-	SPrintf(out, "%Xh", in.v);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh", in.v);
+    return out;
 }
 
-
 typedef struct {
-	UINT32 Data1;
-	UINT16 Data2;
-	UINT16 Data3;
-	BigEndian();
-	UINT64 Data4;
-	LittleEndian();
+    UINT32 Data1;
+    UINT16 Data2;
+    UINT16 Data3;
+    BigEndian();
+    UINT64 Data4;
+    LittleEndian();
 } GUID <read=read_GUID>;
 
 string read_GUID(GUID &in) {
-	local string out;
-	local UINT32 d1 = in.Data1;
-	local UINT32 d2 = in.Data2;
-	local UINT32 d3 = in.Data3;
-	local UINT64 d4 = in.Data4;
-	local UINT32 d4a = d4 >> 32;
-	local UINT32 d4b = d4 & 0xFFFFFFFF;
+    local string out;
+    local UINT32 d1 = in.Data1;
+    local UINT32 d2 = in.Data2;
+    local UINT32 d3 = in.Data3;
+    local UINT64 d4 = in.Data4;
+    local UINT32 d4a = d4 >> 32;
+    local UINT32 d4b = d4 & 0xFFFFFFFF;
 
-		 if (d1 == 0x7A9354D9 && d2 == 0x0468 && d3 == 0x444A && d4a == 0x81CE0BF6 && d4b == 0x17D890DF) {
-		out = "EFI_FIRMWARE_FILE_SYSTEM_GUID";
-	}
-	else if (d1 == 0x8C8CE578 && d2 == 0x8A3D && d3 == 0x4F1C && d4a == 0x99358961 && d4b == 0x85C32DD3) {
-		out = "EFI_FIRMWARE_FILE_SYSTEM2_GUID";
-	}
-	else if (d1 == 0x5473C07A && d2 == 0x3DCB && d3 == 0x4DCA && d4a == 0xBD6F1E96 && d4b == 0x89E7349A) {
-		out = "EFI_FIRMWARE_FILE_SYSTEM3_GUID";
-	}
-	else if (d1 == 0xFFF12B8D && d2 == 0x7696 && d3 == 0x4C8B && d4a == 0xA9852747 && d4b == 0x075B4F50) {
-		out = "EFI_FIRMWARE_NVRAM_GUID";
-	}
-	else if (d1 == 0x1BA0062E && d2 == 0xC779 && d3 == 0x4582 && d4a == 0x8566336A && d4b == 0xE8F78F09) {
-		out = "EFI_FFS_VOLUME_TOP_FILE_GUID";
-	}
-	else if (d1 == 0x0F9D89E8 && d2 == 0x9259 && d3 == 0x4F76 && d4a == 0xA5AF0C89 && d4b == 0xE34023DF) {
-		out = "EFI_FIRMWARE_CONTENTS_SIGNED_GUID";
-	}
-	else if (d1 == 0xD42AE6BD && d2 == 0x1352 && d3 == 0x4BFB && d4a == 0x909ACA72 && d4b == 0xA6AEE889) {
-		out = "SECTION_LZMAF86_GUID";
-	}
-	else if (d1 == 0x8C3D856A && d2 == 0x9BE6 && d3 == 0x468E && d4a == 0x850A24F7 && d4b == 0xA8D38E08) {
-		out = "SECTION_VPDTOOL_GUID";
-	}
-	else if (d1 == 0xEE4E5898 && d2 == 0x3914 && d3 == 0x4259 && d4a == 0x9D6EDC7B && d4b == 0xD79403CF) {
-		out = "SECTION_LZMA_GUID";
-	}
-	else if (d1 == 0xA31280AD && d2 == 0x481E && d3 == 0x41B6 && d4a == 0x95E8127F && d4b == 0x4C984779) {
-		out = "SECTION_TIANO_GUID";
-	}
-	else if (d1 == 0xFC1BCDB0 && d2 == 0x7D31 && d3 == 0x49AA && d4a == 0x936AA460 && d4b == 0x0D9DD083) {
-		out = "SECTION_CRC32_GUID";
-	}
-	else {
-		SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
-			d1, d2, d3, d4a >> 16, d4a & 0xFFFF, d4b);
-	}
-	return out;
+         if (d1 == 0x7A9354D9 && d2 == 0x0468 && d3 == 0x444A && d4a == 0x81CE0BF6 && d4b == 0x17D890DF) {
+        out = "EFI_FIRMWARE_FILE_SYSTEM_GUID";
+    }
+    else if (d1 == 0x8C8CE578 && d2 == 0x8A3D && d3 == 0x4F1C && d4a == 0x99358961 && d4b == 0x85C32DD3) {
+        out = "EFI_FIRMWARE_FILE_SYSTEM2_GUID";
+    }
+    else if (d1 == 0x5473C07A && d2 == 0x3DCB && d3 == 0x4DCA && d4a == 0xBD6F1E96 && d4b == 0x89E7349A) {
+        out = "EFI_FIRMWARE_FILE_SYSTEM3_GUID";
+    }
+    else if (d1 == 0xFFF12B8D && d2 == 0x7696 && d3 == 0x4C8B && d4a == 0xA9852747 && d4b == 0x075B4F50) {
+        out = "EFI_FIRMWARE_NVRAM_GUID";
+    }
+    else if (d1 == 0x1BA0062E && d2 == 0xC779 && d3 == 0x4582 && d4a == 0x8566336A && d4b == 0xE8F78F09) {
+        out = "EFI_FFS_VOLUME_TOP_FILE_GUID";
+    }
+    else if (d1 == 0x0F9D89E8 && d2 == 0x9259 && d3 == 0x4F76 && d4a == 0xA5AF0C89 && d4b == 0xE34023DF) {
+        out = "EFI_FIRMWARE_CONTENTS_SIGNED_GUID";
+    }
+    else if (d1 == 0xD42AE6BD && d2 == 0x1352 && d3 == 0x4BFB && d4a == 0x909ACA72 && d4b == 0xA6AEE889) {
+        out = "SECTION_LZMAF86_GUID";
+    }
+    else if (d1 == 0x8C3D856A && d2 == 0x9BE6 && d3 == 0x468E && d4a == 0x850A24F7 && d4b == 0xA8D38E08) {
+        out = "SECTION_VPDTOOL_GUID";
+    }
+    else if (d1 == 0xEE4E5898 && d2 == 0x3914 && d3 == 0x4259 && d4a == 0x9D6EDC7B && d4b == 0xD79403CF) {
+        out = "SECTION_LZMA_GUID";
+    }
+    else if (d1 == 0xA31280AD && d2 == 0x481E && d3 == 0x41B6 && d4a == 0x95E8127F && d4b == 0x4C984779) {
+        out = "SECTION_TIANO_GUID";
+    }
+    else if (d1 == 0xFC1BCDB0 && d2 == 0x7D31 && d3 == 0x49AA && d4a == 0x936AA460 && d4b == 0x0D9DD083) {
+        out = "SECTION_CRC32_GUID";
+    }
+    else {
+        SPrintf(out, "{%08X-%04X-%04X-%04X-%04X%08X}",
+            d1, d2, d3, d4a >> 16, d4a & 0xFFFF, d4b);
+    }
+    return out;
 }
 
-
 typedef struct {
-	local UINT32 value = ReadUInt(FTell());
-	BitfieldDisablePadding();
+    local UINT32 value = ReadUInt(FTell());
+    BitfieldDisablePadding();
 
 int EFI_FVB_READ_DISABLD_CAP: 1;
 int EFI_FVB_READ_ENABLED_CAP: 1;
@@ -128,19 +124,18 @@ int EFI_FVB_ALIGNMENT_16K: 1;
 int EFI_FVB_ALIGNMENT_32K: 1;
 int EFI_FVB_ALIGNMENT_64K: 1;
 
-	BitfieldEnablePadding();
+    BitfieldEnablePadding();
 } EFI_FVB_ATTRIBUTES <read=read_EFI_FVB_ATTRIBUTES>;
 
 string read_EFI_FVB_ATTRIBUTES(EFI_FVB_ATTRIBUTES &in) {
-	local string out;
-	SPrintf(out, "%Xh", in.value);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh", in.value);
+    return out;
 }
 
-
 typedef struct {
-	local UINT32 value = ReadUInt(FTell());
-	BitfieldDisablePadding();
+    local UINT32 value = ReadUInt(FTell());
+    BitfieldDisablePadding();
 
 int EFI_FVB2_READ_DISABLED_CAP: 1;
 int EFI_FVB2_READ_ENABLED_CAP: 1;
@@ -166,115 +161,111 @@ int EFI_FVB2_WRITE_LOCK_CAP: 1;
 int EFI_FVB2_WRITE_LOCK_STATUS: 1;
 
 enum <int> eEFI_FVB2_ALIGNMENT {
-	EFI_FVB2_ALIGNMENT_1 = 0,
-	EFI_FVB2_ALIGNMENT_2,
-	EFI_FVB2_ALIGNMENT_4,
-	EFI_FVB2_ALIGNMENT_8,
-	EFI_FVB2_ALIGNMENT_16,
-	EFI_FVB2_ALIGNMENT_32,
-	EFI_FVB2_ALIGNMENT_64,
-	EFI_FVB2_ALIGNMENT_128,
-	EFI_FVB2_ALIGNMENT_256,
-	EFI_FVB2_ALIGNMENT_512,
-	EFI_FVB2_ALIGNMENT_1K,
-	EFI_FVB2_ALIGNMENT_2K,
-	EFI_FVB2_ALIGNMENT_4K,
-	EFI_FVB2_ALIGNMENT_8K,
-	EFI_FVB2_ALIGNMENT_16K,
-	EFI_FVB2_ALIGNMENT_32K,
-	EFI_FVB2_ALIGNMENT_64K,
-	EFI_FVB2_ALIGNMENT_128K,
-	EFI_FVB2_ALIGNMENT_256K,
-	EFI_FVB2_ALIGNMENT_512K,
-	EFI_FVB2_ALIGNMENT_1M,
-	EFI_FVB2_ALIGNMENT_2M,
-	EFI_FVB2_ALIGNMENT_4M,
-	EFI_FVB2_ALIGNMENT_8M,
-	EFI_FVB2_ALIGNMENT_16M,
-	EFI_FVB2_ALIGNMENT_32M,
-	EFI_FVB2_ALIGNMENT_64M,
-	EFI_FVB2_ALIGNMENT_128M,
-	EFI_FVB2_ALIGNMENT_256M,
-	EFI_FVB2_ALIGNMENT_512M,
-	EFI_FVB2_ALIGNMENT_1G,
-	EFI_FVB2_ALIGNMENT_2G
+    EFI_FVB2_ALIGNMENT_1 = 0,
+    EFI_FVB2_ALIGNMENT_2,
+    EFI_FVB2_ALIGNMENT_4,
+    EFI_FVB2_ALIGNMENT_8,
+    EFI_FVB2_ALIGNMENT_16,
+    EFI_FVB2_ALIGNMENT_32,
+    EFI_FVB2_ALIGNMENT_64,
+    EFI_FVB2_ALIGNMENT_128,
+    EFI_FVB2_ALIGNMENT_256,
+    EFI_FVB2_ALIGNMENT_512,
+    EFI_FVB2_ALIGNMENT_1K,
+    EFI_FVB2_ALIGNMENT_2K,
+    EFI_FVB2_ALIGNMENT_4K,
+    EFI_FVB2_ALIGNMENT_8K,
+    EFI_FVB2_ALIGNMENT_16K,
+    EFI_FVB2_ALIGNMENT_32K,
+    EFI_FVB2_ALIGNMENT_64K,
+    EFI_FVB2_ALIGNMENT_128K,
+    EFI_FVB2_ALIGNMENT_256K,
+    EFI_FVB2_ALIGNMENT_512K,
+    EFI_FVB2_ALIGNMENT_1M,
+    EFI_FVB2_ALIGNMENT_2M,
+    EFI_FVB2_ALIGNMENT_4M,
+    EFI_FVB2_ALIGNMENT_8M,
+    EFI_FVB2_ALIGNMENT_16M,
+    EFI_FVB2_ALIGNMENT_32M,
+    EFI_FVB2_ALIGNMENT_64M,
+    EFI_FVB2_ALIGNMENT_128M,
+    EFI_FVB2_ALIGNMENT_256M,
+    EFI_FVB2_ALIGNMENT_512M,
+    EFI_FVB2_ALIGNMENT_1G,
+    EFI_FVB2_ALIGNMENT_2G
 } EFI_FVB2_ALIGNMENT: 5;
 int EFI_FVB2_res2: 10 <hidden=true>;
 int EFI_FVB2_WEAK_ALIGNMENT: 1;
 
-	BitfieldEnablePadding();
+    BitfieldEnablePadding();
 } EFI_FVB2_ATTRIBUTES <read=read_EFI_FVB2_ATTRIBUTES>;
 
 string read_EFI_FVB2_ATTRIBUTES(EFI_FVB2_ATTRIBUTES &in) {
-	local string out;
-	SPrintf(out, "%Xh", in.value);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh", in.value);
+    return out;
 }
 
-
 typedef struct {
-	UINT32 NumBlocks;
-	UINT32 Length;
-	G_data_remaining += NumBlocks * Length;
+    UINT32 NumBlocks;
+    UINT32 Length;
+    G_data_remaining += NumBlocks * Length;
 } EFI_FV_BLOCK_MAP_ENTRY <read=read_EFI_FV_BLOCK_MAP_ENTRY>;
 
 string read_EFI_FV_BLOCK_MAP_ENTRY(EFI_FV_BLOCK_MAP_ENTRY &in) {
-	local string out;
-	if (in.NumBlocks == 0 && in.Length == 0) {
-		SPrintf(out, "END");
-	}
-	else {
-		SPrintf(out, "%Xh x %Xh", in.NumBlocks, in.Length);
-	}
-	return out;
+    local string out;
+    if (in.NumBlocks == 0 && in.Length == 0) {
+        SPrintf(out, "END");
+    }
+    else {
+        SPrintf(out, "%Xh x %Xh", in.NumBlocks, in.Length);
+    }
+    return out;
 }
 
-
 typedef struct {
-	G_revision = ReadUByte(FTell() + 0x37);
-	Assert(G_revision == 1 || G_revision == 2, "Unknown revision");
-	UINT8 ZeroVector[16];
-	GUID FileSystemGuid;
-	UINT64 FvLength;
-	char Signature[4];
-	if (G_revision == 1) {
-		EFI_FVB_ATTRIBUTES Attributes;
-	}
-	else if (G_revision == 2) {
-		EFI_FVB2_ATTRIBUTES Attributes;
-	}
-	UINT16 HeaderLength;
-	UINT16 Checksum;
-	UINT16 ExtHeaderOffset;
-	UINT8 Reserved;
-	UINT8 Revision;
+    G_revision = ReadUByte(FTell() + 0x37);
+    Assert(G_revision == 1 || G_revision == 2, "Unknown revision");
+    UINT8 ZeroVector[16];
+    GUID FileSystemGuid;
+    UINT64 FvLength;
+    char Signature[4];
+    if (G_revision == 1) {
+        EFI_FVB_ATTRIBUTES Attributes;
+    }
+    else if (G_revision == 2) {
+        EFI_FVB2_ATTRIBUTES Attributes;
+    }
+    UINT16 HeaderLength;
+    UINT16 Checksum;
+    UINT16 ExtHeaderOffset;
+    UINT8 Reserved;
+    UINT8 Revision;
 
-	local UINT64 cur_entry = 0;
-	do {
-		cur_entry = ReadQuad(FTell());
-		EFI_FV_BLOCK_MAP_ENTRY BlockMap;
-	} while (cur_entry != 0);
+    local UINT64 cur_entry = 0;
+    do {
+        cur_entry = ReadQuad(FTell());
+        EFI_FV_BLOCK_MAP_ENTRY BlockMap;
+    } while (cur_entry != 0);
 } EFI_FIRMWARE_VOLUME_HEADER <read=read_EFI_FIRMWARE_VOLUME_HEADER>;
 
 string read_EFI_FIRMWARE_VOLUME_HEADER(EFI_FIRMWARE_VOLUME_HEADER &in) {
-	return read_GUID(in.FileSystemGuid);
+    return read_GUID(in.FileSystemGuid);
 }
 
-
 typedef union {
-	struct {
-		UINT8 Header;
-		UINT8 File;
-	} Checksum;
-	UINT16 TailReference;
+    struct {
+        UINT8 Header;
+        UINT8 File;
+    } Checksum;
+    UINT16 TailReference;
 } EFI_FFS_INTEGRITY_CHECK <read=read_EFI_FFS_INTEGRITY_CHECK>;
 
 string read_EFI_FFS_INTEGRITY_CHECK(EFI_FFS_INTEGRITY_CHECK &in) {
-	local string out;
-	SPrintf(out, "%Xh %Xh", in.Checksum.Header, in.Checksum.File);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh %Xh", in.Checksum.Header, in.Checksum.File);
+    return out;
 }
-
 
 typedef enum <UINT8> eEFI_FV_FILETYPE {
 EFI_FV_FILETYPE_RAW = 0x01,
@@ -293,69 +284,66 @@ EFI_FV_FILETYPE_SMM_CORE = 0x0D,
 EFI_FV_FILETYPE_FFS_PAD = 0xF0
 } EFI_FV_FILETYPE;
 
-
 typedef struct {
-	local UINT8 value = ReadUByte(FTell());
-	BitfieldDisablePadding();
+    local UINT8 value = ReadUByte(FTell());
+    BitfieldDisablePadding();
 int FFS_ATTRIB_TAIL_PRESENT: 1;
 int FFS_ATTRIB_RECOVERY: 1;
 int FFS_ATTRIB_res: 1 <hidden=true>;
 enum <int> {
-	FFS_ATTRIB_DATA_ALIGNMENT_1 = 0,
-	FFS_ATTRIB_DATA_ALIGNMENT_16,
-	FFS_ATTRIB_DATA_ALIGNMENT_128,
-	FFS_ATTRIB_DATA_ALIGNMENT_512,
-	FFS_ATTRIB_DATA_ALIGNMENT_1K,
-	FFS_ATTRIB_DATA_ALIGNMENT_4K,
-	FFS_ATTRIB_DATA_ALIGNMENT_32K,
-	FFS_ATTRIB_DATA_ALIGNMENT_64K
+    FFS_ATTRIB_DATA_ALIGNMENT_1 = 0,
+    FFS_ATTRIB_DATA_ALIGNMENT_16,
+    FFS_ATTRIB_DATA_ALIGNMENT_128,
+    FFS_ATTRIB_DATA_ALIGNMENT_512,
+    FFS_ATTRIB_DATA_ALIGNMENT_1K,
+    FFS_ATTRIB_DATA_ALIGNMENT_4K,
+    FFS_ATTRIB_DATA_ALIGNMENT_32K,
+    FFS_ATTRIB_DATA_ALIGNMENT_64K
 } FFS_ATTRIB_DATA_ALIGNMENT: 3;
 int FFS_ATTRIB_CHECKSUM: 1;
 int FFS_ATTRIB_res2: 1 <hidden=true>;
 
-	BitfieldEnablePadding();
+    BitfieldEnablePadding();
 } EFI_FFS_FILE_ATTRIBUTES <read=read_EFI_FFS_FILE_ATTRIBUTES>;
 
 string read_EFI_FFS_FILE_ATTRIBUTES(EFI_FFS_FILE_ATTRIBUTES &in) {
-	local string out;
-	SPrintf(out, "%Xh", in.value);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh", in.value);
+    return out;
 }
 
-
 typedef struct {
-	local UINT8 value = ReadUByte(FTell());
-	BitfieldDisablePadding();
+    local UINT8 value = ReadUByte(FTell());
+    BitfieldDisablePadding();
 
 int FFS2_ATTRIB_LARGE_FILE: 1;
 int FFS2_ATTRIB_res: 1 <hidden=true>;
 int FFS2_ATTRIB_FIXED: 1;
 enum <int> {
-	FFS2_ATTRIB_DATA_ALIGNMENT_1 = 0,
-	FFS2_ATTRIB_DATA_ALIGNMENT_16,
-	FFS2_ATTRIB_DATA_ALIGNMENT_128,
-	FFS2_ATTRIB_DATA_ALIGNMENT_512,
-	FFS2_ATTRIB_DATA_ALIGNMENT_1K,
-	FFS2_ATTRIB_DATA_ALIGNMENT_4K,
-	FFS2_ATTRIB_DATA_ALIGNMENT_32K,
-	FFS2_ATTRIB_DATA_ALIGNMENT_64K
+    FFS2_ATTRIB_DATA_ALIGNMENT_1 = 0,
+    FFS2_ATTRIB_DATA_ALIGNMENT_16,
+    FFS2_ATTRIB_DATA_ALIGNMENT_128,
+    FFS2_ATTRIB_DATA_ALIGNMENT_512,
+    FFS2_ATTRIB_DATA_ALIGNMENT_1K,
+    FFS2_ATTRIB_DATA_ALIGNMENT_4K,
+    FFS2_ATTRIB_DATA_ALIGNMENT_32K,
+    FFS2_ATTRIB_DATA_ALIGNMENT_64K
 } FFS2_ATTRIB_DATA_ALIGNMENT: 3;
 int FFS2_ATTRIB_CHECKSUM: 1;
 int FFS2_ATTRIB_res2: 1 <hidden=true>;
 
-	BitfieldEnablePadding();
+    BitfieldEnablePadding();
 } EFI_FFS2_FILE_ATTRIBUTES <read=read_EFI_FFS2_FILE_ATTRIBUTES>;
 
 string read_EFI_FFS2_FILE_ATTRIBUTES(EFI_FFS2_FILE_ATTRIBUTES &in) {
-	local string out;
-	SPrintf(out, "%Xh", in.value);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh", in.value);
+    return out;
 }
 
-
 typedef struct {
-	local UINT8 value = ReadUByte(FTell());
-	BitfieldDisablePadding();
+    local UINT8 value = ReadUByte(FTell());
+    BitfieldDisablePadding();
 
 int EFI_FILE_HEADER_CONSTRUCTION: 1;
 int EFI_FILE_HEADER_VALID: 1;
@@ -365,19 +353,18 @@ int EFI_FILE_DELETED: 1;
 int EFI_FILE_HEADER_INVALID: 1;
 int EFI_FILE_res: 2 <hidden=true>;
 
-	BitfieldEnablePadding();
+    BitfieldEnablePadding();
 } EFI_FFS_FILE_STATE <read=read_EFI_FFS_FILE_STATE>;
 
 string read_EFI_FFS_FILE_STATE(EFI_FFS_FILE_STATE &in) {
-	local string out;
-	SPrintf(out, "%Xh", in.value);
-	return out;
+    local string out;
+    SPrintf(out, "%Xh", in.value);
+    return out;
 }
 
-
 typedef struct {
-	UINT24 Size;
-	enum <UINT8> EFI_SECTION_TYPE {
+    UINT24 Size;
+    enum <UINT8> EFI_SECTION_TYPE {
 EFI_SECTION_COMPRESSION = 0x01,
 EFI_SECTION_GUID_DEFINED = 0x02,
 EFI_SECTION_DISPOSABLE = 0x03,
@@ -393,85 +380,82 @@ EFI_SECTION_FREEFORM_SUBTYPE_GUID = 0x18,
 EFI_SECTION_RAW = 0x19,
 EFI_SECTION_PEI_DEPEX = 0x1B,
 EFI_SECTION_SMM_DEPEX = 0x1C
-	} Type;
+    } Type;
 } EFI_COMMON_SECTION_HEADER <read=read_EFI_COMMON_SECTION_HEADER>;
 
 string read_EFI_COMMON_SECTION_HEADER(EFI_COMMON_SECTION_HEADER &in) {
-	local string out;
-	SPrintf(out, "%Xh %s", in.Size.v, EnumToString(in.Type));
-	return out;
+    local string out;
+    SPrintf(out, "%Xh %s", in.Size.v, EnumToString(in.Type));
+    return out;
 }
 
-
 typedef struct {
-	UINT32 UncompressedLength;
-	UINT8 CompressionType;
+    UINT32 UncompressedLength;
+    UINT8 CompressionType;
 } EFI_COMPRESSION_SECTION_HEADER;
 
-
 typedef struct {
-	local int header_size = 0x18;
-	local int full_size;
+    local int header_size = 0x18;
+    local int full_size;
 
-	GUID Name;
-	EFI_FFS_INTEGRITY_CHECK IntegrityCheck;
-	EFI_FV_FILETYPE Type;
-	if (G_revision == 1) {
-		EFI_FFS_FILE_ATTRIBUTES Attributes;
-	}
-	else {
-		EFI_FFS2_FILE_ATTRIBUTES Attributes;
-	}
-	UINT24 Size;
-	full_size = Size.v;
-	EFI_FFS_FILE_STATE State;
+    GUID Name;
+    EFI_FFS_INTEGRITY_CHECK IntegrityCheck;
+    EFI_FV_FILETYPE Type;
+    if (G_revision == 1) {
+        EFI_FFS_FILE_ATTRIBUTES Attributes;
+    }
+    else {
+        EFI_FFS2_FILE_ATTRIBUTES Attributes;
+    }
+    UINT24 Size;
+    full_size = Size.v;
+    EFI_FFS_FILE_STATE State;
 
-	if (G_revision == 2 && Attributes.FFS2_ATTRIB_LARGE_FILE) {
-		header_size += 4;
-		UINT32 ExtendedSize;
-		full_size = ExtendedSize;
-	}
+    if (G_revision == 2 && Attributes.FFS2_ATTRIB_LARGE_FILE) {
+        header_size += 4;
+        UINT32 ExtendedSize;
+        full_size = ExtendedSize;
+    }
 
-	SetBackColor(0xb0b0b0);
-	UINT8 data[full_size - header_size];
+    SetBackColor(0xb0b0b0);
+    UINT8 data[full_size - header_size];
 } EFI_FFS_FILE_HEADER <read=read_EFI_FFS_FILE_HEADER>;
 
 int size_EFI_FFS_FILE_HEADER(EFI_FFS_FILE_HEADER &r) {
-	return ReadUInt(startof(r) + 0x14) & 0xFFFFFF;
+    return ReadUInt(startof(r) + 0x14) & 0xFFFFFF;
 }
 
 string read_EFI_FFS_FILE_HEADER(EFI_FFS_FILE_HEADER &in) {
-	return EnumToString(in.Type);
+    return EnumToString(in.Type);
 }
 
 /*
-	if (Type == EFI_FV_FILETYPE_RAW) {
-	}
-	else if (Size.v > 0x18) {
-		SetBackColor(0xb0e0b0);
-		EFI_COMMON_SECTION_HEADER csh;
+    if (Type == EFI_FV_FILETYPE_RAW) {
+    }
+    else if (Size.v > 0x18) {
+        SetBackColor(0xb0e0b0);
+        EFI_COMMON_SECTION_HEADER csh;
 
-		//Assert((Size.v - csh.Size.v) == 0x18, "size mismatch between ffsh and csh");
+        //Assert((Size.v - csh.Size.v) == 0x18, "size mismatch between ffsh and csh");
 
-		if (csh.Type == EFI_SECTION_COMPRESSION) {
-			SetBackColor(0xffc0c0);
-			UINT8 data[Size.v - 0x1C];
-		}
-		else {
-			if (G_revision == 1 && Attributes.FFS_ATTRIB_TAIL_PRESENT) {
-				SetBackColor(0xb0b0b0);
-				UINT8 data[Size.v - 0x1C - 2];
-				SetBackColor(0x909090);
-				UINT16 tail;
-			}
-			else {
-				SetBackColor(0xb0b0b0);
-				UINT8 data[Size.v - 0x1C];
-			}
-		}
-	}
+        if (csh.Type == EFI_SECTION_COMPRESSION) {
+            SetBackColor(0xffc0c0);
+            UINT8 data[Size.v - 0x1C];
+        }
+        else {
+            if (G_revision == 1 && Attributes.FFS_ATTRIB_TAIL_PRESENT) {
+                SetBackColor(0xb0b0b0);
+                UINT8 data[Size.v - 0x1C - 2];
+                SetBackColor(0x909090);
+                UINT16 tail;
+            }
+            else {
+                SetBackColor(0xb0b0b0);
+                UINT8 data[Size.v - 0x1C];
+            }
+        }
+    }
 */
-
 
 local quad G_data_remaining = 0;
 local UINT8 G_revision = 0;
@@ -491,31 +475,31 @@ local int cur_pos = 0;
 G_data_remaining -= 0x48;
 
 while (G_data_remaining > 0) {
-	cur_pos = FTell();
-	if (ReadUInt(cur_pos) == 0xFFFFFFFF) {
-		SetBackColor(0xf0f0f0);
-		SetForeColor(0x808080);
-		UINT8 padding <hidden=true>;
-		UINT8 padding <hidden=true>;
-		UINT8 padding <hidden=true>;
-		UINT8 padding <hidden=true>;
-		SetForeColor(cNone);
-		SetBackColor(0xc0ffc0);
-		G_data_remaining -= 4;
-		continue;
-	}
+    cur_pos = FTell();
+    if (ReadUInt(cur_pos) == 0xFFFFFFFF) {
+        SetBackColor(0xf0f0f0);
+        SetForeColor(0x808080);
+        UINT8 padding <hidden=true>;
+        UINT8 padding <hidden=true>;
+        UINT8 padding <hidden=true>;
+        UINT8 padding <hidden=true>;
+        SetForeColor(cNone);
+        SetBackColor(0xc0ffc0);
+        G_data_remaining -= 4;
+        continue;
+    }
 
-	SetBackColor(0xc0ffc0);
-	EFI_FFS_FILE_HEADER ffsh;
-	G_data_remaining -= ffsh.full_size;
+    SetBackColor(0xc0ffc0);
+    EFI_FFS_FILE_HEADER ffsh;
+    G_data_remaining -= ffsh.full_size;
 
-	padding_size = (8 - (FTell() & 7)) & 7;
-	for (i = 0; i < padding_size; i++) {
-		SetBackColor(0xf0f0f0);
-		SetForeColor(0x808080);
-		UINT8 padding <hidden=true>;
-		SetForeColor(cNone);
-		SetBackColor(0xc0ffc0);
-	}
-	G_data_remaining -= padding_size;
+    padding_size = (8 - (FTell() & 7)) & 7;
+    for (i = 0; i < padding_size; i++) {
+        SetBackColor(0xf0f0f0);
+        SetForeColor(0x808080);
+        UINT8 padding <hidden=true>;
+        SetForeColor(cNone);
+        SetBackColor(0xc0ffc0);
+    }
+    G_data_remaining -= padding_size;
 }
