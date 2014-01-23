@@ -118,7 +118,11 @@ typedef struct (int size) {
         Warning("EntryMetadata size incorrect");
         Printf("EntryMetadata size incorrect\n");
     }
-} EntryMetadata <optimize=false>;
+} EntryMetadata <optimize=false,read=read_EntryMetadata>;
+
+string read_EntryMetadata(EntryMetadata &in) {
+    return EnumToString(in.h_format_tag);
+}
 
 typedef struct (int size) {
     SetBackColor(0xffb0b0);
@@ -135,17 +139,28 @@ typedef struct (int size) {
 
 typedef struct (int pos) {
     SetBackColor(0xb0b0ff);
-    u4 offset;
-    local int cur_pos = FTell();
-    FSeek(pos + offset);
-    SetBackColor(0xd0d0ff);
-    u4 size;
-    if (size > 0) {
-        u4 data[size];
+    s4 offset;
+    if (offset >= 0) {
+        local int cur_pos = FTell();
+        FSeek(pos + offset);
+        SetBackColor(0xd0d0ff);
+        u4 size;
+        if (size > 0) {
+            u4 data[size];
+        }
+        FSeek(cur_pos);
     }
-    FSeek(cur_pos);
+    else {
+        local int size = 0;
+    }
     SetBackColor(0xb0b0ff);
-} SeekTable <optimize=false>;
+} SeekTable <optimize=false,read=read_SeekTable>;
+
+string read_SeekTable(SeekTable &in) {
+    string out;
+    SPrintf(out, "%d", in.size);
+    return out;
+}
 
 typedef struct (int size) {
     SetBackColor(0xb0b0ff);

@@ -1,0 +1,38 @@
+//--------------------------------------
+//--- 010 Editor v5.0 Binary Template
+//
+// File: RIFFTemplate
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: scan for RIFF blocks
+//--------------------------------------
+
+typedef struct {
+    SetBackColor(0x8080ff);
+    char s[4];
+    int l;
+    SetBackColor(0xc0c0ff);
+    uchar d[l];
+    SetBackColor(cNone);
+    if (!FEof() && (l & 1)) {
+        char p <hidden=true>;
+    }
+} RIFF <read=read_RIFF>;
+
+string read_RIFF(RIFF &in) {
+    string out;
+    if (IsLittleEndian()) {
+        SPrintf(out, "%c%c%c%c %d", in.s[3], in.s[2], in.s[1], in.s[0], in.l);
+    } else {
+        SPrintf(out, "%s %d", in.s, in.l);
+    }
+    return out;
+}
+
+DisplayFormatHex();
+
+FSeek(GetCursorPos());
+
+while (!FEof()) {
+    RIFF b;
+}

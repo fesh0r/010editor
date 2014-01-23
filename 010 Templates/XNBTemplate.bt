@@ -65,6 +65,9 @@ string strip_type(string type) {
     type = str_replace(type, ", FezEngine,", ",");
     type = str_replace(type, ", FezEngine]", "]");
     type = str_replace(type, ", FezEngine%", "%");
+    type = str_replace(type, ", FezContentPipeline,", ",");
+    type = str_replace(type, ", FezContentPipeline]", "]");
+    type = str_replace(type, ", FezContentPipeline%", "%");
     type = str_replace(type, ", Common,", ",");
     type = str_replace(type, ", Common]", "]");
     type = str_replace(type, ", Common%", "%");

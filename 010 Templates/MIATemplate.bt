@@ -1,0 +1,49 @@
+//--------------------------------------
+//--- 010 Editor v4.0.3 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+typedef struct {
+    char type;
+
+    switch (type) {
+        case 'T':
+            string i;
+            break;
+        case 'I':
+            unsigned int i;
+            break;
+        case 'i':
+            signed int i;
+            break;
+        default:
+            return -1;
+    }
+} ITEM <read=readITEM>;
+
+string readITEM(ITEM &in) {
+    string out = "";
+    switch (in.type) {
+        case 'T':
+            out = in.i;
+            break;
+        case 'I':
+            SPrintf(out, "%u", in.i);
+            break;
+        case 'i':
+            SPrintf(out, "%d", in.i);
+            break;
+    }
+    return out;
+}
+
+DisplayFormatHex();
+LittleEndian();
+
+while (true) {
+    ITEM i;
+}
