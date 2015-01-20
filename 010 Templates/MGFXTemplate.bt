@@ -1,0 +1,448 @@
+//--------------------------------------
+//--- 010 Editor v5.0 Binary Template
+//
+// File: MGFXTemplate
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse MonoGame Effect files
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    local int v = 0;
+    local int shift = 0;
+    SetBackColor(0xd8d8d8);
+    do {
+        u1 val;
+        v |= (val & 0x7F) << shift;
+        shift += 7;
+    } while (val & 0x80);
+} EncodedInt <read=read_EncodedInt,optimize=false>;
+
+string read_EncodedInt(EncodedInt &in) {
+    string out;
+  SPrintf(out, "%Xh", in.v);
+    return out;
+}
+
+
+typedef struct {
+    EncodedInt length;
+    SetBackColor(0xc0c0c0);
+    if (length.v) {
+        char v[length.v];
+    }
+    else {
+        local string v = "";
+    }
+} EncodedStr <read=read_EncodedStr,optimize=false>;
+
+string read_EncodedStr(EncodedStr &in) {
+    return in.v;
+}
+
+
+typedef struct {
+    u4 Signature;
+    u1 Version;
+    u1 Profile;
+} HEADER <read=read_HEADER>;
+
+string read_HEADER(HEADER &in) {
+    string out;
+    string profile;
+    switch(in.Profile) {
+        case 0:
+            profile = "GL";
+            break;
+        case 1:
+            profile = "DX";
+            break;
+        default:
+            SPrintf(profile, "(%d)", in.Profile);
+            break;
+    }
+    SPrintf(out, "MGFX v%d %s", in.Version, profile);
+    return out;
+}
+
+
+typedef struct {
+    u1 p;
+    u2 o;
+} CBParam;
+
+
+typedef struct {
+    local int i;
+
+    EncodedStr name;
+    u2 size;
+
+    u1 pCount <hidden=true>;
+    if (pCount) {
+        CBParam cbp[pCount];
+    }
+} ConstantBuffer <read=read_ConstantBuffer,optimize=false>;
+
+string read_ConstantBuffer(ConstantBuffer &in) {
+    return in.name.v;
+}
+
+typedef enum<u1> {
+    TAM_Wrap,
+    TAM_Clamp,
+    TAM_Mirror
+} TextureAddressMode;
+
+
+typedef struct {
+    enum<u1> {
+        ST_2D,
+        ST_Cube,
+        ST_Volume,
+        ST_1D
+    } type;
+    u1 textureSlot <format=decimal>;
+    u1 samplesSlot <format=decimal>;
+    u1 hasState;
+    if (hasState) {
+        TextureAddressMode state_AddressU;
+        TextureAddressMode state_AddressV;
+        TextureAddressMode state_AddressW;
+        u1 state_Filter;
+        u4 state_MaxAnisotropy;
+        u4 state_MaxMipLevel;
+        float state_MipMapLevelOfDetailBias;
+    }
+    EncodedStr name;
+    u1 parameter <format=decimal>;
+} Sampler <read=read_Sampler,optimize=false>;
+
+string read_Sampler(Sampler &in) {
+    return in.name.v;
+}
+
+
+typedef struct {
+    EncodedStr name;
+    enum<u1> {
+        VEU_Position,
+        VEU_Color,
+        VEU_TextureCoordinate,
+        VEU_Normal,
+        VEU_Binormal,
+        VEU_Tangent,
+        VEU_BlendIndices,
+        VEU_BlendWeight,
+        VEU_Depth,
+        VEU_Fog,
+        VEU_PointSize,
+        VEU_Sample,
+        VEU_TessellateFactor
+    } usage;
+    u1 index <format=decimal>;
+    u2 format;
+} Attribute <read=read_Attribute,optimize=false>;
+
+string read_Attribute(Attribute &in) {
+    return in.name.v;
+}
+
+
+typedef struct {
+    local int i;
+    
+    u1 isVertex;
+    u2 length <hidden=true>;
+    SetBackColor(0x80ff80);
+    char bytecode[length];
+    SetBackColor(0xd0ffd0);
+
+    u1 sCount <hidden=true>;
+    if (sCount) {
+        Sampler s[sCount];
+    }
+
+    u1 cbCount <hidden=true>;
+    if (cbCount) {
+        u1 cBuffer[cbCount];
+    }
+
+    u1 aCount <hidden=true>;
+    if (aCount) {
+        Attribute a[aCount];
+    }
+} Shader <read=read_Shader,optimize=false>;
+
+string read_Shader(Shader &in) {
+    if (in.isVertex) {
+        return "VS";
+    }
+    else {
+        return "PS";
+    }
+}
+
+struct Parameter;
+typedef struct {
+    local int i;
+
+    enum <u1> {
+        PC_Scalar,
+        PC_Vector,
+        C_Matrix,
+        PC_Object,
+        PC_Struct
+    } class;
+    enum <u1> {
+        PT_Void,
+        PT_Bool,
+        PT_Int32,
+        PT_Single,
+        PT_String,
+        PT_Texture,
+        PT_Texture1D,
+        PT_Texture2D,
+        PT_Texture3D,
+        PT_TextureCube
+    } type;
+    EncodedStr name;
+    EncodedStr semantic;
+    u1 aCount <hidden=true>;
+    u1 rowCount;
+    u1 columnCount;
+    u1 registerCount;
+
+    u1 eCount <hidden=true>;
+    if (eCount) {
+        Parameter elements[eCount];
+    }
+
+    u1 smCount <hidden=true>;
+    if (smCount) {
+        Parameter structMembers[smCount];
+    }
+
+    if (eCount == 0 && smCount == 0 && rowCount > 0 && columnCount > 0) {
+        float data[rowCount * columnCount];
+    }
+} Parameter <read=read_Parameter,optimize=false>;
+
+string read_Parameter(Parameter &in) {
+    return in.name.v;
+}
+
+
+typedef enum<u1> {
+    BF_Add,
+    BF_Subtract,
+    BF_ReverseSubtract,
+    BF_Max,
+    BF_Min
+} BlendFunction;
+
+
+typedef enum<u1> {
+    B_One,
+    B_Zero,
+    B_SourceColor,
+    B_InverseSourceColor,
+    B_SourceAlpha,
+    B_InverseSourceAlpha,
+    B_DestinationColor,
+    B_InverseDestinationColor,
+    B_DestinationAlpha,
+    B_InverseDestinationAlpha,
+    B_BlendFactor,
+    B_InverseBlendFactor,
+    B_SourceAlphaSaturation
+} Blend;
+
+
+typedef enum<u1> {
+    SO_Keep,
+    SO_Zero,
+    SO_Replace,
+    SO_Increment,
+    SO_Decrement,
+    SO_IncrementSaturation,
+    SO_DecrementSaturation,
+    SO_Invert
+} StencilOperation;
+
+
+typedef enum<u1> {
+    SCF_Always,
+    SCF_Never,
+    SCF_Less,
+    SCF_LessEqual,
+    SCF_Equal,
+    SCF_GreaterEqual,
+    SCF_Greater,
+    SCF_NotEqual
+} CompareFunction;
+
+
+typedef enum<u1> {
+    CM_None,
+    CM_CullClockwiseFace,
+    CM_CullCounterClockwiseFace
+} CullMode;
+
+
+typedef enum<u1> {
+    FM_Solid,
+    FM_WireFrame
+} FillMode;
+
+
+typedef struct {
+    EncodedStr name;
+    u1 aCount <hidden=true>;
+    u1 vertexShader <format=decimal>;
+    u1 pixelShader <format=decimal>;
+
+    u1 hasBlendState <hidden=true>;
+    if (hasBlendState) {
+        BlendFunction AlphaBlendFunction;
+        Blend AlphaDestinationBlend;
+        Blend AlphaSourceBlend;
+        u4 BlendFactor;
+        BlendFunction ColorBlendFunction;
+        Blend ColorDestinationBlend;
+        Blend ColorSourceBlend;
+        u1 ColorWriteChannels0;
+        u1 ColorWriteChannels1;
+        u1 ColorWriteChannels2;
+        u1 ColorWriteChannels3;
+        u4 MultiSampleMask;
+    }
+    
+    u1 hasDepthStencilState <hidden=true>;
+    if (hasDepthStencilState) {
+        StencilOperation CounterClockwiseStencilDepthBufferFail;
+        StencilOperation CounterClockwiseStencilFail;
+        CompareFunction CounterClockwiseStencilFunction;
+        StencilOperation CounterClockwiseStencilPass;
+        u1 DepthBufferEnable;
+        CompareFunction DepthBufferFunction;
+        u1 DepthBufferWriteEnable;
+        u4 ReferenceStencil;
+        StencilOperation StencilDepthBufferFail;
+        u1 StencilEnable;
+        StencilOperation StencilFail;
+        CompareFunction StencilFunction;
+        u4 StencilMask;
+        StencilOperation StencilPass;
+        u4 StencilWriteMask;
+        u1 TwoSidedStencilMode;
+    }
+
+    u1 hasRasterizerState <hidden=true>;
+    if (hasRasterizerState) {
+        CullMode cm;
+        float DepthBias;
+        FillMode fm;
+        u1 MultiSampleAntiAlias;
+        u1 ScissorTestEnable;
+        float SlopeScaleDepthBias;
+    }
+} Pass <read=read_Pass,optimize=false>;
+
+string read_Pass(Pass &in) {
+    return in.name.v;
+}
+
+
+typedef struct {
+    EncodedStr name;
+    u1 aCount <hidden=true>;
+
+    u1 pCount <hidden=true>;
+    if (pCount) {
+        Pass p[pCount];
+    }
+} Technique <read=read_Technique,optimize=false>;
+
+string read_Technique(Technique &in) {
+    return in.name.v;
+}
+
+
+DisplayFormatHex();
+LittleEndian();
+
+local string out;
+local int i;
+
+local u4 _sig;
+_sig = ReadUInt(0);
+if (_sig == 0x5846474D) {
+    LittleEndian();
+}
+else if (_sig == 0x4D474658) {
+    BigEndian();
+    _sig = ReadUInt(0);
+    Warning("BigEndian");
+}
+else {
+    SPrintf(out, "Bad sig! %04X", _sig);
+    Warning(out);
+    Printf("%s\n", out);
+    return -1;
+}
+
+local s1 _ver;
+_ver = ReadByte(4);
+if (_ver != 5) {
+    SPrintf(out, "Bad version! %d", _ver);
+    Warning(out);
+    Printf("%s\n", out);
+    return -1;
+}
+
+local s1 _profile;
+_profile = ReadByte(5);
+if (_profile != 0) {
+    SPrintf(out, "Bad profile! %d", _profile);
+    Warning(out);
+    Printf("%s\n", out);
+    return -1;
+}
+
+SetBackColor(0xd0d0d0);
+HEADER h;
+
+SetBackColor(0xffd0d0);
+u1 cbCount <hidden=true>;
+if (cbCount) {
+    ConstantBuffer cb[cbCount];
+}
+
+SetBackColor(0xd0ffd0);
+u1 sCount <hidden=true>;
+if (sCount) {
+    Shader s[sCount];
+}
+
+SetBackColor(0xd0ffff);
+u1 pCount <hidden=true>;
+if (pCount) {
+    Parameter p[pCount];
+}
+
+SetBackColor(0xffd0ff);
+u1 tCount <hidden=true>;
+if (tCount) {
+    Technique t[tCount];
+}
