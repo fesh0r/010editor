@@ -55,7 +55,6 @@ typedef struct {
     u4 Signature;
     u1 Version;
     u1 Profile;
-    u4 EffectKey;
 } HEADER <read=read_HEADER>;
 
 string read_HEADER(HEADER &in) {
@@ -164,7 +163,7 @@ typedef struct {
     local int i;
     
     u1 isVertex;
-    u4 length <hidden=true>;
+    u2 length <hidden=true>;
     SetBackColor(0x80ff80);
     char bytecode[length];
     SetBackColor(0xd0ffd0);
@@ -222,6 +221,7 @@ typedef struct {
     u1 aCount <hidden=true>;
     u1 rowCount;
     u1 columnCount;
+    u1 registerCount;
 
     u1 eCount <hidden=true>;
     if (eCount) {
@@ -233,10 +233,8 @@ typedef struct {
         Parameter structMembers[smCount];
     }
 
-    if (eCount == 0 && smCount == 0) {
-        if (type == PT_Bool || type == PT_Int32 || type == PT_Single) {
-            float data[rowCount * columnCount];
-        }
+    if (eCount == 0 && smCount == 0 && rowCount > 0 && columnCount > 0) {
+        float data[rowCount * columnCount];
     }
 } Parameter <read=read_Parameter,optimize=false>;
 
@@ -314,52 +312,50 @@ typedef struct {
     u1 vertexShader <format=decimal>;
     u1 pixelShader <format=decimal>;
 
-    if (pixelShader != 255) {
-        u1 hasBlendState <hidden=true>;
-        if (hasBlendState) {
-            BlendFunction AlphaBlendFunction;
-            Blend AlphaDestinationBlend;
-            Blend AlphaSourceBlend;
-            u4 BlendFactor;
-            BlendFunction ColorBlendFunction;
-            Blend ColorDestinationBlend;
-            Blend ColorSourceBlend;
-            u1 ColorWriteChannels0;
-            u1 ColorWriteChannels1;
-            u1 ColorWriteChannels2;
-            u1 ColorWriteChannels3;
-            u4 MultiSampleMask;
-        }
-        
-        u1 hasDepthStencilState <hidden=true>;
-        if (hasDepthStencilState) {
-            StencilOperation CounterClockwiseStencilDepthBufferFail;
-            StencilOperation CounterClockwiseStencilFail;
-            CompareFunction CounterClockwiseStencilFunction;
-            StencilOperation CounterClockwiseStencilPass;
-            u1 DepthBufferEnable;
-            CompareFunction DepthBufferFunction;
-            u1 DepthBufferWriteEnable;
-            u4 ReferenceStencil;
-            StencilOperation StencilDepthBufferFail;
-            u1 StencilEnable;
-            StencilOperation StencilFail;
-            CompareFunction StencilFunction;
-            u4 StencilMask;
-            StencilOperation StencilPass;
-            u4 StencilWriteMask;
-            u1 TwoSidedStencilMode;
-        }
+    u1 hasBlendState <hidden=true>;
+    if (hasBlendState) {
+        BlendFunction AlphaBlendFunction;
+        Blend AlphaDestinationBlend;
+        Blend AlphaSourceBlend;
+        u4 BlendFactor;
+        BlendFunction ColorBlendFunction;
+        Blend ColorDestinationBlend;
+        Blend ColorSourceBlend;
+        u1 ColorWriteChannels0;
+        u1 ColorWriteChannels1;
+        u1 ColorWriteChannels2;
+        u1 ColorWriteChannels3;
+        u4 MultiSampleMask;
+    }
     
-        u1 hasRasterizerState <hidden=true>;
-        if (hasRasterizerState) {
-            CullMode cm;
-            float DepthBias;
-            FillMode fm;
-            u1 MultiSampleAntiAlias;
-            u1 ScissorTestEnable;
-            float SlopeScaleDepthBias;
-        }
+    u1 hasDepthStencilState <hidden=true>;
+    if (hasDepthStencilState) {
+        StencilOperation CounterClockwiseStencilDepthBufferFail;
+        StencilOperation CounterClockwiseStencilFail;
+        CompareFunction CounterClockwiseStencilFunction;
+        StencilOperation CounterClockwiseStencilPass;
+        u1 DepthBufferEnable;
+        CompareFunction DepthBufferFunction;
+        u1 DepthBufferWriteEnable;
+        u4 ReferenceStencil;
+        StencilOperation StencilDepthBufferFail;
+        u1 StencilEnable;
+        StencilOperation StencilFail;
+        CompareFunction StencilFunction;
+        u4 StencilMask;
+        StencilOperation StencilPass;
+        u4 StencilWriteMask;
+        u1 TwoSidedStencilMode;
+    }
+
+    u1 hasRasterizerState <hidden=true>;
+    if (hasRasterizerState) {
+        CullMode cm;
+        float DepthBias;
+        FillMode fm;
+        u1 MultiSampleAntiAlias;
+        u1 ScissorTestEnable;
+        float SlopeScaleDepthBias;
     }
 } Pass <read=read_Pass,optimize=false>;
 
@@ -408,7 +404,7 @@ else {
 
 local s1 _ver;
 _ver = ReadByte(4);
-if (_ver != 6) {
+if (_ver != 5) {
     SPrintf(out, "Bad version! %d", _ver);
     Warning(out);
     Printf("%s\n", out);
