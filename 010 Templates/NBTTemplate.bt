@@ -3,8 +3,8 @@
 //
 // File: NBTTemplate.bt
 // Author: Andrew McRae
-// Revision:
-// Purpose: Parse NBT files from Minecraft
+// Revision: 0.1
+// Purpose: Minecraft NBT file
 //--------------------------------------
 
 enum <ubyte> TAG_TYPE {

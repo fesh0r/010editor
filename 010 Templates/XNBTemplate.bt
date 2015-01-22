@@ -1,10 +1,10 @@
 //--------------------------------------
 //--- 010 Editor v3.1.2 Binary Template
 //
-// File: XNBTemplate
+// File: XNBTemplate.bt
 // Author: Andrew McRae
 // Revision: 0.1
-// Purpose: Parse XNA binary files
+// Purpose: XNA binary file
 //--------------------------------------
 
 typedef uint64 u8;

@@ -1,10 +1,10 @@
 //--------------------------------------
 //--- 010 Editor v3.2.2 Binary Template
 //
-// File: XEXTemplate
+// File: XEXTemplate.bt
 // Author: Andrew McRae
 // Revision: 0.1
-// Purpose: Parse Xbox 360 executables
+// Purpose: Xbox 360 executable
 //--------------------------------------
 
 DisplayFormatHex();

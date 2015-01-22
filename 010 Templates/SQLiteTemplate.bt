@@ -2,9 +2,9 @@
 //--- 010 Editor v3.0.5 Binary Template
 //
 // File: SQLiteTemplate.bt
-// Author:
-// Revision:
-// Purpose:
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: SQLite data file
 //--------------------------------------
 
 BigEndian();

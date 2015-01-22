@@ -1,10 +1,10 @@
 //--------------------------------------
 //--- 010 Editor v5.0 Binary Template
 //
-// File: MGFXTemplate
+// File: MGFXTemplate.bt
 // Author: Andrew McRae
 // Revision: 0.1
-// Purpose: Parse MonoGame Effect files
+// Purpose: MonoGame Effect file
 //--------------------------------------
 
 typedef uint64 u8;

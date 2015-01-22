@@ -4,7 +4,7 @@
 // File: XSBTemplate.bt
 // Author: Andrew McRae
 // Revision: 0.1
-// Purpose: Parse XACT sound bank
+// Purpose: XACT sound bank
 //--------------------------------------
 
 typedef uint64 u8;

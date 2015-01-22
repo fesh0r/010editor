@@ -1,10 +1,10 @@
 //--------------------------------------
 //--- 010 Editor v3.1.2 Binary Template
 //
-// File:
-// Author:
-// Revision:
-// Purpose:
+// File: JC2Template.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Just Cause 2 savegame
 //--------------------------------------
 
 DisplayFormatHex();

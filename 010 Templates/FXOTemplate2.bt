@@ -1,10 +1,10 @@
 //--------------------------------------
 //--- 010 Editor v3.2.2 Binary Template
 //
-// File: FXOTemplateNew
+// File: FXOTemplate.bt
 // Author: Andrew McRae
 // Revision: 0.1
-// Purpose: Parse binary FX 4/5 files
+// Purpose: binary DX FX 4/5 file
 //--------------------------------------
 
 typedef uint64 u8;
