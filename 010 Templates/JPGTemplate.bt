@@ -4,7 +4,7 @@
 // Author   : Mor FTP
 // Purpose  : Designed for jpg files
 // E-Mail   : morftp AT hotmail DOT com
-// LAST MODIFIED : Aug 19 2005
+// LAST MODIFIED : Nov 3 2014
 // This is a detailed JPEG File analysis.
 //Features
 //  1. Huffmann and quantization tables.
@@ -16,6 +16,12 @@
 //  related to the camera and not important for image display softwares.
 //
 // New Features: Parses MakerNote for casio qv-r62
+//
+// 2014-11-03   SweetScape
+//  * fixed using FTell instead of Ftell
+//
+// 2012-10-04   dxp
+//  * added JPEG-LS marker structure.
 //
 // 2009-03-14 modified by Kuang-che Wu
 //  * fix parse fail if encounter unknown APP1
@@ -32,6 +38,7 @@
 // EXIF     http://www.exif.org/Exif2-2.PDF
 // CIFF     http://xyrion.org/ciff/CIFFspecV1R04.pdf
 // exiftool http://www.sno.phy.queensu.ca/~phil/exiftool/
+// JPEG-LS  http://www.itu.int/rec/T-REC-T.87-199806-I/en
 
 // set left to right for both endian
 LittleEndian(); BitfieldLeftToRight();
@@ -138,7 +145,7 @@ typedef enum <WORD> tagID
     M_APP14,
     M_APP15,
     M_JPG0 = 0xfff0,
-    M_JPG1, M_JPG2, M_JPG3, M_JPG4, M_JPG5, M_JPG6, M_JPG7,
+    M_JPG1, M_JPG2, M_JPG3, M_JPG4, M_JPG5, M_JPG6, M_JPGLS,
     M_JPG8, M_JPG9, M_JPG10, M_JPG11, M_JPG12, M_JPG13, M_JPG14, M_JPG15,
     M_COMM = 0xFFFE  // Comment
 } M_ID <format=hex>;
@@ -649,7 +656,7 @@ typedef struct tgCDir {
     local quad myOffset = cDirOffset;
     local DWORD S = ReadInt(myOffset + cDirSize - 4);
     FSeek(cDirOffset + S);
-    //Printf("S @ %#x = %#x Ftell %#Lx",S,myOffset + cDirSize - 4,FTell());
+    //Printf("S @ %#x = %#x FTell %#Lx",S,myOffset + cDirSize - 4,FTell());
     WORD nDirEntry;
     //Printf(" nEntry %#x\n",nDirEntry);
     ChangeColor(0);
@@ -1117,7 +1124,7 @@ typedef struct tagApp0 {
                 //Warning("Unknown JFXX");
                 char unknown[szSection - 8];
         }
-    } else if((ReadStringN(FTell(), 2) == "II" || ReadStringN(Ftell(), 2) == "MM")
+    } else if((ReadStringN(FTell(), 2) == "II" || ReadStringN(FTell(), 2) == "MM")
             && ReadStringN(FTell() + 6, 8) == "HEAPJPGM") {
         // Canon CIFF
         local quad cDirSize  = 0;
@@ -1473,6 +1480,22 @@ typedef struct tagCOMMENT {
 
 } COMMENT<read=ReadComment>;
 
+typedef struct tagJPGLS {
+    M_ID marker;
+    WORD szSection;
+
+    uchar precision <comment="bits per sample">;
+    WORD Y_numlines;
+    WORD X_numcols;
+    uchar Nf <comment="number of components in frame">;
+    uchar C_compID;
+    uchar sub_sampling;
+    uchar Tq <comment="always 0">;
+
+    if (11 < szSection)
+        uchar uknown[szSection - 11];
+} JPGLS;
+
 string ReadComment( COMMENT &com )
 {
     return com.comment;
@@ -1556,6 +1579,9 @@ typedef struct tgJPGFile {
             break;
         case M_COMM:
             COMMENT comment;
+            break;
+        case M_JPGLS:
+            JPGLS jpgls;
             break;
         default:
             UNKNOWN unknownSection;

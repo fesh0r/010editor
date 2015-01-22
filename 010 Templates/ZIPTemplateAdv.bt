@@ -3,7 +3,7 @@
 //
 // File:     ZIPTemplateAdv.bt
 // Author:   SweetScape Software
-// Revision: 2.3
+// Revision: 2.4
 // Purpose:  Defines a template for
 //    parsing ZIP files. Handles more
 //    complex ZIP data such as ZIP64
@@ -17,12 +17,14 @@
 // 2.2 (S.Gibson, KPMG LLP):
 //   - Fix for entry comment field
 //   - Fix for parsing data descriptors
-//
 // 2.3 (DCeres):
 //   - Added write function for VERECORD structure.
 //   - Added write function for ZIP64ENDLOCATORRECORD structure.
 //   - Added write function for ZIP64ENDLOCATOR structure.
 //   - Added write function for EXTRAFIELD structure.
+// 2.4 (George Woods):
+//   - Handle zero compressed size in header with ZIPDATADESCR header
+//     after compressed data.
 //-----------------------------------
 
 // Define structures used in ZIP files
@@ -374,6 +376,14 @@ string read_FILEATTRIBUTE (local FILEATTRIBUTE &af) {
     return s;
 }
 
+// Defintes the Data descriptor
+typedef struct {
+    SignatureTYPE ddSignature; //0x08074b50
+    uint ddCRC <format=hex>;
+    uint ddCompressedSize;
+    uint ddUncompressedSize;
+} ZIPDATADESCR;
+
 // Defines a file record
 typedef struct {
     // Header for the file
@@ -444,7 +454,24 @@ typedef struct {
         uchar   AuthenticationCode[ 10];
     }
     else if( (frCompressedSize > 0) && (frCompressedSize < 0xFFFFFFFF))
+    {
         uchar    frData[ frCompressedSize ];
+    }
+    else if (frCompressedSize == 0 && (frFlags & FLAG_DescriptorUsedMask))
+    {
+        // If bit 3 (0x08) of the flags field is set, then the CRC-32 and file sizes were not known when the header was written.
+        // Instead there is an additional header ZIPDATADESCR appended after the compressed data.
+        // We look for the next signature of the appended header here.
+        local int64 posCurrent = FTell();
+        local int64 posNext =  FindFirst(S_ZIPDATADESCR,true,false,false,0.0,1,posCurrent);
+        if (posNext >= posCurrent)
+        {
+            uchar frData[posNext - posCurrent];
+
+            SetBackColor( cLtGreen );
+            ZIPDATADESCR dataDescr;
+        }
+    }
 
 } ZIPFILERECORD <read=ReadZIPFILERECORD, write=WriteZIPFILERECORD>;
 
@@ -486,14 +513,6 @@ typedef struct {
     if( dsDataLength > 0 )
         uchar   dsData[ dsDataLength ];
 } ZIPDIGITALSIG;
-
-// Defintes the Data descriptor
-typedef struct {
-    SignatureTYPE ddSignature; //0x08074b50
-    uint ddCRC <format=hex>;
-    uint ddCompressedSize;
-    uint ddUncompressedSize;
-} ZIPDATADESCR;
 
 // Zip64 end of central directory record
 typedef struct {
