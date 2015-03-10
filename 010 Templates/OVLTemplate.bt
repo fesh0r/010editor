@@ -1,0 +1,344 @@
+//--------------------------------------
+//--- 010 Editor v6.0.1 Binary Template
+//
+// File: OVLTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse Elite Dangerous ovl files
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+local u4 names_start = 0x90;
+
+typedef struct {
+    SetBackColor(cNone);
+    if (FEof()) {
+        return;
+    }
+    local quad padding = 4 - FTell() & 3;
+    if (padding != 4) {
+        u1 p[padding];
+    }
+} PADDING4 <optimize=false,hidden=true>;
+
+typedef struct {
+    string s <bgcolor=0xffb0b0>;
+} STR <read=read_STR>;
+string read_STR(STR &in) {
+    return in.s;
+}
+
+typedef struct {
+    char sig[4];
+
+    u4 unknown04_1 <bgcolor=0xd8d8d8>;
+    u4 unknown08_1 <bgcolor=0xd8d8d8>;
+    u4 unknown0C_1 <bgcolor=0xd8d8d8>;
+
+    u4 files_offset;
+
+    u4 zero14_1 <hidden=true,bgcolor=0xe8e8e8>;
+
+    u4 other_count <format=decimal>;
+    u2 dir_count <format=decimal>;
+    u2 type_count <format=decimal>;
+    u4 file_count <format=decimal>;
+    u4 file_count2 <format=decimal>;
+    u4 part_count <format=decimal>;
+    u4 archive_count <format=decimal>;
+
+    u4 unknown30_1 <bgcolor=0xd8d8d8>;
+    u4 unknown34_1 <bgcolor=0xd8d8d8>;
+    u4 unknown38_1 <bgcolor=0xd8d8d8>;
+    u4 unknown3C_1 <bgcolor=0xd8d8d8>;
+    u4 zero40_1 <bgcolor=0xd8d8d8>;
+    u4 unknown44_1 <bgcolor=0xd8d8d8>;
+    u4 unknown48_1 <bgcolor=0xd8d8d8>;
+    u4 unknown4C_1 <bgcolor=0xd8d8d8>;
+    u4 unknown50_1 <bgcolor=0xd8d8d8>;
+
+    u4 file_count3 <format=decimal>;
+    u4 names_offset;
+
+    u4 zero5C_1 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero60_1 <hidden=true,bgcolor=cNone>;
+    u4 zero64_1 <hidden=true,bgcolor=cNone>;
+    u4 zero68_1 <hidden=true,bgcolor=cNone>;
+    u4 zero6C_1 <hidden=true,bgcolor=cNone>;
+    u4 zero70_1 <hidden=true,bgcolor=cNone>;
+    u4 zero74_1 <hidden=true,bgcolor=cNone>;
+    u4 zero78_1 <hidden=true,bgcolor=cNone>;
+    u4 zero7C_1 <hidden=true,bgcolor=cNone>;
+    u4 zero80_1 <hidden=true,bgcolor=cNone>;
+    u4 zero84_1 <hidden=true,bgcolor=cNone>;
+    u4 zero88_1 <hidden=true,bgcolor=cNone>;
+    u4 zero8C_1 <hidden=true,bgcolor=cNone>;
+
+    Assert(file_count2 == file_count, "file_count2 mismatch");
+    Assert(file_count3 == file_count, "file_count3 mismatch");
+    Assert((file_count == 0) || (names_offset > 0), "names_offset is 0");
+    Assert((file_count == 0) || (files_offset > 0), "files_offset is 0");
+    //Assert(dir_count == 0, "dir_count not 0");
+    //Assert(part_count == 0, "part_count not 0");
+    //Assert(other_count == 0, "other_count not 0");
+    //Assert(!(dir_count != 0 && part_count != 0), "dir and part");
+    Assert(!(dir_count != 0 && other_count != 0), "dir and other");
+    Assert(!(part_count != 0 && other_count != 0), "part and other");
+    Assert(archive_count == 1, "archive_count not 1");
+
+    Assert(unknown04_1 == 0x01001200, "unknown04_1 not 0x01001200");
+    Assert(unknown08_1 == 0x00006094, "unknown08_1 not 0x00006094");
+    Assert(unknown0C_1 == 0x00000000, "unknown0C_1 not 0x00000000");
+
+    Assert(zero14_1 == 0, "zero14_1");
+    Assert(zero40_1 == 0, "zero40_1");
+    Assert(zero5C_1 == 0, "zero5C_1");
+    Assert(zero60_1 == 0, "zero60_1");
+    Assert(zero64_1 == 0, "zero64_1");
+    Assert(zero68_1 == 0, "zero68_1");
+    Assert(zero6C_1 == 0, "zero6C_1");
+    Assert(zero70_1 == 0, "zero70_1");
+    Assert(zero74_1 == 0, "zero74_1");
+    Assert(zero78_1 == 0, "zero78_1");
+    Assert(zero7C_1 == 0, "zero7C_1");
+    Assert(zero80_1 == 0, "zero70_1");
+    Assert(zero84_1 == 0, "zero74_1");
+    Assert(zero88_1 == 0, "zero78_1");
+    Assert(zero8C_1 == 0, "zero7C_1");
+} HEADER1;
+
+typedef struct {
+    SetBackColor(0xb0b0b0);
+    string type;
+
+    Assert(type == "STATIC", "type not STATIC");
+    u1 zero06_2 <hidden=true,bgcolor=0xe8e8e8>;
+
+    u4 zero08_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero0C_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero10_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown14_2 <bgcolor=0xd8d8d8>;
+    u4 unknown18_2 <bgcolor=0xd8d8d8>;
+    u4 zero1C_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown20_2 <bgcolor=0xd8d8d8>;
+    u4 unknown24_2 <bgcolor=0xd8d8d8>;
+    u4 unknown28_2 <bgcolor=0xd8d8d8>;
+    u4 zero2C_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown30_2 <bgcolor=0xd8d8d8>;
+
+    u4 comp_size;
+    u4 uncomp_size;
+
+    u4 zero3C_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero40_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown44_2 <bgcolor=0xd8d8d8>;
+    u4 zero48_2 <hidden=true,bgcolor=0xe8e8e8>;
+
+    Assert(zero06_2 == 0, "zero06_2");
+    Assert(zero08_2 == 0, "zero08_2");
+    Assert(zero0C_2 == 0, "zero0C_2");
+    Assert(zero10_2 == 0, "zero10_2");
+    Assert(zero1C_2 == 0, "zero1C_2");
+    Assert(zero2C_2 == 0, "zero2C_2");
+    Assert(zero3C_2 == 0, "zero3C_2");
+    Assert(zero40_2 == 0, "zero40_2");
+    Assert(zero48_2 == 0, "zero48_2");
+} HEADER2;
+
+typedef struct {
+    u4 unknown00_3 <bgcolor=0xd8d8d8>;
+    u4 unknown04_3 <bgcolor=0xd8d8d8>;
+} HEADER3;
+
+typedef struct {
+    u4 name_offset;
+    u4 hash;
+
+    u4 unknown08;
+    u4 unknown0C;
+    u4 unknown10;
+
+    Assert(name_offset < h1.files_offset, "name_offset too high");
+
+    local quad o = FTell();
+    FSeek(name_offset + names_start);
+
+    STR name;
+
+    FSeek(o);
+} TYPE <optimize=false,read=read_TYPE>;
+string read_TYPE(TYPE &in) {
+    string out;
+    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name.s, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    return out;
+}
+
+typedef struct {
+    TYPE t[h1.type_count];
+} TYPES;
+
+typedef struct {
+    u4 name_offset;
+    u4 hash;
+
+    u2 unknown08;
+
+    u2 type <format=decimal>;
+
+    Assert(type < h1.type_count, "type too high");
+    Assert(name_offset < h1.files_offset, "name_offset too high");
+
+    local quad o = FTell();
+    FSeek(name_offset + names_start);
+
+    STR name;
+
+    FSeek(o);
+} FILE <optimize=false,read=read_FILE>;
+string read_FILE(FILE &in) {
+    string out;
+    SPrintf(out, "\"%s\" \"%s\" 0x%08x 0x%x", in.name.s, t.t[in.type].name.s, in.hash, in.unknown08);
+    return out;
+}
+
+typedef struct {
+    FILE f[h1.file_count];
+} FILES;
+
+typedef struct {
+    u4 name_offset;
+
+    Assert(name_offset < h1.files_offset, "name_offset too high");
+
+    local quad o = FTell();
+    FSeek(name_offset + names_start);
+
+    STR name;
+
+    FSeek(o);
+} DIR <optimize=false,read=read_DIR>;
+string read_DIR(DIR &in) {
+    string out;
+    SPrintf(out, "\"%s\"", in.name.s);
+    return out;
+}
+
+typedef struct {
+    DIR d[h1.dir_count];
+} DIRS;
+
+typedef struct {
+    u4 hash;
+    u4 name_offset;
+
+    u4 unknown08;
+    u4 unknown0C;
+    u4 unknown10;
+
+    Assert(name_offset < h1.files_offset, "name_offset too high");
+
+    local quad o = FTell();
+    FSeek(name_offset + names_start);
+
+    STR name;
+
+    FSeek(o);
+} PART <optimize=false,read=read_PART>;
+string read_PART(PART &in) {
+    string out;
+    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name.s, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    return out;
+}
+
+typedef struct {
+    PART p[h1.part_count];
+} PARTS;
+
+typedef struct {
+    u4 unknown00;
+
+    u4 name_offset;
+
+    u4 unknown08;
+
+    Assert(name_offset < h1.files_offset, "name_offset too high");
+
+    local quad o = FTell();
+    FSeek(name_offset + names_start);
+
+    STR name;
+
+    FSeek(o);
+} OTHER <optimize=false,read=read_OTHER>;
+string read_OTHER(OTHER &in) {
+    string out;
+    SPrintf(out, "\"%s\" 0x%x 0x%08x", in.name.s, in.unknown00, in.unknown08);
+    return out;
+}
+
+typedef struct {
+    OTHER o[h1.other_count];
+} OTHERS;
+
+typedef struct {
+    Assert(ReadUShort() == 0x9c78, "bad zlib header");
+
+    u1 data[h2.comp_size];
+} ZLIB;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+local int i;
+
+Assert(ReadString(0, 4) == "FRES", "Bad sig!");
+
+SetBackColor(0xb0b0b0);
+HEADER1 h1;
+
+FSeek(h1.files_offset + names_start);
+
+SetBackColor(0xd8ffd8);
+if (h1.type_count) {
+    TYPES t;
+}
+
+SetBackColor(0xb0ffb0);
+if (h1.file_count) {
+    FILES f;
+}
+
+SetBackColor(0xb0b0b0);
+HEADER2 h2;
+
+SetBackColor(0xd8ffd8);
+if (h1.dir_count) {
+    DIRS d;
+}
+
+SetBackColor(0xb0ffb0);
+if (h1.part_count) {
+    PARTS p;
+}
+
+SetBackColor(0x98ff98);
+if (h1.other_count) {
+    OTHERS o;
+}
+
+SetBackColor(0xb0b0b0);
+HEADER3 h3;
+
+SetBackColor(0xb0b0ff);
+ZLIB z;
+
+Assert(FTell() == FileSize(), "trailing data");
