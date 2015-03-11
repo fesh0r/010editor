@@ -80,9 +80,9 @@ typedef struct {
     Assert(!(dir_count != 0 && other_count != 0), "HEADER dir and other");
     Assert(!(part_count != 0 && other_count != 0), "HEADER part and other");
 
-    Assert(unknown04 == 0x01001200, "HEADER unknown04 not 0x01001200");
-    Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
-    Assert(unknown0C == 0x00000000, "HEADER unknown0C not 0x00000000");
+    //Assert(unknown04 == 0x01001200, "HEADER unknown04 not 0x01001200");
+    //Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
+    //Assert(unknown0C == 0x00000000, "HEADER unknown0C not 0x00000000");
 
     Assert(zero14 == 0, "HEADER zero14");
     Assert(zero5C == 0, "HEADER zero5C");
