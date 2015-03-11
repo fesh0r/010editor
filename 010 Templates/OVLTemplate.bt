@@ -145,16 +145,16 @@ typedef struct {
     u4 name_offset;
     u4 hash;
 
-    u4 unknown08;
-    u4 unknown0C;
-    u4 unknown10;
+    u4 unknown08 <bgcolor=0xffd8d8>;
+    u4 unknown0C <bgcolor=0xffd8d8>;
+    u4 unknown10 <bgcolor=0xffd8d8>;
 
     Assert(name_offset < h1.files_offset, "TYPE name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    string name;
+    string name <bgcolor=0xff6060>;
 
     FSeek(o);
 } TYPE <optimize=false,read=read_TYPE>;
@@ -172,7 +172,7 @@ typedef struct {
     u4 name_offset;
     u4 hash;
 
-    u2 unknown08;
+    u2 unknown08 <bgcolor=0xd8ffd8>;
 
     u2 type <format=decimal>;
 
@@ -182,7 +182,7 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    string name;
+    string name <bgcolor=0x60ff60>;
 
     FSeek(o);
 } FILE <optimize=false,read=read_FILE>;
@@ -204,7 +204,7 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    string name;
+    string name <bgcolor=0x60ffff>;
 
     FSeek(o);
 } DIR <optimize=false,read=read_DIR>;
@@ -222,16 +222,16 @@ typedef struct {
     u4 hash;
     u4 name_offset;
 
-    u4 unknown08;
-    u4 unknown0C;
-    u4 unknown10;
+    u4 unknown08 <bgcolor=0xffd8ff>;
+    u4 unknown0C <bgcolor=0xffd8ff>;
+    u4 unknown10 <bgcolor=0xffd8ff>;
 
     Assert(name_offset < h1.files_offset, "PART name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    string name;
+    string name <bgcolor=0xff60ff>;
 
     FSeek(o);
 } PART <optimize=false,read=read_PART>;
@@ -246,18 +246,18 @@ typedef struct {
 } PARTS;
 
 typedef struct {
-    u4 unknown00;
+    u4 unknown00 <bgcolor=0xffffd8>;
 
     u4 name_offset;
 
-    u4 unknown08;
+    u4 unknown08 <bgcolor=0xffffd8>;
 
     Assert(name_offset < h1.files_offset, "OTHER name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    string name;
+    string name <bgcolor=0xffff60>;
 
     FSeek(o);
 } OTHER <optimize=false,read=read_OTHER>;
@@ -290,7 +290,7 @@ HEADER1 h1;
 
 FSeek(h1.files_offset + names_start);
 
-SetBackColor(0xd8ffd8);
+SetBackColor(0xffb0b0);
 if (h1.type_count) {
     TYPES t;
 }
@@ -303,17 +303,17 @@ if (h1.file_count) {
 SetBackColor(0xb0b0b0);
 HEADER2 h2;
 
-SetBackColor(0xd8ffd8);
+SetBackColor(0xb0ffff);
 if (h1.dir_count) {
     DIRS d;
 }
 
-SetBackColor(0xb0ffb0);
+SetBackColor(0xffb0ff);
 if (h1.part_count) {
     PARTS p;
 }
 
-SetBackColor(0x98ff98);
+SetBackColor(0xffffb0);
 if (h1.other_count) {
     OTHERS o;
 }
@@ -321,7 +321,7 @@ if (h1.other_count) {
 SetBackColor(0xb0b0b0);
 HEADER3 h3;
 
-SetBackColor(0xb0b0ff);
+SetBackColor(cNone);
 ZLIB z;
 
 Assert(FTell() == FileSize(), "trailing data");
