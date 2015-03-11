@@ -165,44 +165,47 @@ string read_FILES(FILES &in) {
 }
 
 typedef struct {
-    string type <bgcolor=0x6060ff>;
+    u4 name_offset;
 
-    Assert(type == "STATIC", "ARCHIVE type not STATIC");
-    u1 zero06 <bgcolor=0xd8d8ff>;
-
+    u4 zero04 <bgcolor=0xd8d8ff>;
     u4 zero08 <bgcolor=0xd8d8ff>;
-    u4 zero0C <bgcolor=0xd8d8ff>;
-    u4 zero10 <bgcolor=0xd8d8ff>;
-    u4 unknown14 <bgcolor=0xd8d8ff>;
+    u4 unknown0C <bgcolor=0xd8d8ff>;
+    u4 unknown10 <bgcolor=0xd8d8ff>;
+    u4 zero14 <bgcolor=0xd8d8ff>;
     u4 unknown18 <bgcolor=0xd8d8ff>;
-    u4 zero1C <bgcolor=0xd8d8ff>;
+    u4 unknown1C <bgcolor=0xd8d8ff>;
     u4 unknown20 <bgcolor=0xd8d8ff>;
-    u4 unknown24 <bgcolor=0xd8d8ff>;
+    u4 zero24 <bgcolor=0xd8d8ff>;
     u4 unknown28 <bgcolor=0xd8d8ff>;
-    u4 zero2C <bgcolor=0xd8d8ff>;
-    u4 unknown30 <bgcolor=0xd8d8ff>;
 
     u4 comp_size;
     u4 uncomp_size;
 
-    u4 zero3C <bgcolor=0xd8d8ff>;
+    u4 zero34 <bgcolor=0xd8d8ff>;
+    u4 zero38 <bgcolor=0xd8d8ff>;
+    u4 unknown3c <bgcolor=0xd8d8ff>;
     u4 zero40 <bgcolor=0xd8d8ff>;
-    u4 unknown44 <bgcolor=0xd8d8ff>;
-    u4 zero48 <bgcolor=0xd8d8ff>;
 
-    Assert(zero06 == 0, "ARCHIVE zero06");
+    Assert(name_offset < h.archive_names_length, "FILE name_offset too high");
+
+    local quad o = FTell();
+    FSeek(name_offset + full_archive_names_offset);
+
+    string name <bgcolor=0x6060ff>;
+
+    FSeek(o);
+
+    Assert(zero04 == 0, "ARCHIVE zero04");
     Assert(zero08 == 0, "ARCHIVE zero08");
-    Assert(zero0C == 0, "ARCHIVE zero0C");
-    Assert(zero10 == 0, "ARCHIVE zero10");
-    Assert(zero1C == 0, "ARCHIVE zero1C");
-    Assert(zero2C == 0, "ARCHIVE zero2C");
-    Assert(zero3C == 0, "ARCHIVE zero3C");
+    Assert(zero14 == 0, "ARCHIVE zero14");
+    Assert(zero24 == 0, "ARCHIVE zero24");
+    Assert(zero34 == 0, "ARCHIVE zero34");
+    Assert(zero38 == 0, "ARCHIVE zero38");
     Assert(zero40 == 0, "ARCHIVE zero40");
-    Assert(zero48 == 0, "ARCHIVE zero48");
 } ARCHIVE <optimize=false,read=read_ARCHIVE>;
 string read_ARCHIVE(ARCHIVE &in) {
     string out;
-    SPrintf(out, "\"%s\" %u %u", in.type, in.comp_size, in.uncomp_size);
+    SPrintf(out, "\"%s\" %u %u", in.name, in.comp_size, in.uncomp_size);
     return out;
 }
 
@@ -324,7 +327,8 @@ SetBackColor(0xb0b0b0);
 HEADER h;
 
 // skip main name table
-FSeek(h.names_length + full_names_offset);
+local u4 full_types_offset = h.names_length + full_names_offset;
+FSeek(full_types_offset);
 
 SetBackColor(0xffb0b0);
 if (h.type_count) {
@@ -335,6 +339,11 @@ SetBackColor(0xb0ffb0);
 if (h.file_count) {
     FILES f;
 }
+
+// skip archive name table
+local u4 full_archive_names_offset = h.file_count * 0x0C + h.type_count * 0x14 + full_types_offset;
+local u4 full_archives_offset = h.archive_names_length + full_archive_names_offset;
+FSeek(full_archives_offset);
 
 SetBackColor(0xb0b0ff);
 if (h.archive_count) {
