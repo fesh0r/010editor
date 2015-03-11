@@ -27,7 +27,7 @@ typedef struct {
 
     u4 files_offset;
 
-    u4 zero14 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero14 <bgcolor=0xd8d8d8>;
 
     u4 other_count <format=decimal>;
     u2 dir_count <format=decimal>;
@@ -50,7 +50,8 @@ typedef struct {
     u4 file_count3 <format=decimal>;
     u4 names_offset;
 
-    u4 zero5C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero5C <bgcolor=0xd8d8d8>;
+
     u4 zero60 <hidden=true,bgcolor=cNone>;
     u4 zero64 <hidden=true,bgcolor=cNone>;
     u4 zero68 <hidden=true,bgcolor=cNone>;
@@ -99,31 +100,30 @@ typedef struct {
 } HEADER1;
 
 typedef struct {
-    SetBackColor(0xb0b0b0);
     string type;
 
     Assert(type == "STATIC", "HEADER2 type not STATIC");
-    u1 zero06 <hidden=true,bgcolor=0xe8e8e8>;
+    u1 zero06 <bgcolor=0xd8d8d8>;
 
-    u4 zero08 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero0C <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero10 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero08 <bgcolor=0xd8d8d8>;
+    u4 zero0C <bgcolor=0xd8d8d8>;
+    u4 zero10 <bgcolor=0xd8d8d8>;
     u4 unknown14 <bgcolor=0xd8d8d8>;
     u4 unknown18 <bgcolor=0xd8d8d8>;
-    u4 zero1C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero1C <bgcolor=0xd8d8d8>;
     u4 unknown20 <bgcolor=0xd8d8d8>;
     u4 unknown24 <bgcolor=0xd8d8d8>;
     u4 unknown28 <bgcolor=0xd8d8d8>;
-    u4 zero2C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero2C <bgcolor=0xd8d8d8>;
     u4 unknown30 <bgcolor=0xd8d8d8>;
 
     u4 comp_size;
     u4 uncomp_size;
 
-    u4 zero3C <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero40 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero3C <bgcolor=0xd8d8d8>;
+    u4 zero40 <bgcolor=0xd8d8d8>;
     u4 unknown44 <bgcolor=0xd8d8d8>;
-    u4 zero48 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero48 <bgcolor=0xd8d8d8>;
 
     Assert(zero06 == 0, "HEADER2 zero06");
     Assert(zero08 == 0, "HEADER2 zero08");
