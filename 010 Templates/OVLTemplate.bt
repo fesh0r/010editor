@@ -16,7 +16,6 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-local u4 names_start = 0x90;
 
 typedef struct {
     char sig[4];
@@ -65,81 +64,39 @@ typedef struct {
     u4 zero88 <hidden=true,bgcolor=cNone>;
     u4 zero8C <hidden=true,bgcolor=cNone>;
 
-    Assert(file_count2 == file_count, "HEADER1 file_count2 mismatch");
-    Assert(file_count3 == file_count, "HEADER1 file_count3 mismatch");
-    Assert((file_count == 0) || (names_offset > 0), "HEADER1 names_offset is 0");
-    Assert((file_count == 0) || (files_offset > 0), "HEADER1 files_offset is 0");
-    //Assert(dir_count == 0, "HEADER1 dir_count not 0");
-    //Assert(part_count == 0, "HEADER1 part_count not 0");
-    //Assert(other_count == 0, "HEADER1 other_count not 0");
-    //Assert(!(dir_count != 0 && part_count != 0), "HEADER1 dir and part");
-    Assert(!(dir_count != 0 && other_count != 0), "HEADER1 dir and other");
-    Assert(!(part_count != 0 && other_count != 0), "HEADER1 part and other");
-    Assert(archive_count == 1, "HEADER1 archive_count not 1");
+    Assert(file_count2 == file_count, "HEADER file_count2 mismatch");
+    Assert(file_count3 == file_count, "HEADER file_count3 mismatch");
+    Assert((file_count == 0) || (names_offset > 0), "HEADER names_offset is 0");
+    Assert((file_count == 0) || (files_offset > 0), "HEADER files_offset is 0");
+    //Assert(dir_count == 0, "HEADER dir_count not 0");
+    //Assert(part_count == 0, "HEADER part_count not 0");
+    //Assert(other_count == 0, "HEADER other_count not 0");
+    //Assert(!(dir_count != 0 && part_count != 0), "HEADER dir and part");
+    Assert(!(dir_count != 0 && other_count != 0), "HEADER dir and other");
+    Assert(!(part_count != 0 && other_count != 0), "HEADER part and other");
+    Assert(archive_count == 1, "HEADER archive_count not 1");
 
-    Assert(unknown04 == 0x01001200, "HEADER1 unknown04 not 0x01001200");
-    Assert(unknown08 == 0x00006094, "HEADER1 unknown08 not 0x00006094");
-    Assert(unknown0C == 0x00000000, "HEADER1 unknown0C not 0x00000000");
+    Assert(unknown04 == 0x01001200, "HEADER unknown04 not 0x01001200");
+    Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
+    Assert(unknown0C == 0x00000000, "HEADER unknown0C not 0x00000000");
 
-    Assert(zero14 == 0, "HEADER1 zero14");
-    Assert(zero40 == 0, "HEADER1 zero40");
-    Assert(zero5C == 0, "HEADER1 zero5C");
+    Assert(zero14 == 0, "HEADER zero14");
+    Assert(zero40 == 0, "HEADER zero40");
+    Assert(zero5C == 0, "HEADER zero5C");
 
-    Assert(zero60 == 0, "HEADER1 zero60");
-    Assert(zero64 == 0, "HEADER1 zero64");
-    Assert(zero68 == 0, "HEADER1 zero68");
-    Assert(zero6C == 0, "HEADER1 zero6C");
-    Assert(zero70 == 0, "HEADER1 zero70");
-    Assert(zero74 == 0, "HEADER1 zero74");
-    Assert(zero78 == 0, "HEADER1 zero78");
-    Assert(zero7C == 0, "HEADER1 zero7C");
-    Assert(zero80 == 0, "HEADER1 zero70");
-    Assert(zero84 == 0, "HEADER1 zero74");
-    Assert(zero88 == 0, "HEADER1 zero78");
-    Assert(zero8C == 0, "HEADER1 zero7C");
-} HEADER1;
-
-typedef struct {
-    string type;
-
-    Assert(type == "STATIC", "HEADER2 type not STATIC");
-    u1 zero06 <bgcolor=0xd8d8d8>;
-
-    u4 zero08 <bgcolor=0xd8d8d8>;
-    u4 zero0C <bgcolor=0xd8d8d8>;
-    u4 zero10 <bgcolor=0xd8d8d8>;
-    u4 unknown14 <bgcolor=0xd8d8d8>;
-    u4 unknown18 <bgcolor=0xd8d8d8>;
-    u4 zero1C <bgcolor=0xd8d8d8>;
-    u4 unknown20 <bgcolor=0xd8d8d8>;
-    u4 unknown24 <bgcolor=0xd8d8d8>;
-    u4 unknown28 <bgcolor=0xd8d8d8>;
-    u4 zero2C <bgcolor=0xd8d8d8>;
-    u4 unknown30 <bgcolor=0xd8d8d8>;
-
-    u4 comp_size;
-    u4 uncomp_size;
-
-    u4 zero3C <bgcolor=0xd8d8d8>;
-    u4 zero40 <bgcolor=0xd8d8d8>;
-    u4 unknown44 <bgcolor=0xd8d8d8>;
-    u4 zero48 <bgcolor=0xd8d8d8>;
-
-    Assert(zero06 == 0, "HEADER2 zero06");
-    Assert(zero08 == 0, "HEADER2 zero08");
-    Assert(zero0C == 0, "HEADER2 zero0C");
-    Assert(zero10 == 0, "HEADER2 zero10");
-    Assert(zero1C == 0, "HEADER2 zero1C");
-    Assert(zero2C == 0, "HEADER2 zero2C");
-    Assert(zero3C == 0, "HEADER2 zero3C");
-    Assert(zero40 == 0, "HEADER2 zero40");
-    Assert(zero48 == 0, "HEADER2 zero48");
-} HEADER2;
-
-typedef struct {
-    u4 unknown00 <bgcolor=0xd8d8d8>;
-    u4 unknown04 <bgcolor=0xd8d8d8>;
-} HEADER3;
+    Assert(zero60 == 0, "HEADER zero60");
+    Assert(zero64 == 0, "HEADER zero64");
+    Assert(zero68 == 0, "HEADER zero68");
+    Assert(zero6C == 0, "HEADER zero6C");
+    Assert(zero70 == 0, "HEADER zero70");
+    Assert(zero74 == 0, "HEADER zero74");
+    Assert(zero78 == 0, "HEADER zero78");
+    Assert(zero7C == 0, "HEADER zero7C");
+    Assert(zero80 == 0, "HEADER zero70");
+    Assert(zero84 == 0, "HEADER zero74");
+    Assert(zero88 == 0, "HEADER zero78");
+    Assert(zero8C == 0, "HEADER zero7C");
+} HEADER;
 
 typedef struct {
     u4 name_offset;
@@ -149,7 +106,7 @@ typedef struct {
     u4 unknown0C <bgcolor=0xffd8d8>;
     u4 unknown10 <bgcolor=0xffd8d8>;
 
-    Assert(name_offset < h1.files_offset, "TYPE name_offset too high");
+    Assert(name_offset < h.files_offset, "TYPE name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -165,8 +122,13 @@ string read_TYPE(TYPE &in) {
 }
 
 typedef struct {
-    TYPE t[h1.type_count];
-} TYPES;
+    TYPE t[h.type_count];
+} TYPES <read=read_TYPES>;
+string read_TYPES(TYPES &in) {
+    string out;
+    SPrintf(out, "%u", h.type_count);
+    return out;
+}
 
 typedef struct {
     u4 name_offset;
@@ -176,8 +138,8 @@ typedef struct {
 
     u2 type <format=decimal>;
 
-    Assert(type < h1.type_count, "FILE type too high");
-    Assert(name_offset < h1.files_offset, "FILE name_offset too high");
+    Assert(type < h.type_count, "FILE type too high");
+    Assert(name_offset < h.files_offset, "FILE name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -193,13 +155,60 @@ string read_FILE(FILE &in) {
 }
 
 typedef struct {
-    FILE f[h1.file_count];
-} FILES;
+    FILE f[h.file_count];
+} FILES <read=read_FILES>;
+string read_FILES(FILES &in) {
+    string out;
+    SPrintf(out, "%u", h.file_count);
+    return out;
+}
+
+typedef struct {
+    string type <bgcolor=0x6060ff>;
+
+    Assert(type == "STATIC", "HEADER2 type not STATIC");
+    u1 zero06 <bgcolor=0xd8d8ff>;
+
+    u4 zero08 <bgcolor=0xd8d8ff>;
+    u4 zero0C <bgcolor=0xd8d8ff>;
+    u4 zero10 <bgcolor=0xd8d8ff>;
+    u4 unknown14 <bgcolor=0xd8d8ff>;
+    u4 unknown18 <bgcolor=0xd8d8ff>;
+    u4 zero1C <bgcolor=0xd8d8ff>;
+    u4 unknown20 <bgcolor=0xd8d8ff>;
+    u4 unknown24 <bgcolor=0xd8d8ff>;
+    u4 unknown28 <bgcolor=0xd8d8ff>;
+    u4 zero2C <bgcolor=0xd8d8ff>;
+    u4 unknown30 <bgcolor=0xd8d8ff>;
+
+    u4 comp_size;
+    u4 uncomp_size;
+
+    u4 zero3C <bgcolor=0xd8d8ff>;
+    u4 zero40 <bgcolor=0xd8d8ff>;
+    u4 unknown44 <bgcolor=0xd8d8ff>;
+    u4 zero48 <bgcolor=0xd8d8ff>;
+
+    Assert(zero06 == 0, "HEADER2 zero06");
+    Assert(zero08 == 0, "HEADER2 zero08");
+    Assert(zero0C == 0, "HEADER2 zero0C");
+    Assert(zero10 == 0, "HEADER2 zero10");
+    Assert(zero1C == 0, "HEADER2 zero1C");
+    Assert(zero2C == 0, "HEADER2 zero2C");
+    Assert(zero3C == 0, "HEADER2 zero3C");
+    Assert(zero40 == 0, "HEADER2 zero40");
+    Assert(zero48 == 0, "HEADER2 zero48");
+} HEADER2 <optimize=false,read=read_HEADER2>;
+string read_HEADER2(HEADER2 &in) {
+    string out;
+    SPrintf(out, "\"%s\" %u %u", in.type, in.comp_size, in.uncomp_size);
+    return out;
+}
 
 typedef struct {
     u4 name_offset;
 
-    Assert(name_offset < h1.files_offset, "DIR name_offset too high");
+    Assert(name_offset < h.files_offset, "DIR name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -215,8 +224,13 @@ string read_DIR(DIR &in) {
 }
 
 typedef struct {
-    DIR d[h1.dir_count];
-} DIRS;
+    DIR d[h.dir_count];
+} DIRS <read=read_DIRS>;
+string read_DIRS(DIRS &in) {
+    string out;
+    SPrintf(out, "%u", h.dir_count);
+    return out;
+}
 
 typedef struct {
     u4 hash;
@@ -226,7 +240,7 @@ typedef struct {
     u4 unknown0C <bgcolor=0xffd8ff>;
     u4 unknown10 <bgcolor=0xffd8ff>;
 
-    Assert(name_offset < h1.files_offset, "PART name_offset too high");
+    Assert(name_offset < h.files_offset, "PART name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -242,8 +256,13 @@ string read_PART(PART &in) {
 }
 
 typedef struct {
-    PART p[h1.part_count];
-} PARTS;
+    PART p[h.part_count];
+} PARTS <read=read_PARTS>;
+string read_PARTS(PARTS &in) {
+    string out;
+    SPrintf(out, "%u", h.part_count);
+    return out;
+}
 
 typedef struct {
     u4 unknown00 <bgcolor=0xffffd8>;
@@ -252,7 +271,7 @@ typedef struct {
 
     u4 unknown08 <bgcolor=0xffffd8>;
 
-    Assert(name_offset < h1.files_offset, "OTHER name_offset too high");
+    Assert(name_offset < h.files_offset, "OTHER name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -268,14 +287,18 @@ string read_OTHER(OTHER &in) {
 }
 
 typedef struct {
-    OTHER o[h1.other_count];
-} OTHERS;
+    OTHER o[h.other_count];
+} OTHERS <read=read_OTHERS>;
+string read_OTHERS(OTHERS &in) {
+    string out;
+    SPrintf(out, "%u", h.other_count);
+    return out;
+}
 
 typedef struct {
-    Assert(ReadUShort() == 0x9c78, "ZLIB bad zlib header");
-
-    u1 data[h2.comp_size];
-} ZLIB;
+    u4 unknown00 <bgcolor=0xd8d8d8>;
+    u4 unknown04 <bgcolor=0xd8d8d8>;
+} HEADER3;
 
 
 DisplayFormatHex();
@@ -285,43 +308,43 @@ local int i;
 
 Assert(ReadString(0, 4) == "FRES", "Bad sig!");
 
-SetBackColor(0xb0b0b0);
-HEADER1 h1;
+local u4 names_start = 0x90;
 
-FSeek(h1.files_offset + names_start);
+SetBackColor(0xb0b0b0);
+HEADER h;
+
+// skip main name table
+FSeek(h.files_offset + names_start);
 
 SetBackColor(0xffb0b0);
-if (h1.type_count) {
+if (h.type_count) {
     TYPES t;
 }
 
 SetBackColor(0xb0ffb0);
-if (h1.file_count) {
+if (h.file_count) {
     FILES f;
 }
 
-SetBackColor(0xb0b0b0);
+SetBackColor(0xb0b0ff);
 HEADER2 h2;
 
 SetBackColor(0xb0ffff);
-if (h1.dir_count) {
+if (h.dir_count) {
     DIRS d;
 }
 
 SetBackColor(0xffb0ff);
-if (h1.part_count) {
+if (h.part_count) {
     PARTS p;
 }
 
 SetBackColor(0xffffb0);
-if (h1.other_count) {
+if (h.other_count) {
     OTHERS o;
 }
 
 SetBackColor(0xb0b0b0);
 HEADER3 h3;
 
-SetBackColor(cNone);
-ZLIB z;
-
-Assert(FTell() == FileSize(), "trailing data");
+Assert(ReadUShort() == 0x9c78, "bad zlib header");
