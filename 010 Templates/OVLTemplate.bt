@@ -39,13 +39,13 @@ string read_STR(STR &in) {
 typedef struct {
     char sig[4];
 
-    u4 unknown04_1 <bgcolor=0xd8d8d8>;
-    u4 unknown08_1 <bgcolor=0xd8d8d8>;
-    u4 unknown0C_1 <bgcolor=0xd8d8d8>;
+    u4 unknown04 <bgcolor=0xd8d8d8>;
+    u4 unknown08 <bgcolor=0xd8d8d8>;
+    u4 unknown0C <bgcolor=0xd8d8d8>;
 
     u4 files_offset;
 
-    u4 zero14_1 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero14 <hidden=true,bgcolor=0xe8e8e8>;
 
     u4 other_count <format=decimal>;
     u2 dir_count <format=decimal>;
@@ -55,107 +55,108 @@ typedef struct {
     u4 part_count <format=decimal>;
     u4 archive_count <format=decimal>;
 
-    u4 unknown30_1 <bgcolor=0xd8d8d8>;
-    u4 unknown34_1 <bgcolor=0xd8d8d8>;
-    u4 unknown38_1 <bgcolor=0xd8d8d8>;
-    u4 unknown3C_1 <bgcolor=0xd8d8d8>;
-    u4 zero40_1 <bgcolor=0xd8d8d8>;
-    u4 unknown44_1 <bgcolor=0xd8d8d8>;
-    u4 unknown48_1 <bgcolor=0xd8d8d8>;
-    u4 unknown4C_1 <bgcolor=0xd8d8d8>;
-    u4 unknown50_1 <bgcolor=0xd8d8d8>;
+    u4 unknown30 <bgcolor=0xd8d8d8>;
+    u4 unknown34 <bgcolor=0xd8d8d8>;
+    u4 unknown38 <bgcolor=0xd8d8d8>;
+    u4 unknown3C <bgcolor=0xd8d8d8>;
+    u4 zero40 <bgcolor=0xd8d8d8>;
+    u4 unknown44 <bgcolor=0xd8d8d8>;
+    u4 unknown48 <bgcolor=0xd8d8d8>;
+    u4 unknown4C <bgcolor=0xd8d8d8>;
+    u4 unknown50 <bgcolor=0xd8d8d8>;
 
     u4 file_count3 <format=decimal>;
     u4 names_offset;
 
-    u4 zero5C_1 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero60_1 <hidden=true,bgcolor=cNone>;
-    u4 zero64_1 <hidden=true,bgcolor=cNone>;
-    u4 zero68_1 <hidden=true,bgcolor=cNone>;
-    u4 zero6C_1 <hidden=true,bgcolor=cNone>;
-    u4 zero70_1 <hidden=true,bgcolor=cNone>;
-    u4 zero74_1 <hidden=true,bgcolor=cNone>;
-    u4 zero78_1 <hidden=true,bgcolor=cNone>;
-    u4 zero7C_1 <hidden=true,bgcolor=cNone>;
-    u4 zero80_1 <hidden=true,bgcolor=cNone>;
-    u4 zero84_1 <hidden=true,bgcolor=cNone>;
-    u4 zero88_1 <hidden=true,bgcolor=cNone>;
-    u4 zero8C_1 <hidden=true,bgcolor=cNone>;
+    u4 zero5C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero60 <hidden=true,bgcolor=cNone>;
+    u4 zero64 <hidden=true,bgcolor=cNone>;
+    u4 zero68 <hidden=true,bgcolor=cNone>;
+    u4 zero6C <hidden=true,bgcolor=cNone>;
+    u4 zero70 <hidden=true,bgcolor=cNone>;
+    u4 zero74 <hidden=true,bgcolor=cNone>;
+    u4 zero78 <hidden=true,bgcolor=cNone>;
+    u4 zero7C <hidden=true,bgcolor=cNone>;
+    u4 zero80 <hidden=true,bgcolor=cNone>;
+    u4 zero84 <hidden=true,bgcolor=cNone>;
+    u4 zero88 <hidden=true,bgcolor=cNone>;
+    u4 zero8C <hidden=true,bgcolor=cNone>;
 
-    Assert(file_count2 == file_count, "file_count2 mismatch");
-    Assert(file_count3 == file_count, "file_count3 mismatch");
-    Assert((file_count == 0) || (names_offset > 0), "names_offset is 0");
-    Assert((file_count == 0) || (files_offset > 0), "files_offset is 0");
-    //Assert(dir_count == 0, "dir_count not 0");
-    //Assert(part_count == 0, "part_count not 0");
-    //Assert(other_count == 0, "other_count not 0");
-    //Assert(!(dir_count != 0 && part_count != 0), "dir and part");
-    Assert(!(dir_count != 0 && other_count != 0), "dir and other");
-    Assert(!(part_count != 0 && other_count != 0), "part and other");
-    Assert(archive_count == 1, "archive_count not 1");
+    Assert(file_count2 == file_count, "HEADER1 file_count2 mismatch");
+    Assert(file_count3 == file_count, "HEADER1 file_count3 mismatch");
+    Assert((file_count == 0) || (names_offset > 0), "HEADER1 names_offset is 0");
+    Assert((file_count == 0) || (files_offset > 0), "HEADER1 files_offset is 0");
+    //Assert(dir_count == 0, "HEADER1 dir_count not 0");
+    //Assert(part_count == 0, "HEADER1 part_count not 0");
+    //Assert(other_count == 0, "HEADER1 other_count not 0");
+    //Assert(!(dir_count != 0 && part_count != 0), "HEADER1 dir and part");
+    Assert(!(dir_count != 0 && other_count != 0), "HEADER1 dir and other");
+    Assert(!(part_count != 0 && other_count != 0), "HEADER1 part and other");
+    Assert(archive_count == 1, "HEADER1 archive_count not 1");
 
-    Assert(unknown04_1 == 0x01001200, "unknown04_1 not 0x01001200");
-    Assert(unknown08_1 == 0x00006094, "unknown08_1 not 0x00006094");
-    Assert(unknown0C_1 == 0x00000000, "unknown0C_1 not 0x00000000");
+    Assert(unknown04 == 0x01001200, "HEADER1 unknown04 not 0x01001200");
+    Assert(unknown08 == 0x00006094, "HEADER1 unknown08 not 0x00006094");
+    Assert(unknown0C == 0x00000000, "HEADER1 unknown0C not 0x00000000");
 
-    Assert(zero14_1 == 0, "zero14_1");
-    Assert(zero40_1 == 0, "zero40_1");
-    Assert(zero5C_1 == 0, "zero5C_1");
-    Assert(zero60_1 == 0, "zero60_1");
-    Assert(zero64_1 == 0, "zero64_1");
-    Assert(zero68_1 == 0, "zero68_1");
-    Assert(zero6C_1 == 0, "zero6C_1");
-    Assert(zero70_1 == 0, "zero70_1");
-    Assert(zero74_1 == 0, "zero74_1");
-    Assert(zero78_1 == 0, "zero78_1");
-    Assert(zero7C_1 == 0, "zero7C_1");
-    Assert(zero80_1 == 0, "zero70_1");
-    Assert(zero84_1 == 0, "zero74_1");
-    Assert(zero88_1 == 0, "zero78_1");
-    Assert(zero8C_1 == 0, "zero7C_1");
+    Assert(zero14 == 0, "HEADER1 zero14");
+    Assert(zero40 == 0, "HEADER1 zero40");
+    Assert(zero5C == 0, "HEADER1 zero5C");
+
+    Assert(zero60 == 0, "HEADER1 zero60");
+    Assert(zero64 == 0, "HEADER1 zero64");
+    Assert(zero68 == 0, "HEADER1 zero68");
+    Assert(zero6C == 0, "HEADER1 zero6C");
+    Assert(zero70 == 0, "HEADER1 zero70");
+    Assert(zero74 == 0, "HEADER1 zero74");
+    Assert(zero78 == 0, "HEADER1 zero78");
+    Assert(zero7C == 0, "HEADER1 zero7C");
+    Assert(zero80 == 0, "HEADER1 zero70");
+    Assert(zero84 == 0, "HEADER1 zero74");
+    Assert(zero88 == 0, "HEADER1 zero78");
+    Assert(zero8C == 0, "HEADER1 zero7C");
 } HEADER1;
 
 typedef struct {
     SetBackColor(0xb0b0b0);
     string type;
 
-    Assert(type == "STATIC", "type not STATIC");
-    u1 zero06_2 <hidden=true,bgcolor=0xe8e8e8>;
+    Assert(type == "STATIC", "HEADER2 type not STATIC");
+    u1 zero06 <hidden=true,bgcolor=0xe8e8e8>;
 
-    u4 zero08_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero0C_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero10_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 unknown14_2 <bgcolor=0xd8d8d8>;
-    u4 unknown18_2 <bgcolor=0xd8d8d8>;
-    u4 zero1C_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 unknown20_2 <bgcolor=0xd8d8d8>;
-    u4 unknown24_2 <bgcolor=0xd8d8d8>;
-    u4 unknown28_2 <bgcolor=0xd8d8d8>;
-    u4 zero2C_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 unknown30_2 <bgcolor=0xd8d8d8>;
+    u4 zero08 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero0C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero10 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown14 <bgcolor=0xd8d8d8>;
+    u4 unknown18 <bgcolor=0xd8d8d8>;
+    u4 zero1C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown20 <bgcolor=0xd8d8d8>;
+    u4 unknown24 <bgcolor=0xd8d8d8>;
+    u4 unknown28 <bgcolor=0xd8d8d8>;
+    u4 zero2C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown30 <bgcolor=0xd8d8d8>;
 
     u4 comp_size;
     u4 uncomp_size;
 
-    u4 zero3C_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 zero40_2 <hidden=true,bgcolor=0xe8e8e8>;
-    u4 unknown44_2 <bgcolor=0xd8d8d8>;
-    u4 zero48_2 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero3C <hidden=true,bgcolor=0xe8e8e8>;
+    u4 zero40 <hidden=true,bgcolor=0xe8e8e8>;
+    u4 unknown44 <bgcolor=0xd8d8d8>;
+    u4 zero48 <hidden=true,bgcolor=0xe8e8e8>;
 
-    Assert(zero06_2 == 0, "zero06_2");
-    Assert(zero08_2 == 0, "zero08_2");
-    Assert(zero0C_2 == 0, "zero0C_2");
-    Assert(zero10_2 == 0, "zero10_2");
-    Assert(zero1C_2 == 0, "zero1C_2");
-    Assert(zero2C_2 == 0, "zero2C_2");
-    Assert(zero3C_2 == 0, "zero3C_2");
-    Assert(zero40_2 == 0, "zero40_2");
-    Assert(zero48_2 == 0, "zero48_2");
+    Assert(zero06 == 0, "HEADER2 zero06");
+    Assert(zero08 == 0, "HEADER2 zero08");
+    Assert(zero0C == 0, "HEADER2 zero0C");
+    Assert(zero10 == 0, "HEADER2 zero10");
+    Assert(zero1C == 0, "HEADER2 zero1C");
+    Assert(zero2C == 0, "HEADER2 zero2C");
+    Assert(zero3C == 0, "HEADER2 zero3C");
+    Assert(zero40 == 0, "HEADER2 zero40");
+    Assert(zero48 == 0, "HEADER2 zero48");
 } HEADER2;
 
 typedef struct {
-    u4 unknown00_3 <bgcolor=0xd8d8d8>;
-    u4 unknown04_3 <bgcolor=0xd8d8d8>;
+    u4 unknown00 <bgcolor=0xd8d8d8>;
+    u4 unknown04 <bgcolor=0xd8d8d8>;
 } HEADER3;
 
 typedef struct {
@@ -166,7 +167,7 @@ typedef struct {
     u4 unknown0C;
     u4 unknown10;
 
-    Assert(name_offset < h1.files_offset, "name_offset too high");
+    Assert(name_offset < h1.files_offset, "TYPE name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -193,8 +194,8 @@ typedef struct {
 
     u2 type <format=decimal>;
 
-    Assert(type < h1.type_count, "type too high");
-    Assert(name_offset < h1.files_offset, "name_offset too high");
+    Assert(type < h1.type_count, "FILE type too high");
+    Assert(name_offset < h1.files_offset, "FILE name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -216,7 +217,7 @@ typedef struct {
 typedef struct {
     u4 name_offset;
 
-    Assert(name_offset < h1.files_offset, "name_offset too high");
+    Assert(name_offset < h1.files_offset, "DIR name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -243,7 +244,7 @@ typedef struct {
     u4 unknown0C;
     u4 unknown10;
 
-    Assert(name_offset < h1.files_offset, "name_offset too high");
+    Assert(name_offset < h1.files_offset, "PART name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -269,7 +270,7 @@ typedef struct {
 
     u4 unknown08;
 
-    Assert(name_offset < h1.files_offset, "name_offset too high");
+    Assert(name_offset < h1.files_offset, "OTHER name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + names_start);
@@ -289,7 +290,7 @@ typedef struct {
 } OTHERS;
 
 typedef struct {
-    Assert(ReadUShort() == 0x9c78, "bad zlib header");
+    Assert(ReadUShort() == 0x9c78, "ZLIB bad zlib header");
 
     u1 data[h2.comp_size];
 } ZLIB;
