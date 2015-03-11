@@ -41,7 +41,9 @@ typedef struct {
     u4 unknown34 <bgcolor=0xd8d8d8>;
     u4 unknown38 <bgcolor=0xd8d8d8>;
     u4 unknown3C <bgcolor=0xd8d8d8>;
-    u4 zero40 <bgcolor=0xd8d8d8>;
+
+    u4 unknown_count;
+
     u4 unknown44 <bgcolor=0xd8d8d8>;
     u4 unknown48 <bgcolor=0xd8d8d8>;
     u4 unknown4C <bgcolor=0xd8d8d8>;
@@ -73,17 +75,16 @@ typedef struct {
     //Assert(dir_count == 0, "HEADER dir_count not 0");
     //Assert(part_count == 0, "HEADER part_count not 0");
     //Assert(other_count == 0, "HEADER other_count not 0");
+    //Assert(archive_count == 1, "HEADER archive_count not 1");
     //Assert(!(dir_count != 0 && part_count != 0), "HEADER dir and part");
     Assert(!(dir_count != 0 && other_count != 0), "HEADER dir and other");
     Assert(!(part_count != 0 && other_count != 0), "HEADER part and other");
-    Assert(archive_count == 1, "HEADER archive_count not 1");
 
     Assert(unknown04 == 0x01001200, "HEADER unknown04 not 0x01001200");
     Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
     Assert(unknown0C == 0x00000000, "HEADER unknown0C not 0x00000000");
 
     Assert(zero14 == 0, "HEADER zero14");
-    Assert(zero40 == 0, "HEADER zero40");
     Assert(zero5C == 0, "HEADER zero5C");
 
     Assert(zero60 == 0, "HEADER zero60");
@@ -168,8 +169,8 @@ string read_FILES(FILES &in) {
 typedef struct {
     u4 name_offset;
 
-    u4 zero04 <bgcolor=0xd8d8ff>;
-    u4 zero08 <bgcolor=0xd8d8ff>;
+    u4 unknown04 <bgcolor=0xd8d8ff>;
+    u4 unknown08 <bgcolor=0xd8d8ff>;
     u4 unknown0C <bgcolor=0xd8d8ff>;
     u4 unknown10 <bgcolor=0xd8d8ff>;
     u4 zero14 <bgcolor=0xd8d8ff>;
@@ -183,9 +184,9 @@ typedef struct {
     u4 uncomp_size;
 
     u4 zero34 <bgcolor=0xd8d8ff>;
-    u4 zero38 <bgcolor=0xd8d8ff>;
+    u4 unknown38 <bgcolor=0xd8d8ff>;
     u4 unknown3c <bgcolor=0xd8d8ff>;
-    u4 zero40 <bgcolor=0xd8d8ff>;
+    u4 unknown40 <bgcolor=0xd8d8ff>;
 
     Assert(name_offset < h.archive_names_length, "FILE name_offset too high");
 
@@ -201,17 +202,17 @@ typedef struct {
         zlib_length = comp_size;
     }
 
-    Assert(zero04 == 0, "ARCHIVE zero04");
-    Assert(zero08 == 0, "ARCHIVE zero08");
+    //Assert(unknown04 == 0, "ARCHIVE unknown04");
+    //Assert(unknown08 == 0, "ARCHIVE unknown08");
     Assert(zero14 == 0, "ARCHIVE zero14");
     Assert(zero24 == 0, "ARCHIVE zero24");
     Assert(zero34 == 0, "ARCHIVE zero34");
-    Assert(zero38 == 0, "ARCHIVE zero38");
-    Assert(zero40 == 0, "ARCHIVE zero40");
+    //Assert(unknown38 == 0, "ARCHIVE unknown38");
+    //Assert(unknown40 == 0, "ARCHIVE unknown40");
 } ARCHIVE <optimize=false,read=read_ARCHIVE>;
 string read_ARCHIVE(ARCHIVE &in) {
     string out;
-    SPrintf(out, "\"%s\" %u %u", in.name, in.comp_size, in.uncomp_size);
+    SPrintf(out, "\"%s\" 0x%x 0x%x", in.name, in.comp_size, in.uncomp_size);
     return out;
 }
 
@@ -315,9 +316,43 @@ string read_OTHERS(OTHERS &in) {
 }
 
 typedef struct {
-    u4 unknown00 <bgcolor=0xd8d8d8>;
-    u4 unknown04 <bgcolor=0xd8d8d8>;
-} HEADER3;
+    u4 unknown00 <bgcolor=0x6cd0ff>;
+    u4 unknown04 <bgcolor=0x6cd0ff>;
+    u4 unknown08 <bgcolor=0x6cd0ff>;
+} UNKNOWN <optimize=false,read=read_UNKNOWN>;
+string read_UNKNOWN(UNKNOWN &in) {
+    string out;
+    SPrintf(out, "0x%x 0x%x 0x%x", in.unknown00, in.unknown04, in.unknown08);
+    return out;
+}
+
+typedef struct {
+    UNKNOWN u[h.unknown_count];
+} UNKNOWNS <read=read_UNKNOWNS>;
+string read_UNKNOWNS(UNKNOWNS &in) {
+    string out;
+    SPrintf(out, "%u", h.unknown_count);
+    return out;
+}
+
+typedef struct {
+    u4 unknown00 <bgcolor=0xffd06c>;
+    u4 unknown04 <bgcolor=0xffd06c>;
+} ARCHIVE2 <optimize=false,read=read_ARCHIVE2>;
+string read_ARCHIVE2(ARCHIVE2 &in) {
+    string out;
+    SPrintf(out, "0x%x 0x%x", in.unknown00, in.unknown04);
+    return out;
+}
+
+typedef struct {
+    ARCHIVE2 a2[h.archive_count];
+} ARCHIVES2 <read=read_ARCHIVES2>;
+string read_ARCHIVES2(ARCHIVES2 &in) {
+    string out;
+    SPrintf(out, "%u", h.archive_count);
+    return out;
+}
 
 typedef struct {
     Assert(zlib_length > 0, "ZLIB zlib_length is 0");
@@ -326,7 +361,12 @@ typedef struct {
     u1 data[zlib_length];
 
     Assert(FTell() == FileSize(), "ZLIB trailing data");
-} ZLIB;
+} ZLIB <read=read_ZLIB>;
+string read_ZLIB(ZLIB &in) {
+    string out;
+    SPrintf(out, "0x%x", zlib_length);
+    return out;
+}
 
 DisplayFormatHex();
 LittleEndian();
@@ -379,8 +419,15 @@ if (h.other_count) {
     OTHERS o;
 }
 
-SetBackColor(0xb0b0b0);
-HEADER3 h3;
+SetBackColor(0x48a0ff);
+if (h.unknown_count) {
+    UNKNOWNS u;
+}
+
+SetBackColor(0xffa048);
+if (h.archive_count) {
+    ARCHIVES2 a2;
+}
 
 SetBackColor(0x909090);
 ZLIB z;
