@@ -24,7 +24,7 @@ typedef struct {
     u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 unknown0C <bgcolor=0xd8d8d8>;
 
-    u4 files_offset;
+    u4 names_length;
 
     u4 zero14 <bgcolor=0xd8d8d8>;
 
@@ -44,10 +44,10 @@ typedef struct {
     u4 unknown44 <bgcolor=0xd8d8d8>;
     u4 unknown48 <bgcolor=0xd8d8d8>;
     u4 unknown4C <bgcolor=0xd8d8d8>;
-    u4 unknown50 <bgcolor=0xd8d8d8>;
 
+    u4 archive_names_length;
     u4 file_count3 <format=decimal>;
-    u4 names_offset;
+    u4 type_names_length;
 
     u4 zero5C <bgcolor=0xd8d8d8>;
 
@@ -66,8 +66,9 @@ typedef struct {
 
     Assert(file_count2 == file_count, "HEADER file_count2 mismatch");
     Assert(file_count3 == file_count, "HEADER file_count3 mismatch");
-    Assert((file_count == 0) || (names_offset > 0), "HEADER names_offset is 0");
-    Assert((file_count == 0) || (files_offset > 0), "HEADER files_offset is 0");
+    Assert((file_count == 0) || (type_names_length > 0), "HEADER type_names_length is 0");
+    Assert((file_count == 0) || (names_length > 0), "HEADER names_length is 0");
+    Assert((archive_count == 0) || (archive_names_length > 0), "HEADER archive_names_length is 0");
     //Assert(dir_count == 0, "HEADER dir_count not 0");
     //Assert(part_count == 0, "HEADER part_count not 0");
     //Assert(other_count == 0, "HEADER other_count not 0");
@@ -106,10 +107,10 @@ typedef struct {
     u4 unknown0C <bgcolor=0xffd8d8>;
     u4 unknown10 <bgcolor=0xffd8d8>;
 
-    Assert(name_offset < h.files_offset, "TYPE name_offset too high");
+    Assert(name_offset < h.names_length, "TYPE name_offset too high");
 
     local quad o = FTell();
-    FSeek(name_offset + names_start);
+    FSeek(name_offset + full_names_offset);
 
     string name <bgcolor=0xff6060>;
 
@@ -139,10 +140,10 @@ typedef struct {
     u2 type <format=decimal>;
 
     Assert(type < h.type_count, "FILE type too high");
-    Assert(name_offset < h.files_offset, "FILE name_offset too high");
+    Assert(name_offset < h.names_length, "FILE name_offset too high");
 
     local quad o = FTell();
-    FSeek(name_offset + names_start);
+    FSeek(name_offset + full_names_offset);
 
     string name <bgcolor=0x60ff60>;
 
@@ -166,7 +167,7 @@ string read_FILES(FILES &in) {
 typedef struct {
     string type <bgcolor=0x6060ff>;
 
-    Assert(type == "STATIC", "HEADER2 type not STATIC");
+    Assert(type == "STATIC", "ARCHIVE type not STATIC");
     u1 zero06 <bgcolor=0xd8d8ff>;
 
     u4 zero08 <bgcolor=0xd8d8ff>;
@@ -189,29 +190,38 @@ typedef struct {
     u4 unknown44 <bgcolor=0xd8d8ff>;
     u4 zero48 <bgcolor=0xd8d8ff>;
 
-    Assert(zero06 == 0, "HEADER2 zero06");
-    Assert(zero08 == 0, "HEADER2 zero08");
-    Assert(zero0C == 0, "HEADER2 zero0C");
-    Assert(zero10 == 0, "HEADER2 zero10");
-    Assert(zero1C == 0, "HEADER2 zero1C");
-    Assert(zero2C == 0, "HEADER2 zero2C");
-    Assert(zero3C == 0, "HEADER2 zero3C");
-    Assert(zero40 == 0, "HEADER2 zero40");
-    Assert(zero48 == 0, "HEADER2 zero48");
-} HEADER2 <optimize=false,read=read_HEADER2>;
-string read_HEADER2(HEADER2 &in) {
+    Assert(zero06 == 0, "ARCHIVE zero06");
+    Assert(zero08 == 0, "ARCHIVE zero08");
+    Assert(zero0C == 0, "ARCHIVE zero0C");
+    Assert(zero10 == 0, "ARCHIVE zero10");
+    Assert(zero1C == 0, "ARCHIVE zero1C");
+    Assert(zero2C == 0, "ARCHIVE zero2C");
+    Assert(zero3C == 0, "ARCHIVE zero3C");
+    Assert(zero40 == 0, "ARCHIVE zero40");
+    Assert(zero48 == 0, "ARCHIVE zero48");
+} ARCHIVE <optimize=false,read=read_ARCHIVE>;
+string read_ARCHIVE(ARCHIVE &in) {
     string out;
     SPrintf(out, "\"%s\" %u %u", in.type, in.comp_size, in.uncomp_size);
     return out;
 }
 
 typedef struct {
+    ARCHIVE a[h.archive_count];
+} ARCHIVES <read=read_ARCHIVES>;
+string read_ARCHIVES(ARCHIVES &in) {
+    string out;
+    SPrintf(out, "%u", h.archive_count);
+    return out;
+}
+
+typedef struct {
     u4 name_offset;
 
-    Assert(name_offset < h.files_offset, "DIR name_offset too high");
+    Assert(name_offset < h.names_length, "DIR name_offset too high");
 
     local quad o = FTell();
-    FSeek(name_offset + names_start);
+    FSeek(name_offset + full_names_offset);
 
     string name <bgcolor=0x60ffff>;
 
@@ -240,10 +250,10 @@ typedef struct {
     u4 unknown0C <bgcolor=0xffd8ff>;
     u4 unknown10 <bgcolor=0xffd8ff>;
 
-    Assert(name_offset < h.files_offset, "PART name_offset too high");
+    Assert(name_offset < h.names_length, "PART name_offset too high");
 
     local quad o = FTell();
-    FSeek(name_offset + names_start);
+    FSeek(name_offset + full_names_offset);
 
     string name <bgcolor=0xff60ff>;
 
@@ -271,10 +281,10 @@ typedef struct {
 
     u4 unknown08 <bgcolor=0xffffd8>;
 
-    Assert(name_offset < h.files_offset, "OTHER name_offset too high");
+    Assert(name_offset < h.names_length, "OTHER name_offset too high");
 
     local quad o = FTell();
-    FSeek(name_offset + names_start);
+    FSeek(name_offset + full_names_offset);
 
     string name <bgcolor=0xffff60>;
 
@@ -308,13 +318,13 @@ local int i;
 
 Assert(ReadString(0, 4) == "FRES", "Bad sig!");
 
-local u4 names_start = 0x90;
+local u4 full_names_offset = 0x90;
 
 SetBackColor(0xb0b0b0);
 HEADER h;
 
 // skip main name table
-FSeek(h.files_offset + names_start);
+FSeek(h.names_length + full_names_offset);
 
 SetBackColor(0xffb0b0);
 if (h.type_count) {
@@ -327,7 +337,9 @@ if (h.file_count) {
 }
 
 SetBackColor(0xb0b0ff);
-HEADER2 h2;
+if (h.archive_count) {
+    ARCHIVES a;
+}
 
 SetBackColor(0xb0ffff);
 if (h.dir_count) {
