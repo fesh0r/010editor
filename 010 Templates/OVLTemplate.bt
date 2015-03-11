@@ -16,6 +16,7 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
+local u4 zlib_length = 0;
 
 typedef struct {
     char sig[4];
@@ -195,6 +196,11 @@ typedef struct {
 
     FSeek(o);
 
+    // check if STATIC archive
+    if (name == "STATIC") {
+        zlib_length = comp_size;
+    }
+
     Assert(zero04 == 0, "ARCHIVE zero04");
     Assert(zero08 == 0, "ARCHIVE zero08");
     Assert(zero14 == 0, "ARCHIVE zero14");
@@ -313,6 +319,14 @@ typedef struct {
     u4 unknown04 <bgcolor=0xd8d8d8>;
 } HEADER3;
 
+typedef struct {
+    Assert(zlib_length > 0, "ZLIB zlib_length is 0");
+    Assert(ReadUShort() == 0x9c78, "ZLIB bad zlib header");
+
+    u1 data[zlib_length];
+
+    Assert(FTell() == FileSize(), "ZLIB trailing data");
+} ZLIB;
 
 DisplayFormatHex();
 LittleEndian();
@@ -368,4 +382,5 @@ if (h.other_count) {
 SetBackColor(0xb0b0b0);
 HEADER3 h3;
 
-Assert(ReadUShort() == 0x9c78, "bad zlib header");
+SetBackColor(0x909090);
+ZLIB z;
