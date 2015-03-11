@@ -19,24 +19,6 @@ typedef byte   s1;
 local u4 names_start = 0x90;
 
 typedef struct {
-    SetBackColor(cNone);
-    if (FEof()) {
-        return;
-    }
-    local quad padding = 4 - FTell() & 3;
-    if (padding != 4) {
-        u1 p[padding];
-    }
-} PADDING4 <optimize=false,hidden=true>;
-
-typedef struct {
-    string s <bgcolor=0xffb0b0>;
-} STR <read=read_STR>;
-string read_STR(STR &in) {
-    return in.s;
-}
-
-typedef struct {
     char sig[4];
 
     u4 unknown04 <bgcolor=0xd8d8d8>;
@@ -172,13 +154,13 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    STR name;
+    string name;
 
     FSeek(o);
 } TYPE <optimize=false,read=read_TYPE>;
 string read_TYPE(TYPE &in) {
     string out;
-    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name.s, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
     return out;
 }
 
@@ -200,13 +182,13 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    STR name;
+    string name;
 
     FSeek(o);
 } FILE <optimize=false,read=read_FILE>;
 string read_FILE(FILE &in) {
     string out;
-    SPrintf(out, "\"%s\" \"%s\" 0x%08x 0x%x", in.name.s, t.t[in.type].name.s, in.hash, in.unknown08);
+    SPrintf(out, "\"%s\" \"%s\" 0x%08x 0x%x", in.name, t.t[in.type].name, in.hash, in.unknown08);
     return out;
 }
 
@@ -222,13 +204,13 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    STR name;
+    string name;
 
     FSeek(o);
 } DIR <optimize=false,read=read_DIR>;
 string read_DIR(DIR &in) {
     string out;
-    SPrintf(out, "\"%s\"", in.name.s);
+    SPrintf(out, "\"%s\"", in.name);
     return out;
 }
 
@@ -249,13 +231,13 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    STR name;
+    string name;
 
     FSeek(o);
 } PART <optimize=false,read=read_PART>;
 string read_PART(PART &in) {
     string out;
-    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name.s, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
     return out;
 }
 
@@ -275,13 +257,13 @@ typedef struct {
     local quad o = FTell();
     FSeek(name_offset + names_start);
 
-    STR name;
+    string name;
 
     FSeek(o);
 } OTHER <optimize=false,read=read_OTHER>;
 string read_OTHER(OTHER &in) {
     string out;
-    SPrintf(out, "\"%s\" 0x%x 0x%08x", in.name.s, in.unknown00, in.unknown08);
+    SPrintf(out, "\"%s\" 0x%x 0x%08x", in.name, in.unknown00, in.unknown08);
     return out;
 }
 
