@@ -3,7 +3,9 @@
 //
 // Name: Blaine Lefebvre
 // Purpose: display the structure of an exe file
-//------------------------------------
+// File mask: *.exe,*.dll
+// Update:    Sergey Evtushenko wildcar@mail.ru
+//            2014/07/25: Added Resource structure decode
 
 // DOS exe format
 typedef struct {
@@ -138,9 +140,164 @@ typedef struct{
         int32 Characteristics;
 } SectionTable;
 
+void GetResourceDirectory()
+    {
+    res_level+=1;
+    struct
+        {
+        local int32 j;
+        uint32 Characteristics;
+        DOSTIME TimeStamp;
+        DOSDATE DataStamp;
+        uint16 MajorVersion;
+        uint16 MinorVersion;
+        uint16 NumberOfNameEntries;
+        uint16 NumberOfIDEntries;
+        for( j=0;j<NumberOfNameEntries;j++)
+            {
+            struct
+                {
+                local int64 currentaddress;
+                uint32 NameRVA:31 <format=hex>;
+                int TopBit:1;
+                currentaddress= FTell();
+                FSeek(resource_sa+NameRVA);
+                int16 Length;
+                wchar_t UnicodeString[Length];
+                if (res_show_log==1){Printf("\nLevel %d. ",res_level);}
+                if (res_show_log==1){Printf("Name: %s",UnicodeString);}
+                FSeek(currentaddress);
+
+                uint32 DataEntryRVA:31 <format=hex>;
+                int PointToChild:1;
+                currentaddress= FTell();
+                if (PointToChild==1)
+                    {
+                    FSeek(resource_sa+DataEntryRVA);
+                    GetResourceDirectory();
+                    FSeek(currentaddress);
+                    };
+                } DirectoryNameEntry;
+            };
+        for( j=0;j<NumberOfIDEntries;j++)
+            {
+            struct
+                {
+                local int64 currentaddress;
+                //if (res_show_log==1){Printf("\nLevel %d. ",res_level);}
+                switch( res_level )
+                    {
+                    case 1:
+                    uint32 IntegerID <comment=ShowType>;
+                    rTypeID=IntegerID;
+                    if (res_show_log==1){Printf("\n%s",ShowType(rTypeID));}
+                    break;
+                    case 2:
+                    uint32 IntegerID <comment=ShowName>;
+                    rNameID=IntegerID;
+                    if (res_show_log==1){Printf("\n%s",ShowName(rNameID));}
+                    break;
+                    case 3:
+                    uint32 IntegerID <comment=ShowLanguage>;
+                    rLanguageID=IntegerID;
+                    if (res_show_log==1){Printf("\n%s",ShowLanguage(rLanguageID));}
+                    break;
+                    }
+                uint32 DataEntryRVA:31 <format=hex>;
+                int PointToChild:1;
+                currentaddress= FTell();
+                if (PointToChild==1)
+                    {
+                    FSeek(resource_sa+DataEntryRVA);
+                    GetResourceDirectory();
+                    FSeek(currentaddress);
+                    }
+                else
+                    {
+                    FSeek(resource_sa+DataEntryRVA);
+                    struct
+                        {
+                        local int64 ba1, ba2;
+                        int32 DataRVA <format=hex>;
+                        int32 Size;
+                        int32 Codepage;
+                        int32 Reserved;
+                        FSeek(DataRVA-(SectionVirtualAddress-resource_sa));
+                        if (rTypeID==16)
+                            {
+                            struct
+                                {
+                                ba1=FTell();
+                                char VersionInfoRAWData[Size];
+                                ba2=FTell();
+                                FSeek(ba1);
+                                struct{} VersionInfoStructure;
+                                FSeek(ba2);
+                                } versioninfo;
+                            }
+                        else
+                            {
+                        char ResourceRAWData[Size];
+                            };
+                        } DataEntry;
+                    FSeek(currentaddress);
+                    };
+                } DirectoryIDEntry;
+            };
+        } DirectoryTable;
+    res_level-=1;
+    };
+
+string ShowType(uint32 ID)
+    {
+    local string s;
+    switch( ID)
+        {
+        case 1: s="Cursor";break;
+        case 2: s="Bitmap";break;
+        case 3: s="Icon";break;
+        case 4: s="Menu";break;
+        case 5: s="Dialog box";break;
+        case 6: s="String table entry";break;
+        case 7: s="Font directory";break;
+        case 8: s="Font";break;
+        case 9: s="Accelerator table";break;
+        case 10: s="Application defined resource (raw data)";break;
+        case 11: s="Message table entry";break;
+        case 12: s="Group cursor";break;
+        case 14: s="Group icon";break;
+        case 16: s="Version information";break;
+        case 17: s="Dlginclude";break;
+        case 19: s="Plug and play resource";break;
+        case 20: s="VXD";break;
+        case 21: s="Animated cursor";break;
+        case 22: s="Animated icon";break;
+        case 23: s="HTML";break;
+        case 24: s="Side-by-side assembly manifest";break;
+        }
+    SPrintf( s, "Level 1. Resource type: %s", s );
+    return s;
+    }
+string ShowName(uint32 ID)
+    {
+    local string s;
+    SPrintf( s, "Level 2. Name ID: %d", ID );
+    return s;
+    }
+
+string ShowLanguage(uint32 ID)
+    {
+    local string s;
+    SPrintf( s, "Level 3. Language ID: %d", ID );
+    return s;
+    }
 ////////////////////////////////////////////////////////////////
 
 local int32 i, done, j;
+local int32 rTypeID, rNameID, rLanguageID;
+local int64 resource_sa, resource_ea, res_level;
+local int64 SectionVirtualAddress;
+local int res_show_log=0;
 SetBackColor(cLtGray);
 DosExeHeader DOSHead;
 
@@ -170,7 +327,21 @@ for ( i = 0 ; i < PEHead.NumSections ; i++ )
         }
     if ( !Strcmp(sec[i].Name,".rsrc") )
         {
-        char rsrcsection[sec[i].SizeOfRawData];
+        struct
+            {
+            resource_sa= FTell();
+            SectionVirtualAddress=sec[i].VirtualAddress;
+            char rawrsrcsection[sec[i].SizeOfRawData];
+            resource_ea= FTell();
+            FSeek(resource_sa);
+            struct
+                {
+                if (res_show_log==1){Printf("\nResources list.");}
+                res_level=0;
+                GetResourceDirectory();
+                } ResourcesStructure;
+            FSeek(resource_ea);
+            } rsrcsection;
         done = 1;
         }
     if ( !Strcmp(sec[i].Name,".rdata") )

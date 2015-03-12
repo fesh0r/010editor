@@ -53,4 +53,3 @@ struct DBF {
         char    fields[header.lengthOfEachRecord-1];
     } record [ header.numberOfRecords ] <optimize=false>;
 } dbf <optimize=false>;
-

@@ -3,7 +3,7 @@
 //
 // File:     BMPTemplate.bt
 // Author:   SweetScape Software
-// Revision: 2.1
+// Revision: 2.2
 // Purpose:  Defines a template for
 //    parsing BMP image files.
 //-----------------------------------
@@ -52,14 +52,14 @@ typedef struct {   // rgbt
 string ReadRGBQUAD( RGBQUAD &a )
 {
     string s;
-    SPrintf( s, "#%02X%02X%02X%02X", a.rgbReserved, a.rgbRed, a.rgbGreen, a.rgbBlue );
+    SPrintf( s, "#%02X%02X%02X%02X", (int)a.rgbReserved, (int)a.rgbRed, (int)a.rgbGreen, (int)a.rgbBlue );
     return s;
 }
 
 string ReadRGBTRIPLE( RGBTRIPLE &a )
 {
     string s;
-    SPrintf( s, "#%02X%02X%02X", a.rgbRed, a.rgbGreen, a.rgbBlue );
+    SPrintf( s, "#%02X%02X%02X", (int)a.rgbRed, (int)a.rgbGreen, (int)a.rgbBlue );
     return s;
 }
 
