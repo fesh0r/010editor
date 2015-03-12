@@ -161,7 +161,7 @@ string read_Attribute(Attribute &in) {
 
 typedef struct {
     local int i;
-    
+
     u1 isVertex;
     u2 length <hidden=true>;
     SetBackColor(0x80ff80);
@@ -327,7 +327,7 @@ typedef struct {
         u1 ColorWriteChannels3;
         u4 MultiSampleMask;
     }
-    
+
     u1 hasDepthStencilState <hidden=true>;
     if (hasDepthStencilState) {
         StencilOperation CounterClockwiseStencilDepthBufferFail;
