@@ -21,7 +21,9 @@ local u4 zlib_length = 0;
 typedef struct {
     char sig[4];
 
-    u4 unknown04 <bgcolor=0xd8d8d8>;
+    u2 version <bgcolor=0xd8d8d8>;
+
+    u2 unknown06 <bgcolor=0xd8d8d8>;
     u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 unknown0C <bgcolor=0xd8d8d8>;
 
@@ -67,6 +69,7 @@ typedef struct {
     u4 zero88 <hidden=true,bgcolor=cNone>;
     u4 zero8C <hidden=true,bgcolor=cNone>;
 
+    Assert((version == 0x1200) || (version == 0x1300), "HEADER version not 0x1200 or 0x1300");
     Assert(file_count2 == file_count, "HEADER file_count2 mismatch");
     Assert(file_count3 == file_count, "HEADER file_count3 mismatch");
     Assert((file_count == 0) || (type_names_length > 0), "HEADER type_names_length is 0");
@@ -80,9 +83,7 @@ typedef struct {
     Assert(!(dir_count != 0 && other_count != 0), "HEADER dir and other");
     Assert(!(part_count != 0 && other_count != 0), "HEADER part and other");
 
-    //Assert(unknown04 == 0x01001200, "HEADER unknown04 not 0x01001200");
-    //Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
-    //Assert(unknown0C == 0x00000000, "HEADER unknown0C not 0x00000000");
+    Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
 
     Assert(zero14 == 0, "HEADER zero14");
     Assert(zero5C == 0, "HEADER zero5C");
