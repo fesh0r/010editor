@@ -44,7 +44,7 @@ typedef struct {
     u4 unknown38 <bgcolor=0xd8d8d8>;
     u4 unknown3C <bgcolor=0xd8d8d8>;
 
-    u4 unknown_count;
+    u4 unknown_count <format=decimal>;
 
     u4 unknown44 <bgcolor=0xd8d8d8>;
     u4 unknown48 <bgcolor=0xd8d8d8>;
