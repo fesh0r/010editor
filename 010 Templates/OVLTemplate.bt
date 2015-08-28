@@ -17,6 +17,7 @@ typedef int16  s2;
 typedef byte   s1;
 
 local u4 zlib_length = 0;
+local u4 zlib_uncomp_length = 0;
 
 typedef struct {
     char sig[4];
@@ -120,7 +121,7 @@ typedef struct {
     FSeek(o);
 } TYPE <optimize=false,read=read_TYPE>;
 string read_TYPE(TYPE &in) {
-    string out;
+    local string out;
     SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
     return out;
 }
@@ -129,7 +130,7 @@ typedef struct {
     TYPE t[h.type_count];
 } TYPES <read=read_TYPES>;
 string read_TYPES(TYPES &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.type_count);
     return out;
 }
@@ -153,7 +154,7 @@ typedef struct {
     FSeek(o);
 } FILE <optimize=false,read=read_FILE>;
 string read_FILE(FILE &in) {
-    string out;
+    local string out;
     SPrintf(out, "\"%s\" \"%s\" 0x%08x 0x%x", in.name, t.t[in.type].name, in.hash, in.unknown08);
     return out;
 }
@@ -162,7 +163,7 @@ typedef struct {
     FILE f[h.file_count];
 } FILES <read=read_FILES>;
 string read_FILES(FILES &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.file_count);
     return out;
 }
@@ -201,6 +202,7 @@ typedef struct {
     // check if STATIC archive
     if (name == "STATIC") {
         zlib_length = comp_size;
+        zlib_uncomp_length = uncomp_size;
     }
 
     //Assert(unknown04 == 0, "ARCHIVE unknown04");
@@ -212,7 +214,7 @@ typedef struct {
     //Assert(unknown40 == 0, "ARCHIVE unknown40");
 } ARCHIVE <optimize=false,read=read_ARCHIVE>;
 string read_ARCHIVE(ARCHIVE &in) {
-    string out;
+    local string out;
     SPrintf(out, "\"%s\" 0x%x 0x%x", in.name, in.comp_size, in.uncomp_size);
     return out;
 }
@@ -221,7 +223,7 @@ typedef struct {
     ARCHIVE a[h.archive_count];
 } ARCHIVES <read=read_ARCHIVES>;
 string read_ARCHIVES(ARCHIVES &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.archive_count);
     return out;
 }
@@ -239,7 +241,7 @@ typedef struct {
     FSeek(o);
 } DIR <optimize=false,read=read_DIR>;
 string read_DIR(DIR &in) {
-    string out;
+    local string out;
     SPrintf(out, "\"%s\"", in.name);
     return out;
 }
@@ -248,7 +250,7 @@ typedef struct {
     DIR d[h.dir_count];
 } DIRS <read=read_DIRS>;
 string read_DIRS(DIRS &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.dir_count);
     return out;
 }
@@ -271,8 +273,18 @@ typedef struct {
     FSeek(o);
 } PART <optimize=false,read=read_PART>;
 string read_PART(PART &in) {
-    string out;
-    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    local string file_name;
+    SPrintf(file_name, "0x%08xh", in.hash);
+    local int i;
+    for (i = 0; i < h.file_count; i++) {
+        if (f.f[i].hash == in.hash) {
+            SPrintf(file_name, "\"%s\"", f.f[i].name);
+            break;
+        }
+    }
+
+    local string out;
+    SPrintf(out, "%s \"%s\" 0x%x 0x%x 0x%x", file_name, in.name, in.unknown08, in.unknown0C, in.unknown10);
     return out;
 }
 
@@ -280,7 +292,7 @@ typedef struct {
     PART p[h.part_count];
 } PARTS <read=read_PARTS>;
 string read_PARTS(PARTS &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.part_count);
     return out;
 }
@@ -302,7 +314,7 @@ typedef struct {
     FSeek(o);
 } OTHER <optimize=false,read=read_OTHER>;
 string read_OTHER(OTHER &in) {
-    string out;
+    local string out;
     SPrintf(out, "\"%s\" 0x%x 0x%08x", in.name, in.unknown00, in.unknown08);
     return out;
 }
@@ -311,7 +323,7 @@ typedef struct {
     OTHER o[h.other_count];
 } OTHERS <read=read_OTHERS>;
 string read_OTHERS(OTHERS &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.other_count);
     return out;
 }
@@ -322,7 +334,7 @@ typedef struct {
     u4 unknown08 <bgcolor=0x6cd0ff>;
 } UNKNOWN <optimize=false,read=read_UNKNOWN>;
 string read_UNKNOWN(UNKNOWN &in) {
-    string out;
+    local string out;
     SPrintf(out, "0x%x 0x%x 0x%x", in.unknown00, in.unknown04, in.unknown08);
     return out;
 }
@@ -331,7 +343,7 @@ typedef struct {
     UNKNOWN u[h.unknown_count];
 } UNKNOWNS <read=read_UNKNOWNS>;
 string read_UNKNOWNS(UNKNOWNS &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.unknown_count);
     return out;
 }
@@ -341,7 +353,7 @@ typedef struct {
     u4 unknown04 <bgcolor=0xffd06c>;
 } ARCHIVE2 <optimize=false,read=read_ARCHIVE2>;
 string read_ARCHIVE2(ARCHIVE2 &in) {
-    string out;
+    local string out;
     SPrintf(out, "0x%x 0x%x", in.unknown00, in.unknown04);
     return out;
 }
@@ -350,7 +362,7 @@ typedef struct {
     ARCHIVE2 a2[h.archive_count];
 } ARCHIVES2 <read=read_ARCHIVES2>;
 string read_ARCHIVES2(ARCHIVES2 &in) {
-    string out;
+    local string out;
     SPrintf(out, "%u", h.archive_count);
     return out;
 }
@@ -364,8 +376,8 @@ typedef struct {
     Assert(FTell() == FileSize(), "ZLIB trailing data");
 } ZLIB <read=read_ZLIB>;
 string read_ZLIB(ZLIB &in) {
-    string out;
-    SPrintf(out, "0x%x", zlib_length);
+    local string out;
+    SPrintf(out, "0x%x 0x%x", zlib_length, zlib_uncomp_length);
     return out;
 }
 
