@@ -100,9 +100,8 @@ typedef struct {
         shift += 7;
     } while (val & 0x80);
 } EncodedInt <read=read_EncodedInt,optimize=false>;
-
 string read_EncodedInt(EncodedInt &in) {
-    string out;
+    local string out;
 //  SPrintf(out, "%Xh", in.v);
     SPrintf(out, "%d", in.v);
     return out;
@@ -115,7 +114,6 @@ typedef struct {
         char v[length.v];
     }
 } EncodedStr <read=read_EncodedStr,optimize=false>;
-
 string read_EncodedStr(EncodedStr &in) {
     if (in.length.v) {
         return in.v;
@@ -156,9 +154,8 @@ typedef struct {
         return -1;
     }
 } XNB_Header <read=read_XNB_Header>;
-
 string read_XNB_Header(XNB_Header &in) {
-    string out;
+    local string out;
     SPrintf(out, "%s %s", EnumToString(in.platform), EnumToString(in.version));
     return out;
 }
@@ -167,7 +164,6 @@ typedef struct {
     EncodedInt readerIndex <read=EncIntReaderType>;
     u4 d;
 } XNB_Int32 <read=read_XNB_Int32,optimize=false>;
-
 string read_XNB_Int32(XNB_Int32 &in) {
     local string out;
     SPrintf(out, "%d", in.d);
@@ -178,7 +174,6 @@ typedef struct {
     EncodedInt readerIndex <read=EncIntReaderType>;
     float d;
 } XNB_Single <read=read_XNB_Single,optimize=false>;
-
 string read_XNB_Single(XNB_Single &in) {
     local string out;
     SPrintf(out, "%f", in.d);
@@ -245,7 +240,6 @@ typedef struct {
         u1 data[size];
     }
 } XNB_TextureData <read=read_TextureData,optimize=false>;
-
 string read_TextureData(XNB_TextureData &in) {
     local string out;
     SPrintf(out, "%d", in.size);
@@ -347,7 +341,6 @@ typedef struct {
         XNB_TextureData d[mipmap_levels];
     }
 } XNB_Texture2D <read=read_Texture2D,optimize=false>;
-
 string read_Texture2D(XNB_Texture2D &in) {
     local string out;
     SPrintf(out, "%dx%d", in.width, in.height);
@@ -366,7 +359,6 @@ typedef struct {
         XNB_TextureData d[mipmap_levels];
     }
 } XNB_Texture3D <read=read_Texture3D,optimize=false>;
-
 string read_Texture3D(XNB_Texture3D &in) {
     local string out;
     SPrintf(out, "%dx%dx%d", in.width, in.height, in.depth);
@@ -379,7 +371,6 @@ typedef struct {
     u4 width;
     u4 height;
 } Rectangle <read=read_Rectangle>;
-
 string read_Rectangle(Rectangle &in) {
     local string out;
     SPrintf(out, "%d,%d %dx%d", in.x, in.y, in.width, in.height);
@@ -395,7 +386,6 @@ typedef struct {
         Rectangle d[num];
     }
 } XNB_List_Rectangle <read=read_List_Rectangle,optimize=false>;
-
 string read_List_Rectangle(XNB_List_Rectangle &in) {
     local string out;
     SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
@@ -410,7 +400,6 @@ typedef struct {
         char d[num];
     }
 } XNB_List_Char <read=read_List_Char,optimize=false>;
-
 string read_List_Char(XNB_List_Char &in) {
     local string out;
     SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
@@ -422,7 +411,6 @@ typedef struct {
     float y;
     float z;
 } Vector3 <read=read_Vector3>;
-
 string read_Vector3(Vector3 &in) {
     local string out;
     SPrintf(out, "%.2f,%.2f,%.2f", in.x, in.y, in.z);
@@ -433,7 +421,6 @@ typedef struct {
     float x;
     float y;
 } Vector2 <read=read_Vector2>;
-
 string read_Vector2(Vector2 &in) {
     local string out;
     SPrintf(out, "%.2f,%.2f,", in.x, in.y);
@@ -449,7 +436,6 @@ typedef struct {
         Vector3 d[num];
     }
 } XNB_List_Vector3 <read=read_List_Vector3,optimize=false>;
-
 string read_List_Vector3(XNB_List_Vector3 &in) {
     local string out;
     SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
@@ -460,7 +446,6 @@ typedef struct {
     EncodedInt readerIndex <read=EncIntReaderType>;
     EncodedStr d;
 } XNB_String <read=read_XNB_String,optimize=false>;
-
 string read_XNB_String(XNB_String &in) {
     return read_EncodedStr(in.d);
 }
@@ -473,7 +458,6 @@ typedef struct {
         XNB_String d[num];
     }
 } XNB_List_String <read=read_List_String,optimize=false>;
-
 string read_List_String(XNB_List_String &in) {
     local string out;
     SPrintf(out, "%s[%d]", EncIntReaderType(in.readerIndex), in.num);
@@ -530,7 +514,6 @@ typedef struct {
     XNB_String k;
     XNB_String v;
 } XNB_Dict_String_String_Entry <read=read_XNB_Dict_String_String_Entry, optimize=false>;
-
 string read_XNB_Dict_String_String_Entry(XNB_Dict_String_String_Entry &in) {
     return read_XNB_String(in.k);
 }
@@ -543,7 +526,6 @@ typedef struct {
         XNB_Dict_String_String_Entry d[num];
     }
 } XNB_Dict_String_String <read=read_XNB_Dict_String_String, optimize=false>;
-
 string read_XNB_Dict_String_String(XNB_Dict_String_String &in) {
     local string out;
     SPrintf(out, "Dict(String,String)[%d]", in.num);
@@ -554,7 +536,6 @@ typedef struct {
     XNB_String k;
     XNB_Dict_String_String v;
 } XNB_Dict_String_Dict_String_String_entry <read=read_XNB_Dict_String_Dict_String_String_entry, optimize=false>;
-
 string read_XNB_Dict_String_Dict_String_String_entry(XNB_Dict_String_Dict_String_String_entry &in) {
     return read_XNB_String(in.k);
 }
@@ -567,7 +548,6 @@ typedef struct {
         XNB_Dict_String_Dict_String_String_entry d[num];
     }
 } XNB_Dict_String_Dict_String_String <read=read_XNB_Dict_String_Dict_String_String, optimize=false>;
-
 string read_XNB_Dict_String_Dict_String_String(XNB_Dict_String_Dict_String_String &in) {
     local string out;
     SPrintf(out, "Dict(String,Dict(String,String))[%d]", in.num);
@@ -592,6 +572,15 @@ typedef struct {
 typedef struct {
     EncodedInt readerIndex <read=EncIntReaderType>;
 
+    u4 num;
+    if (num) {
+        XNB_Texture2D d[num];
+    }
+} XNB_Array_Texture <optimize=false>;
+
+typedef struct {
+    EncodedInt readerIndex <read=EncIntReaderType>;
+
     s4 duration;
     s4 loop_times_from;
     s4 loop_times_to;
@@ -607,7 +596,6 @@ typedef struct {
     u1 one_at_a_time;
     u1 cut_off_tail;
 } FEZ_Loop <read=read_FEZ_Loop,optimize=false>;
-
 string read_FEZ_Loop(FEZ_Loop &in) {
     return read_EncodedStr(in.name);
 }
@@ -632,7 +620,6 @@ typedef struct {
     XNB_Enum assemble_chord;
     u1 random_ordering;
 } FEZ_TrackedSong <read=read_FEZ_TrackedSong,optimize=false>;
-
 string read_FEZ_TrackedSong(FEZ_TrackedSong &in) {
     return read_EncodedStr(in.name);
 }
@@ -687,7 +674,6 @@ typedef struct {
 
     EncodedInt readerIndex2 <read=EncIntReaderType>;
 } FEZ_ArtObject <read=read_FEZ_ArtObject,optimize=false>;
-
 string read_FEZ_ArtObject(FEZ_ArtObject &in) {
     return read_EncodedStr(in.name);
 }
@@ -732,7 +718,6 @@ typedef struct {
     s4 actual_height;
     XNB_List_Frame frames;
 } FEZ_AnimatedTexture <read=read_FEZ_AnimatedTexture,optimize=false>;
-
 string read_FEZ_AnimatedTexture(FEZ_AnimatedTexture &in) {
     local string out;
     SPrintf(out, "FEZ_AnimatedTexture(%dx%d,%d)", in.actual_width, in.actual_height, in.frames.num);
@@ -743,7 +728,6 @@ typedef struct {
     EncodedStr type;
     u4 version;
 } XNB_Reader <read=read_XNB_Reader,optimize=false>;
-
 string read_XNB_Reader(XNB_Reader &in) {
     return ReaderType((string)in.type.v);
 }
@@ -885,6 +869,10 @@ string ReaderType(string type) {
             out = "AnimatedTexture (FEZ)";
             break;
 
+        case "Microsoft.Xna.Framework.Content.ArrayReader`1[[Microsoft.Xna.Framework.Graphics.Texture]]":
+            out = "Array(Texture)";
+            break;
+
         default:
             out = type;
 /*
@@ -919,9 +907,8 @@ typedef struct {
         parentof(this).eof = 1;
     }
 } LZX_Block <read=read_LZX_Block,optimize=false>;
-
 string read_LZX_Block(LZX_Block &in) {
-    string out;
+    local string out;
     if (in.block_size && in.frame_size) {
         SPrintf(out, "%04Xh %04Xh", in.block_size, in.frame_size);
     }
@@ -947,9 +934,8 @@ typedef struct (int size) {
     }
     LittleEndian();
 } LZX_Stream <read=read_LZX_Stream,optimize=false>;
-
 string read_LZX_Stream(LZX_Stream &in) {
-    string out;
+    local string out;
     SPrintf(out, "%d %d", in.comp_size, in.full_size);
     return out;
 }
@@ -1028,6 +1014,10 @@ switch (type) {
 
     case "Microsoft.Xna.Framework.Content.DictionaryReader`2[[System.String],[System.Collections.Generic.Dictionary`2[[System.String],[System.String]]]]":
         XNB_Dict_String_Dict_String_String d;
+        break;
+
+    case "Microsoft.Xna.Framework.Content.ArrayReader`1[[Microsoft.Xna.Framework.Graphics.Texture]]":
+        XNB_Array_Texture d;
         break;
 
     case "FezEngine.Readers.TrackedSongReader":
