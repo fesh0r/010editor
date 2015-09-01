@@ -122,7 +122,7 @@ typedef struct {
 } TYPE <optimize=false,read=read_TYPE>;
 string read_TYPE(TYPE &in) {
     local string out;
-    SPrintf(out, "\"%s\" 0x%08x 0x%x 0x%x 0x%x", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    SPrintf(out, "\"%s\" %08Xh %Xh %Xh %Xh", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
     return out;
 }
 
@@ -155,7 +155,7 @@ typedef struct {
 } FILE <optimize=false,read=read_FILE>;
 string read_FILE(FILE &in) {
     local string out;
-    SPrintf(out, "\"%s\" \"%s\" 0x%08x 0x%x", in.name, t.t[in.type].name, in.hash, in.unknown08);
+    SPrintf(out, "\"%s\" \"%s\" %08Xh %Xh", in.name, t.t[in.type].name, in.hash, in.unknown08);
     return out;
 }
 
@@ -215,7 +215,7 @@ typedef struct {
 } ARCHIVE <optimize=false,read=read_ARCHIVE>;
 string read_ARCHIVE(ARCHIVE &in) {
     local string out;
-    SPrintf(out, "\"%s\" 0x%x 0x%x", in.name, in.comp_size, in.uncomp_size);
+    SPrintf(out, "\"%s\" %Xh %Xh", in.name, in.comp_size, in.uncomp_size);
     return out;
 }
 
@@ -274,7 +274,7 @@ typedef struct {
 } PART <optimize=false,read=read_PART>;
 string read_PART(PART &in) {
     local string file_name;
-    SPrintf(file_name, "0x%08xh", in.hash);
+    SPrintf(file_name, "%08Xh", in.hash);
     local int i;
     for (i = 0; i < h.file_count; i++) {
         if (f.f[i].hash == in.hash) {
@@ -284,7 +284,7 @@ string read_PART(PART &in) {
     }
 
     local string out;
-    SPrintf(out, "%s \"%s\" 0x%x 0x%x 0x%x", file_name, in.name, in.unknown08, in.unknown0C, in.unknown10);
+    SPrintf(out, "%s \"%s\" %Xh %Xh %Xh", file_name, in.name, in.unknown08, in.unknown0C, in.unknown10);
     return out;
 }
 
@@ -315,7 +315,7 @@ typedef struct {
 } OTHER <optimize=false,read=read_OTHER>;
 string read_OTHER(OTHER &in) {
     local string out;
-    SPrintf(out, "\"%s\" 0x%x 0x%08x", in.name, in.unknown00, in.unknown08);
+    SPrintf(out, "\"%s\" %Xh %08Xh", in.name, in.unknown00, in.unknown08);
     return out;
 }
 
@@ -335,7 +335,7 @@ typedef struct {
 } UNKNOWN <optimize=false,read=read_UNKNOWN>;
 string read_UNKNOWN(UNKNOWN &in) {
     local string out;
-    SPrintf(out, "0x%x 0x%x 0x%x", in.unknown00, in.unknown04, in.unknown08);
+    SPrintf(out, "%Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08);
     return out;
 }
 
@@ -350,11 +350,11 @@ string read_UNKNOWNS(UNKNOWNS &in) {
 
 typedef struct {
     u4 unknown00 <bgcolor=0xffd06c>;
-    u4 unknown04 <bgcolor=0xffd06c>;
+    u4 data_size <bgcolor=0xffd06c>;
 } ARCHIVE2 <optimize=false,read=read_ARCHIVE2>;
 string read_ARCHIVE2(ARCHIVE2 &in) {
     local string out;
-    SPrintf(out, "0x%x 0x%x", in.unknown00, in.unknown04);
+    SPrintf(out, "%Xh %Xh", in.unknown00, in.data_size);
     return out;
 }
 
@@ -377,7 +377,7 @@ typedef struct {
 } ZLIB <read=read_ZLIB>;
 string read_ZLIB(ZLIB &in) {
     local string out;
-    SPrintf(out, "0x%x 0x%x", zlib_length, zlib_uncomp_length);
+    SPrintf(out, "%Xh %Xh", zlib_length, zlib_uncomp_length);
     return out;
 }
 
