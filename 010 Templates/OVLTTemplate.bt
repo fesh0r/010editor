@@ -1,0 +1,145 @@
+//--------------------------------------
+//--- 010 Editor v6.0.2 Binary Template
+//
+// File: OVLTTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse Elite Dangerous compressed ovl texture block
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    u4 file_hash;
+    u4 type_hash;
+    u4 unknown08;
+    u4 unknown0C;
+    u4 unknown10;
+    u4 file_length;
+} FILE_HEAD1 <read=read_FILE_HEAD1>;
+string read_FILE_HEAD1(FILE_HEAD1 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.unknown0C, in.unknown10, in.file_length);
+    return out;
+}
+
+typedef struct {
+    u4 unknown00;
+    u4 unknown04;
+    u4 unknown08;
+    u4 file_length;
+} FILE_HEAD2 <read=read_FILE_HEAD2>;
+string read_FILE_HEAD2(FILE_HEAD2 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08, in.file_length);
+    return out;
+}
+
+typedef struct {
+    u4 file_hash;
+    u4 type_hash;
+    u4 unknown08;
+    u4 offset;
+} FILE_HEAD3 <read=read_FILE_HEAD3>;
+string read_FILE_HEAD3(FILE_HEAD3 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.offset);
+    return out;
+}
+typedef struct {
+    u4 unknown00;
+    u4 offset1;
+    u4 unknown08;
+    u4 offset2;
+} FILE_HEAD4 <read=read_FILE_HEAD4>;
+string read_FILE_HEAD4(FILE_HEAD4 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.offset1, in.unknown08, in.offset2);
+    return out;
+}
+typedef struct (int file_count) {
+    u4 unknown00;
+    u4 unknown04;
+    u4 unknown08;
+    u4 unknown0C;
+    
+    u4 file_hash;
+    u4 unknown14;
+    u4 type_hash;
+    u4 unknown1C;
+    
+    if (file_count > 0) {
+        FILE_HEAD1 fh1[file_count];
+        FILE_HEAD2 fh2[file_count];
+        FILE_HEAD3 fh3[file_count];
+        FILE_HEAD4 fh4[file_count];
+    }
+
+    u4 unknown68;
+    u4 unknown6C;
+    
+    u8 sig;
+
+    Assert(sig == 0x010204083F7FBFFF, "HEADER signature not 0x010204083F7FBFFF");
+} HEADER;
+
+typedef struct {
+    u4 unknown00;
+    u4 unknown04;
+    u4 unknown08;
+    u4 unknown0C;
+} TEXTURE_HEAD1 <read=read_TEXTURE_HEAD1>;
+string read_TEXTURE_HEAD1(TEXTURE_HEAD1 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08, in.unknown0C);
+    return out;
+}
+
+typedef struct {
+    u2 width <format=decimal>;
+    u2 height <format=decimal>;
+    u4 unknown04;
+} TEXTURE_HEAD2 <read=read_TEXTURE_HEAD2>;
+string read_TEXTURE_HEAD2(TEXTURE_HEAD2 &in) {
+    local string out;
+    SPrintf(out, "%dx%d %Xh %Xh", in.width, in.height, in.unknown04, (u4)in.width * (u4)in.height * (u4)in.unknown04);
+    return out;
+}
+
+typedef struct (int i) {
+    local int size = (u4)th2[i].width * (u4)th2[i].height * (u4)th2[i].unknown04;
+    u1 d[size];
+} TEXTURE_DATA <read=read_TEXTURE_DATA>;
+string read_TEXTURE_DATA(TEXTURE_DATA &in) {
+    local string out;
+    SPrintf(out, "%Xd", in.size);
+    return out;
+}
+
+DisplayFormatHex();
+LittleEndian();
+
+local int file_count = 4;
+
+local int i;
+
+SetBackColor(0xb0b0b0);
+HEADER h(file_count);
+
+SetBackColor(0xffb0b0);
+TEXTURE_HEAD1 th1[file_count];
+
+SetBackColor(0xff8080);
+TEXTURE_HEAD2 th2[file_count];
+
+SetBackColor(0xb0b0ff);
+for (i = 0; i < file_count; i++) {
+    TEXTURE_DATA td(i);
+}
