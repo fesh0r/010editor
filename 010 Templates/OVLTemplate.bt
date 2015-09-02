@@ -187,7 +187,7 @@ typedef struct {
 
     u4 zero34 <bgcolor=0xd8d8ff>;
     u4 unknown38 <bgcolor=0xd8d8ff>;
-    u4 unknown3c <bgcolor=0xd8d8ff>;
+    u4 unknown3C <bgcolor=0xd8d8ff>;
     u4 unknown40 <bgcolor=0xd8d8ff>;
 
     Assert(name_offset < h.archive_names_length, "FILE name_offset too high");

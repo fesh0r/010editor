@@ -19,23 +19,26 @@ typedef byte   s1;
 typedef struct {
     u4 file_hash;
     u4 type_hash;
-    u4 unknown08;
-    u4 unknown0C;
-    u4 unknown10;
+    u4 unknown08 <bgcolor=0xd8d8d8>;
+    u4 zero0C <bgcolor=cNone>;
+    u4 zero10 <bgcolor=cNone>;
     u4 file_length;
-} FILE_HEAD1 <read=read_FILE_HEAD1>;
+
+    Assert(zero0C == 0, "FILE_HEAD1 zero0C");
+    Assert(zero10 == 0, "FILE_HEAD1 zero10");
+} FILE_HEAD1 <optimize=true,read=read_FILE_HEAD1>;
 string read_FILE_HEAD1(FILE_HEAD1 &in) {
     local string out;
-    SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.unknown0C, in.unknown10, in.file_length);
+    SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.zero0C, in.zero10, in.file_length);
     return out;
 }
 
 typedef struct {
-    u4 unknown00;
-    u4 unknown04;
-    u4 unknown08;
+    u4 unknown00 <bgcolor=0xd8d8d8>;
+    u4 unknown04 <bgcolor=0xd8d8d8>;
+    u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 file_length;
-} FILE_HEAD2 <read=read_FILE_HEAD2>;
+} FILE_HEAD2 <optimize=true,read=read_FILE_HEAD2>;
 string read_FILE_HEAD2(FILE_HEAD2 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08, in.file_length);
@@ -45,35 +48,36 @@ string read_FILE_HEAD2(FILE_HEAD2 &in) {
 typedef struct {
     u4 file_hash;
     u4 type_hash;
-    u4 unknown08;
+    u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 offset;
-} FILE_HEAD3 <read=read_FILE_HEAD3>;
+} FILE_HEAD3 <optimize=true,read=read_FILE_HEAD3>;
 string read_FILE_HEAD3(FILE_HEAD3 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.offset);
     return out;
 }
 typedef struct {
-    u4 unknown00;
+    u4 unknown00 <bgcolor=0xd8d8d8>;
     u4 offset1;
-    u4 unknown08;
+    u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 offset2;
-} FILE_HEAD4 <read=read_FILE_HEAD4>;
+} FILE_HEAD4 <optimize=true,read=read_FILE_HEAD4>;
 string read_FILE_HEAD4(FILE_HEAD4 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.offset1, in.unknown08, in.offset2);
     return out;
 }
 typedef struct (int file_count) {
-    u4 unknown00;
-    u4 unknown04;
-    u4 unknown08;
-    u4 unknown0C;
+    u2 unknown00 <bgcolor=0xd8d8d8>;
+    u2 unknown02 <bgcolor=0xd8d8d8>;
+    u4 zero04 <bgcolor=cNone>;
+    u4 unknown08 <bgcolor=0xd8d8d8>;
+    u4 zero0C <bgcolor=cNone>;
     
     u4 file_hash;
-    u4 unknown14;
+    u4 unknown14 <bgcolor=0xd8d8d8>;
     u4 type_hash;
-    u4 unknown1C;
+    u4 zero1C <bgcolor=cNone>;
     
     if (file_count > 0) {
         FILE_HEAD1 fh1[file_count];
@@ -82,20 +86,25 @@ typedef struct (int file_count) {
         FILE_HEAD4 fh4[file_count];
     }
 
-    u4 unknown68;
-    u4 unknown6C;
+    u4 zero68 <bgcolor=cNone>;
+    u4 zero6C <bgcolor=cNone>;
     
     u8 sig;
 
     Assert(sig == 0x010204083F7FBFFF, "HEADER signature not 0x010204083F7FBFFF");
+    Assert(zero04 == 0, "HEADER zero04");
+    Assert(zero0C == 0, "HEADER zero0C");
+    Assert(zero1C == 0, "HEADER zero1C");
+    Assert(zero68 == 0, "HEADER zero68");
+    Assert(zero6C == 0, "HEADER zero6C");
 } HEADER;
 
 typedef struct {
-    u4 unknown00;
-    u4 unknown04;
-    u4 unknown08;
-    u4 unknown0C;
-} TEXTURE_HEAD1 <read=read_TEXTURE_HEAD1>;
+    u4 unknown00 <bgcolor=0xffd8d8>;
+    u4 unknown04 <bgcolor=0xffd8d8>;
+    u4 unknown08 <bgcolor=0xffd8d8>;
+    u4 unknown0C <bgcolor=0xffd8d8>;
+} TEXTURE_HEAD1 <optimize=true,read=read_TEXTURE_HEAD1>;
 string read_TEXTURE_HEAD1(TEXTURE_HEAD1 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08, in.unknown0C);
@@ -105,8 +114,8 @@ string read_TEXTURE_HEAD1(TEXTURE_HEAD1 &in) {
 typedef struct {
     u2 width <format=decimal>;
     u2 height <format=decimal>;
-    u4 unknown04;
-} TEXTURE_HEAD2 <read=read_TEXTURE_HEAD2>;
+    u4 unknown04 <bgcolor=0xd8ffd8>;
+} TEXTURE_HEAD2 <optimize=true,read=read_TEXTURE_HEAD2>;
 string read_TEXTURE_HEAD2(TEXTURE_HEAD2 &in) {
     local string out;
     SPrintf(out, "%dx%d %Xh %Xh", in.width, in.height, in.unknown04, (u4)in.width * (u4)in.height * (u4)in.unknown04);
@@ -126,7 +135,7 @@ string read_TEXTURE_DATA(TEXTURE_DATA &in) {
 DisplayFormatHex();
 LittleEndian();
 
-local int file_count = 4;
+local int file_count = 1;
 
 local int i;
 
@@ -136,7 +145,7 @@ HEADER h(file_count);
 SetBackColor(0xffb0b0);
 TEXTURE_HEAD1 th1[file_count];
 
-SetBackColor(0xff8080);
+SetBackColor(0x80ff80);
 TEXTURE_HEAD2 th2[file_count];
 
 SetBackColor(0xb0b0ff);
