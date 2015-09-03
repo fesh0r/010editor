@@ -17,6 +17,34 @@ typedef int16  s2;
 typedef byte   s1;
 
 typedef struct {
+    u2 unknown00 <bgcolor=0xd8d8d8>;
+    u2 unknown02 <bgcolor=0xd8d8d8>;
+} FILE_HEAD1 <optimize=true,read=read_FILE_HEAD1>;
+string read_FILE_HEAD1(FILE_HEAD1 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh", in.unknown00, in.unknown02);
+    return out;
+}
+
+typedef struct {
+    u4 zero00 <bgcolor=cNone>;
+    u4 h2_size;
+    u4 h2_offset;
+    u4 file_hash <bgcolor=0xd8d8d8>;
+    u4 unknown10 <bgcolor=0xd8d8d8>;
+    u4 type_hash <bgcolor=0xd8d8d8>;
+    u4 zero18 <bgcolor=cNone>;
+
+    Assert(zero00 == 0, "FILE_HEAD2 zero00");
+    Assert(zero18 == 0, "FILE_HEAD2 zero18");
+} FILE_HEAD2 <optimize=true,read=read_FILE_HEAD2>;
+string read_FILE_HEAD2(FILE_HEAD2 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh %Xh", in.zero00, in.h2_size, in.h2_offset, in.file_hash, in.unknown10, in.type_hash, in.zero18);
+    return out;
+}
+
+typedef struct {
     u4 file_hash;
     u4 type_hash;
     u4 unknown08 <bgcolor=0xd8d8d8>;
@@ -24,10 +52,10 @@ typedef struct {
     u4 zero10 <bgcolor=cNone>;
     u4 file_length;
 
-    Assert(zero0C == 0, "FILE_HEAD1 zero0C");
-    Assert(zero10 == 0, "FILE_HEAD1 zero10");
-} FILE_HEAD1 <optimize=true,read=read_FILE_HEAD1>;
-string read_FILE_HEAD1(FILE_HEAD1 &in) {
+    Assert(zero0C == 0, "FILE_HEAD3 zero0C");
+    Assert(zero10 == 0, "FILE_HEAD3 zero10");
+} FILE_HEAD3 <optimize=true,read=read_FILE_HEAD3>;
+string read_FILE_HEAD3(FILE_HEAD3 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.zero0C, in.zero10, in.file_length);
     return out;
@@ -38,8 +66,8 @@ typedef struct {
     u4 unknown04 <bgcolor=0xd8d8d8>;
     u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 file_length;
-} FILE_HEAD2 <optimize=true,read=read_FILE_HEAD2>;
-string read_FILE_HEAD2(FILE_HEAD2 &in) {
+} FILE_HEAD4 <optimize=true,read=read_FILE_HEAD4>;
+string read_FILE_HEAD4(FILE_HEAD4 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08, in.file_length);
     return out;
@@ -50,8 +78,8 @@ typedef struct {
     u4 type_hash;
     u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 offset;
-} FILE_HEAD3 <optimize=true,read=read_FILE_HEAD3>;
-string read_FILE_HEAD3(FILE_HEAD3 &in) {
+} FILE_HEAD5 <optimize=true,read=read_FILE_HEAD5>;
+string read_FILE_HEAD5(FILE_HEAD5 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.offset);
     return out;
@@ -61,42 +89,38 @@ typedef struct {
     u4 offset1;
     u4 unknown08 <bgcolor=0xd8d8d8>;
     u4 offset2;
-} FILE_HEAD4 <optimize=true,read=read_FILE_HEAD4>;
-string read_FILE_HEAD4(FILE_HEAD4 &in) {
+} FILE_HEAD6 <optimize=true,read=read_FILE_HEAD6>;
+string read_FILE_HEAD6(FILE_HEAD6 &in) {
     local string out;
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.offset1, in.unknown08, in.offset2);
     return out;
 }
-typedef struct (int file_count) {
-    u2 unknown00 <bgcolor=0xd8d8d8>;
-    u2 unknown02 <bgcolor=0xd8d8d8>;
-    u4 zero04 <bgcolor=cNone>;
-    u4 unknown08 <bgcolor=0xd8d8d8>;
-    u4 zero0C <bgcolor=cNone>;
-    
-    u4 file_hash;
-    u4 unknown14 <bgcolor=0xd8d8d8>;
-    u4 type_hash;
-    u4 zero1C <bgcolor=cNone>;
-    
-    if (file_count > 0) {
-        FILE_HEAD1 fh1[file_count];
-        FILE_HEAD2 fh2[file_count];
-        FILE_HEAD3 fh3[file_count];
-        FILE_HEAD4 fh4[file_count];
+
+typedef struct (int fh1_count, int fh2_count, int fh3_count, int fh4_count, int fh5_count, int fh6_count) {
+    if (fh1_count) {
+        FILE_HEAD1 fh1[fh1_count];
+    }
+    if (fh2_count) {
+        FILE_HEAD2 fh2[fh2_count];
+    }
+    if (fh3_count) {
+        FILE_HEAD3 fh3[fh3_count];
+    }
+    if (fh4_count) {
+        FILE_HEAD4 fh4[fh4_count];
+    }
+    if (fh5_count) {
+        FILE_HEAD5 fh5[fh5_count];
+    }
+    if (fh6_count) {
+        FILE_HEAD6 fh6[fh6_count];
     }
 
-    u4 zero68 <bgcolor=cNone>;
-    u4 zero6C <bgcolor=cNone>;
-    
+    u8 zero68 <bgcolor=cNone>;
     u8 sig;
 
     Assert(sig == 0x010204083F7FBFFF, "HEADER signature not 0x010204083F7FBFFF");
-    Assert(zero04 == 0, "HEADER zero04");
-    Assert(zero0C == 0, "HEADER zero0C");
-    Assert(zero1C == 0, "HEADER zero1C");
     Assert(zero68 == 0, "HEADER zero68");
-    Assert(zero6C == 0, "HEADER zero6C");
 } HEADER;
 
 typedef struct {
@@ -135,20 +159,48 @@ string read_TEXTURE_DATA(TEXTURE_DATA &in) {
 DisplayFormatHex();
 LittleEndian();
 
-local int file_count = 1;
+//local int texture_count = 4; // StationIdents/Data.ovl
+//local int header2_size = 0x60; // StationIdents/Data.ovl
+//local int data_size = 0x1ab00; // StationIdents/Data.ovl
+//local int texture_count = 0; // Astro.ovl
+//local int header2_size = 0x1490; // Astro.ovl
+//local int data_size = 0x0; // Astro.ovl
+//local int texture_count = 3; // Earth/Data.ovl
+local int header2_size = 0x28; // Earth/Data.ovl
+local int data_size = 0xaaac; // Earth/Data.ovl
 
 local int i;
 
 SetBackColor(0xb0b0b0);
-HEADER h(file_count);
+//HEADER h(1, 1, 4, 4, 4, 4); // StationIdents/Data.ovl
+//HEADER h(2, 2, 0, 0, 23, 104); // Astro.ovl
+HEADER h(1, 1, 1, 1, 1, 1); // Earth/Data.ovl
 
+if (header2_size) {
+    SetBackColor(0xffb0b0);
+    u1 h2[header2_size];
+}
+
+if (data_size) {
+    SetBackColor(0xb0b0ff);
+    u1 d[data_size];
+}
+
+/*
 SetBackColor(0xffb0b0);
-TEXTURE_HEAD1 th1[file_count];
+if (texture_count) {
+    TEXTURE_HEAD1 th1[texture_count];
+}
 
 SetBackColor(0x80ff80);
-TEXTURE_HEAD2 th2[file_count];
+if (texture_count) {
+    TEXTURE_HEAD2 th2[texture_count];
+}
 
 SetBackColor(0xb0b0ff);
-for (i = 0; i < file_count; i++) {
-    TEXTURE_DATA td(i);
+if (texture_count) {
+    for (i = 0; i < texture_count; i++) {
+        TEXTURE_DATA td(i);
+    }
 }
+*/
