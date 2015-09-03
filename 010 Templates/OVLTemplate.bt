@@ -109,7 +109,7 @@ typedef struct {
 
     u4 unknown08 <bgcolor=0xffd8d8>;
     u4 unknown0C <bgcolor=0xffd8d8>;
-    u4 unknown10 <bgcolor=0xffd8d8>;
+    u4 count <format=decimal>;
 
     Assert(name_offset < h.names_length, "TYPE name_offset too high");
 
@@ -122,7 +122,7 @@ typedef struct {
 } TYPE <optimize=false,read=read_TYPE>;
 string read_TYPE(TYPE &in) {
     local string out;
-    SPrintf(out, "\"%s\" %08Xh %Xh %Xh %Xh", in.name, in.hash, in.unknown08, in.unknown0C, in.unknown10);
+    SPrintf(out, "\"%s\" %08Xh %Xh %Xh %d", in.name, in.hash, in.unknown08, in.unknown0C, in.count);
     return out;
 }
 
@@ -174,7 +174,8 @@ typedef struct {
     u4 unknown04 <bgcolor=0xd8d8ff>;
     u4 unknown08 <bgcolor=0xd8d8ff>;
     u4 unknown0C <bgcolor=0xd8d8ff>;
-    u4 unknown10 <bgcolor=0xd8d8ff>;
+    u2 unknown10 <bgcolor=0xd8d8ff>;
+    u2 unknown12 <bgcolor=0xd8d8ff>;
     u4 zero14 <bgcolor=0xd8d8ff>;
     u4 unknown18 <bgcolor=0xd8d8ff>;
     u4 unknown1C <bgcolor=0xd8d8ff>;

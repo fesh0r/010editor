@@ -48,16 +48,13 @@ typedef struct {
     u4 file_hash;
     u4 type_hash;
     u4 unknown08 <bgcolor=0xd8d8d8>;
-    u4 zero0C <bgcolor=cNone>;
-    u4 zero10 <bgcolor=cNone>;
+    u4 unknown0C <bgcolor=0xd8d8d8>;
+    u4 unknown10 <bgcolor=0xd8d8d8>;
     u4 file_length;
-
-    Assert(zero0C == 0, "FILE_HEAD3 zero0C");
-    Assert(zero10 == 0, "FILE_HEAD3 zero10");
 } FILE_HEAD3 <optimize=true,read=read_FILE_HEAD3>;
 string read_FILE_HEAD3(FILE_HEAD3 &in) {
     local string out;
-    SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.zero0C, in.zero10, in.file_length);
+    SPrintf(out, "%Xh %Xh %Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.unknown0C, in.unknown10, in.file_length);
     return out;
 }
 
@@ -123,51 +120,23 @@ typedef struct (int fh1_count, int fh2_count, int fh3_count, int fh4_count, int 
     Assert(zero68 == 0, "HEADER zero68");
 } HEADER;
 
-typedef struct {
-    u4 unknown00 <bgcolor=0xffd8d8>;
-    u4 unknown04 <bgcolor=0xffd8d8>;
-    u4 unknown08 <bgcolor=0xffd8d8>;
-    u4 unknown0C <bgcolor=0xffd8d8>;
-} TEXTURE_HEAD1 <optimize=true,read=read_TEXTURE_HEAD1>;
-string read_TEXTURE_HEAD1(TEXTURE_HEAD1 &in) {
-    local string out;
-    SPrintf(out, "%Xh %Xh %Xh %Xh", in.unknown00, in.unknown04, in.unknown08, in.unknown0C);
-    return out;
-}
-
-typedef struct {
-    u2 width <format=decimal>;
-    u2 height <format=decimal>;
-    u4 unknown04 <bgcolor=0xd8ffd8>;
-} TEXTURE_HEAD2 <optimize=true,read=read_TEXTURE_HEAD2>;
-string read_TEXTURE_HEAD2(TEXTURE_HEAD2 &in) {
-    local string out;
-    SPrintf(out, "%dx%d %Xh %Xh", in.width, in.height, in.unknown04, (u4)in.width * (u4)in.height * (u4)in.unknown04);
-    return out;
-}
-
-typedef struct (int i) {
-    local int size = (u4)th2[i].width * (u4)th2[i].height * (u4)th2[i].unknown04;
-    u1 d[size];
-} TEXTURE_DATA <read=read_TEXTURE_DATA>;
-string read_TEXTURE_DATA(TEXTURE_DATA &in) {
-    local string out;
-    SPrintf(out, "%Xd", in.size);
-    return out;
-}
-
 DisplayFormatHex();
 LittleEndian();
 
-//local int texture_count = 4; // StationIdents/Data.ovl
-//local int header2_size = 0x60; // StationIdents/Data.ovl
-//local int data_size = 0x1ab00; // StationIdents/Data.ovl
-//local int texture_count = 0; // Astro.ovl
-//local int header2_size = 0x1490; // Astro.ovl
-//local int data_size = 0x0; // Astro.ovl
-//local int texture_count = 3; // Earth/Data.ovl
-local int header2_size = 0x28; // Earth/Data.ovl
-local int data_size = 0xaaac; // Earth/Data.ovl
+local int header2_size = 0;
+local int data1_size = 0;
+local int data2_size = 0;
+
+//header2_size = 0x60; // StationIdents/Data.ovl
+//data2_size = 0x1ab00; // StationIdents/Data.ovl
+//header2_size = 0x1490; // Astro.ovl
+header2_size = 0x28; // Earth/Data.ovl
+data2_size = 0xaaac; // Earth/Data.ovl
+//header2_size = 8; // Earth/Data.ovs.textures_l0
+//data2_size = 0x2aaaaac; // Earth/Data.ovs.textures_l0
+//header2_size = 0x2a0; // Root_Final.ovl
+//data1_size = 0x0234; // Root_Final.ovl
+//data2_size = 0x5570; // Root_Final.ovl
 
 local int i;
 
@@ -175,32 +144,21 @@ SetBackColor(0xb0b0b0);
 //HEADER h(1, 1, 4, 4, 4, 4); // StationIdents/Data.ovl
 //HEADER h(2, 2, 0, 0, 23, 104); // Astro.ovl
 HEADER h(1, 1, 1, 1, 1, 1); // Earth/Data.ovl
+//HEADER h(1, 1, 1, 0, 0, 0); // Earth/Data.ovs.textures_l0
+//HEADER h(2, 2, 5, 2, 5, 12); // Root_Final.ovl
+//HEADER h(4, 4, 3, 3, 5, 13); // FederationSymbol/Data.ovl
 
 if (header2_size) {
     SetBackColor(0xffb0b0);
     u1 h2[header2_size];
 }
 
-if (data_size) {
+if (data1_size) {
     SetBackColor(0xb0b0ff);
-    u1 d[data_size];
+    u1 d1[data1_size];
 }
 
-/*
-SetBackColor(0xffb0b0);
-if (texture_count) {
-    TEXTURE_HEAD1 th1[texture_count];
+if (data2_size) {
+    SetBackColor(0xd0d0ff);
+    u1 d2[data2_size];
 }
-
-SetBackColor(0x80ff80);
-if (texture_count) {
-    TEXTURE_HEAD2 th2[texture_count];
-}
-
-SetBackColor(0xb0b0ff);
-if (texture_count) {
-    for (i = 0; i < texture_count; i++) {
-        TEXTURE_DATA td(i);
-    }
-}
-*/
