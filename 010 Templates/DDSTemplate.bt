@@ -144,7 +144,7 @@ string read_DDS_CAPS2(DDS_CAPS2 &in) {
     return out;
 }
 
-typedef enum <UINT> { 
+typedef enum <UINT> {
     DXGI_FORMAT_UNKNOWN = 0,
     DXGI_FORMAT_R32G32B32A32_TYPELESS = 1,
     DXGI_FORMAT_R32G32B32A32_FLOAT = 2,
@@ -267,7 +267,7 @@ typedef enum <UINT> {
     DXGI_FORMAT_FORCE_UINT = 0xffffffff
 } DXGI_FORMAT;
 
-typedef enum <UINT> { 
+typedef enum <UINT> {
     D3D10_RESOURCE_DIMENSION_TEXTURE1D = 2,
     D3D10_RESOURCE_DIMENSION_TEXTURE2D = 3,
     D3D10_RESOURCE_DIMENSION_TEXTURE3D = 4
@@ -275,7 +275,7 @@ typedef enum <UINT> {
 
 typedef struct {
     DXGI_FORMAT dxgiFormat;
-    enum <UINT> { 
+    enum <UINT> {
         TEXTURE1D = 2,
         TEXTURE2D = 3,
         TEXTURE3D = 4
