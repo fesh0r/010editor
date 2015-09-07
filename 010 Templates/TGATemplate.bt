@@ -1,0 +1,159 @@
+//--------------------------------------
+//--- 010 Editor v2.0.2 Binary Template
+//
+// File:	TGATemplate.bt
+// Author:	Chiuta Adrian Marius
+// E-mail:	camsoftwarero@yahoo.com
+// Revision:	1.0
+// Purpose:	Shows the fields of a TGA image.
+//--------------------------------------
+
+//Definim structurile folosite de TGA
+typedef struct{
+   WORD   FirstIndexEntry;
+   WORD   ColorMapLength;
+   UBYTE  ColorMapEntrySize;   
+}COLORMAPSPECIFICATION;
+
+typedef struct{
+   WORD   XOrigin;
+   WORD   YOrigin;
+   WORD   Width;
+   WORD   Height;
+   UBYTE  PixelDepth;
+   UBYTE  ImageDescriptor;   
+}IMAGESPECIFICATION <read=ReadImageSpecification>;
+
+typedef struct{
+   UBYTE  IDLength;
+   UBYTE  ColorMapType;
+   UBYTE  ImageType;
+   COLORMAPSPECIFICATION CMSpecification;
+   IMAGESPECIFICATION ISpecification;
+}TGAFILEHEADER <read=ReadTGAHeader>;
+
+typedef struct{
+   DWORD B:5;
+   DWORD G:5;
+   DWORD R:5;
+}RGB555 <read=ReadRGB555>;
+
+typedef struct{
+   DWORD B:5;
+   DWORD G:5;
+   DWORD R:5;
+   DWORD X:1;
+}XRGB1555 <read=ReadXRGB1555>;
+
+typedef struct{
+   UBYTE B;
+   UBYTE G;
+   UBYTE R;
+}RGB888 <read=ReadRGB888>;
+
+typedef struct{
+   UBYTE B;
+   UBYTE G;
+   UBYTE R;
+   UBYTE A;
+}ARGB8888 <read=ReadARGB8888>;
+
+string ReadTGAHeader(TGAFILEHEADER &a)
+{
+    switch( a.ImageType )
+   {
+    case 0:
+	return "No Image Data Included";
+    case 1:
+      	return "Uncompressed, Color-mapped Image";
+    case 2:
+	return "Uncompressed, True-color Image";
+    case 3:
+	return "Uncompressed, Black-and-white Image";
+    case 9:
+	return "Run-length encoded, Color-mapped Image";
+    case 10:
+	return "Run-length encoded, True-color Image";
+    case 11:
+	return "Run-length encoded, Black-and-white Image";
+   }
+}
+string ReadImageSpecification(IMAGESPECIFICATION &a)
+{
+    string s;
+    SPrintf( s, "Res: %dx%d^%d", a.Width, a.Height, a.PixelDepth );
+    return s;
+}
+string ReadRGB555( RGB555 &a )
+{
+    string s;
+    SPrintf( s, "B=%03d G=%03d R=%03d", a.B, a.G, a.R );
+    return s;
+}
+string ReadXRGB1555( XRGB1555 &a )
+{
+    string s;
+    SPrintf( s, "X=%1d B=%03d G=%03d R=%03d",a.X, a.B, a.G, a.R );
+    return s;
+}
+
+string ReadRGB888( RGB888 &a )
+{
+    string s;
+    SPrintf( s, "B=%03d G=%03d R=%03d", a.B, a.G, a.R );
+    return s;
+}
+
+string ReadARGB8888( ARGB8888 &a )
+{
+    string s;
+    SPrintf( s, "A=%03d B=%03d G=%03d R=%03d",a.A, a.B, a.G, a.R );
+    return s;
+}
+
+LittleEndian(); 
+SetBackColor( cLtGray );
+//Definim headerului fisierului TGA
+TGAFILEHEADER TGAfh;
+
+
+if( TGAfh.IDLength!=0 )//Definim ID-ul imaginii TGA
+	UBYTE  ImageID[ TGAfh.IDLength ];
+
+SetBackColor( cSilver );
+//Definim culorile indexate asociate TGA-ului
+if( TGAfh.ColorMapType!=0 )
+	switch( TGAfh.CMSpecification.ColorMapEntrySize)
+	{
+	case 15:
+		RGB555 ColorMap[ TGAfh.CMSpecification.ColorMapLength ];
+		break;
+	case 16:
+		XRGB1555 ColorMap[ TGAfh.CMSpecification.ColorMapLength ];
+		break;
+	case 24:
+		RGB888 ColorMap[ TGAfh.CMSpecification.ColorMapLength ];
+		break;
+	case 32:
+		ARGB8888 ColorMap[ TGAfh.CMSpecification.ColorMapLength ];
+		break;
+	}
+SetBackColor( cLtAqua );
+struct TGALine {
+	switch( TGAfh.ISpecification.PixelDepth )
+	{
+	case 8:
+		UBYTE ColorIndex[TGAfh.ISpecification.Height];
+		break;
+	case 16:
+		XRGB1555 Pixel[TGAfh.ISpecification.Height];
+		break;
+	case 24:
+		RGB888 Pixel[TGAfh.ISpecification.Height];
+		break;
+	case 32:
+		ARGB8888 Pixel[TGAfh.ISpecification.Height];
+		break;
+	}
+}TGALines [ TGAfh.ISpecification.Width ] <optimize=true>;
+ 
