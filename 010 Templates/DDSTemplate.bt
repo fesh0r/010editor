@@ -282,7 +282,7 @@ typedef struct {
     } resourceDimension;
     struct DDS10_MISC {
         UINT reserved: 2 <hidden=true>;
-        UINT TEXTURECUBE: 1;
+        UINT TEXTURECUBE: 1 <format=decimal>;
         UINT reserved: 29 <hidden=true>;
     } miscFlag <read=read_DDS10_MISC>;
     UINT arraySize <format=decimal>;
