@@ -1,0 +1,338 @@
+//--------------------------------------
+//--- 010 Editor v6.0.2 Binary Template
+//
+// File: DDSTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: DDS File parser
+//--------------------------------------
+
+typedef struct {
+    DWORD dwSize <hidden=true>;
+    Assert(dwSize == 32, "DDS_PIXELFORMAT size not 32");
+
+    struct DDPF_FLAGS {
+        DWORD ALPHAPIXELS: 1 <format=decimal>; // 0x1
+        DWORD ALPHA: 1 <format=decimal>; // 0x2
+        DWORD FOURCC: 1 <format=decimal>; // 0x4
+        DWORD reserved: 3 <hidden=true>;
+        DWORD RGB: 1 <format=decimal>; // 0x40
+        DWORD reserved: 2 <hidden=true>;
+        DWORD YUV: 1 <format=decimal>; // 0x200
+        DWORD reserved: 7 <hidden=true>;
+        DWORD LUMINANCE: 1 <format=decimal>; // 0x2000
+        DWORD reserved: 14 <hidden=true>;
+    } dwFlags <read=read_DDPF_FLAGS>;
+    char dwFourCC[4];
+    DWORD dwRGBBitCount <format=decimal>;
+    DWORD dwRBitMask;
+    DWORD dwGBitMask;
+    DWORD dwBBitMask;
+    DWORD dwABitMask;
+} DDS_PIXELFORMAT <read=read_DDS_PIXELFORMAT>;
+string read_DDS_PIXELFORMAT(DDS_PIXELFORMAT &in) {
+    return in.dwFourCC;
+}
+string read_DDPF_FLAGS(DDPF_FLAGS &in) {
+    local string out;
+    if (in.ALPHAPIXELS) out += "ALPHAPIXELS ";
+    if (in.ALPHA) out += "ALPHA ";
+    if (in.FOURCC) out += "FOURCC ";
+    if (in.RGB) out += "RGB ";
+    if (in.YUV) out += "YUV ";
+    if (in.LUMINANCE) out += "LUMINANCE ";
+    return out;
+}
+
+typedef struct {
+    DWORD dwSize <hidden=true>;
+    Assert(dwSize == 124, "DDS_HEADER size not 124");
+
+    struct DDS_FLAGS {
+        DWORD CAPS: 1 <format=decimal>; // 0x1
+        DWORD HEIGHT: 1 <format=decimal>; // 0x2
+        DWORD WIDTH: 1 <format=decimal>; // 0x4
+        DWORD PITCH: 1 <format=decimal>; // 0x8
+        DWORD reserved: 8 <hidden=true>;
+        DWORD PIXELFORMAT: 1 <format=decimal>; // 0x1000
+        DWORD reserved: 4 <hidden=true>;
+        DWORD MIPMAPCOUNT: 1 <format=decimal>; // 0x20000
+        DWORD reserved: 1 <hidden=true>;
+        DWORD LINEARSIZE: 1 <format=decimal>; // 0x80000
+        DWORD reserved : 3 <hidden=true>;
+        DWORD DEPTH: 1 <format=decimal>; // 0x800000
+        DWORD reserved: 8 <hidden=true>;
+    } dwFlags <read=read_DDS_FLAGS>;
+
+    DWORD dwHeight <format=decimal>;
+    DWORD dwWidth <format=decimal>;
+    DWORD dwPitchOrLinearSize;
+    DWORD dwDepth <format=decimal>;
+    DWORD dwMipMapCount <format=decimal>;
+    DWORD dwReserved1[11] <hidden=true,bgcolor=0xd8d8d8>;
+
+    DDS_PIXELFORMAT ddspf;
+
+    struct DDS_CAPS {
+        DWORD reserved: 3 <hidden=true>;
+        DWORD COMPLEX: 1 <format=decimal>; // 0x8
+        DWORD reserved: 8 <hidden=true>;
+        DWORD TEXTURE: 1 <format=decimal>; // 0x1000
+        DWORD reserved: 9 <hidden=true>;
+        DWORD MIPMAP: 1 <format=decimal>; // 0x400000
+        DWORD reserved: 8 <hidden=true>;
+    } dwCaps <read=read_DDS_CAPS>;
+
+    struct DDS_CAPS2 {
+        DWORD reserved: 9 <hidden=true>;
+        DWORD CUBEMAP: 1 <format=decimal>; // 0x200
+        DWORD CUBEMAP_POSITIVEX: 1 <format=decimal>; // 0x400
+        DWORD CUBEMAP_NEGATIVEX: 1 <format=decimal>; // 0x800
+        DWORD CUBEMAP_POSITIVEY: 1 <format=decimal>; // 0x1000
+        DWORD CUBEMAP_NEGATIVEY: 1 <format=decimal>; // 0x2000
+        DWORD CUBEMAP_POSITIVEZ: 1 <format=decimal>; // 0x4000
+        DWORD CUBEMAP_NEGATIVEZ: 1 <format=decimal>; // 0x8000
+        DWORD reserved: 5 <hidden=true>;
+        DWORD VOLUME: 1 <format=decimal>; // 0x20000
+        DWORD reserved: 10 <hidden=true>;
+    } dwCaps2 <read=read_DDS_CAPS2>;
+
+    struct DDS_CAPS3 {
+        DWORD reserved: 32 <hidden=true>;
+    } dwCaps3 <hidden=true,bgcolor=0xd8d8d8>;
+
+    struct DDS_CAPS4 {
+        DWORD reserved: 32 <hidden=true>;
+    } dwCaps4 <hidden=true,bgcolor=0xd8d8d8>;
+
+    DWORD dwReserved2 <hidden=true,bgcolor=0xd8d8d8>;
+} DDS_HEADER <read=read_DDS_HEADER>;
+string read_DDS_HEADER(DDS_HEADER &in) {
+    local string out;
+    SPrintf(out, "%dx%d %s", in.dwWidth, in.dwHeight, read_DDS_PIXELFORMAT(in.ddspf));
+    return out;
+}
+string read_DDS_FLAGS(DDS_FLAGS &in) {
+    local string out;
+    if (in.CAPS) out += "CAPS ";
+    if (in.HEIGHT) out += "HEIGHT ";
+    if (in.WIDTH) out += "WIDTH ";
+    if (in.PITCH) out += "PITCH ";
+    if (in.PIXELFORMAT) out += "PIXELFORMAT ";
+    if (in.MIPMAPCOUNT) out += "MIPMAPCOUNT ";
+    if (in.LINEARSIZE) out += "LINEARSIZE ";
+    if (in.DEPTH) out += "DEPTH ";
+    return out;
+}
+string read_DDS_CAPS(DDS_CAPS &in) {
+    local string out;
+    if (in.COMPLEX) out += "COMPLEX ";
+    if (in.TEXTURE) out += "TEXTURE ";
+    if (in.MIPMAP) out += "MIPMAP ";
+    return out;
+}
+string read_DDS_CAPS2(DDS_CAPS2 &in) {
+    local string out;
+    if (in.CUBEMAP) out += "CUBEMAP ";
+    if (in.CUBEMAP_POSITIVEX) out += "CUBEMAP_POSITIVEX ";
+    if (in.CUBEMAP_NEGATIVEX) out += "CUBEMAP_NEGATIVEX ";
+    if (in.CUBEMAP_POSITIVEY) out += "CUBEMAP_POSITIVEY ";
+    if (in.CUBEMAP_NEGATIVEY) out += "CUBEMAP_NEGATIVEY ";
+    if (in.CUBEMAP_POSITIVEZ) out += "CUBEMAP_POSITIVEZ ";
+    if (in.CUBEMAP_NEGATIVEZ) out += "CUBEMAP_NEGATIVEZ ";
+    if (in.VOLUME) out += "VOLUME ";
+    return out;
+}
+
+typedef enum <UINT> { 
+    DXGI_FORMAT_UNKNOWN = 0,
+    DXGI_FORMAT_R32G32B32A32_TYPELESS = 1,
+    DXGI_FORMAT_R32G32B32A32_FLOAT = 2,
+    DXGI_FORMAT_R32G32B32A32_UINT = 3,
+    DXGI_FORMAT_R32G32B32A32_SINT = 4,
+    DXGI_FORMAT_R32G32B32_TYPELESS = 5,
+    DXGI_FORMAT_R32G32B32_FLOAT = 6,
+    DXGI_FORMAT_R32G32B32_UINT = 7,
+    DXGI_FORMAT_R32G32B32_SINT = 8,
+    DXGI_FORMAT_R16G16B16A16_TYPELESS = 9,
+    DXGI_FORMAT_R16G16B16A16_FLOAT = 10,
+    DXGI_FORMAT_R16G16B16A16_UNORM = 11,
+    DXGI_FORMAT_R16G16B16A16_UINT = 12,
+    DXGI_FORMAT_R16G16B16A16_SNORM = 13,
+    DXGI_FORMAT_R16G16B16A16_SINT = 14,
+    DXGI_FORMAT_R32G32_TYPELESS = 15,
+    DXGI_FORMAT_R32G32_FLOAT = 16,
+    DXGI_FORMAT_R32G32_UINT = 17,
+    DXGI_FORMAT_R32G32_SINT = 18,
+    DXGI_FORMAT_R32G8X24_TYPELESS = 19,
+    DXGI_FORMAT_D32_FLOAT_S8X24_UINT = 20,
+    DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS = 21,
+    DXGI_FORMAT_X32_TYPELESS_G8X24_UINT = 22,
+    DXGI_FORMAT_R10G10B10A2_TYPELESS = 23,
+    DXGI_FORMAT_R10G10B10A2_UNORM = 24,
+    DXGI_FORMAT_R10G10B10A2_UINT = 25,
+    DXGI_FORMAT_R11G11B10_FLOAT = 26,
+    DXGI_FORMAT_R8G8B8A8_TYPELESS = 27,
+    DXGI_FORMAT_R8G8B8A8_UNORM = 28,
+    DXGI_FORMAT_R8G8B8A8_UNORM_SRGB = 29,
+    DXGI_FORMAT_R8G8B8A8_UINT = 30,
+    DXGI_FORMAT_R8G8B8A8_SNORM = 31,
+    DXGI_FORMAT_R8G8B8A8_SINT = 32,
+    DXGI_FORMAT_R16G16_TYPELESS = 33,
+    DXGI_FORMAT_R16G16_FLOAT = 34,
+    DXGI_FORMAT_R16G16_UNORM = 35,
+    DXGI_FORMAT_R16G16_UINT = 36,
+    DXGI_FORMAT_R16G16_SNORM = 37,
+    DXGI_FORMAT_R16G16_SINT = 38,
+    DXGI_FORMAT_R32_TYPELESS = 39,
+    DXGI_FORMAT_D32_FLOAT = 40,
+    DXGI_FORMAT_R32_FLOAT = 41,
+    DXGI_FORMAT_R32_UINT = 42,
+    DXGI_FORMAT_R32_SINT = 43,
+    DXGI_FORMAT_R24G8_TYPELESS = 44,
+    DXGI_FORMAT_D24_UNORM_S8_UINT = 45,
+    DXGI_FORMAT_R24_UNORM_X8_TYPELESS = 46,
+    DXGI_FORMAT_X24_TYPELESS_G8_UINT = 47,
+    DXGI_FORMAT_R8G8_TYPELESS = 48,
+    DXGI_FORMAT_R8G8_UNORM = 49,
+    DXGI_FORMAT_R8G8_UINT = 50,
+    DXGI_FORMAT_R8G8_SNORM = 51,
+    DXGI_FORMAT_R8G8_SINT = 52,
+    DXGI_FORMAT_R16_TYPELESS = 53,
+    DXGI_FORMAT_R16_FLOAT = 54,
+    DXGI_FORMAT_D16_UNORM = 55,
+    DXGI_FORMAT_R16_UNORM = 56,
+    DXGI_FORMAT_R16_UINT = 57,
+    DXGI_FORMAT_R16_SNORM = 58,
+    DXGI_FORMAT_R16_SINT = 59,
+    DXGI_FORMAT_R8_TYPELESS = 60,
+    DXGI_FORMAT_R8_UNORM = 61,
+    DXGI_FORMAT_R8_UINT = 62,
+    DXGI_FORMAT_R8_SNORM = 63,
+    DXGI_FORMAT_R8_SINT = 64,
+    DXGI_FORMAT_A8_UNORM = 65,
+    DXGI_FORMAT_R1_UNORM = 66,
+    DXGI_FORMAT_R9G9B9E5_SHAREDEXP = 67,
+    DXGI_FORMAT_R8G8_B8G8_UNORM = 68,
+    DXGI_FORMAT_G8R8_G8B8_UNORM = 69,
+    DXGI_FORMAT_BC1_TYPELESS = 70,
+    DXGI_FORMAT_BC1_UNORM = 71,
+    DXGI_FORMAT_BC1_UNORM_SRGB = 72,
+    DXGI_FORMAT_BC2_TYPELESS = 73,
+    DXGI_FORMAT_BC2_UNORM = 74,
+    DXGI_FORMAT_BC2_UNORM_SRGB = 75,
+    DXGI_FORMAT_BC3_TYPELESS = 76,
+    DXGI_FORMAT_BC3_UNORM = 77,
+    DXGI_FORMAT_BC3_UNORM_SRGB = 78,
+    DXGI_FORMAT_BC4_TYPELESS = 79,
+    DXGI_FORMAT_BC4_UNORM = 80,
+    DXGI_FORMAT_BC4_SNORM = 81,
+    DXGI_FORMAT_BC5_TYPELESS = 82,
+    DXGI_FORMAT_BC5_UNORM = 83,
+    DXGI_FORMAT_BC5_SNORM = 84,
+    DXGI_FORMAT_B5G6R5_UNORM = 85,
+    DXGI_FORMAT_B5G5R5A1_UNORM = 86,
+    DXGI_FORMAT_B8G8R8A8_UNORM = 87,
+    DXGI_FORMAT_B8G8R8X8_UNORM = 88,
+    DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM = 89,
+    DXGI_FORMAT_B8G8R8A8_TYPELESS = 90,
+    DXGI_FORMAT_B8G8R8A8_UNORM_SRGB = 91,
+    DXGI_FORMAT_B8G8R8X8_TYPELESS = 92,
+    DXGI_FORMAT_B8G8R8X8_UNORM_SRGB = 93,
+    DXGI_FORMAT_BC6H_TYPELESS = 94,
+    DXGI_FORMAT_BC6H_UF16 = 95,
+    DXGI_FORMAT_BC6H_SF16 = 96,
+    DXGI_FORMAT_BC7_TYPELESS = 97,
+    DXGI_FORMAT_BC7_UNORM = 98,
+    DXGI_FORMAT_BC7_UNORM_SRGB = 99,
+    DXGI_FORMAT_AYUV = 100,
+    DXGI_FORMAT_Y410 = 101,
+    DXGI_FORMAT_Y416 = 102,
+    DXGI_FORMAT_NV12 = 103,
+    DXGI_FORMAT_P010 = 104,
+    DXGI_FORMAT_P016 = 105,
+    DXGI_FORMAT_420_OPAQUE = 106,
+    DXGI_FORMAT_YUY2 = 107,
+    DXGI_FORMAT_Y210 = 108,
+    DXGI_FORMAT_Y216 = 109,
+    DXGI_FORMAT_NV11 = 110,
+    DXGI_FORMAT_AI44 = 111,
+    DXGI_FORMAT_IA44 = 112,
+    DXGI_FORMAT_P8 = 113,
+    DXGI_FORMAT_A8P8 = 114,
+    DXGI_FORMAT_B4G4R4A4_UNORM = 115,
+    DXGI_FORMAT_P208 = 130,
+    DXGI_FORMAT_V208 = 131,
+    DXGI_FORMAT_V408 = 132,
+    DXGI_FORMAT_FORCE_UINT = 0xffffffff
+} DXGI_FORMAT;
+
+typedef enum <UINT> { 
+    D3D10_RESOURCE_DIMENSION_TEXTURE1D = 2,
+    D3D10_RESOURCE_DIMENSION_TEXTURE2D = 3,
+    D3D10_RESOURCE_DIMENSION_TEXTURE3D = 4
+} D3D10_RESOURCE_DIMENSION;
+
+typedef struct {
+    DXGI_FORMAT dxgiFormat;
+    enum <UINT> { 
+        TEXTURE1D = 2,
+        TEXTURE2D = 3,
+        TEXTURE3D = 4
+    } resourceDimension;
+    struct DDS10_MISC {
+        UINT reserved: 2 <hidden=true>;
+        UINT TEXTURECUBE: 1;
+        UINT reserved: 29 <hidden=true>;
+    } miscFlag <read=read_DDS10_MISC>;
+    UINT arraySize <format=decimal>;
+    struct DDS10_MISC2 {
+        enum <UINT> {
+            ALPHA_MODE_UNKNOWN,
+            ALPHA_MODE_STRAIGHT,
+            ALPHA_MODE_PREMULTIPLIED,
+            ALPHA_MODE_OPAQUE,
+            ALPHA_MODE_CUSTOM
+        } alpha: 3;
+        UINT reserved: 29 <hidden=true>;
+    } miscFlags2 <read=read_DDS10_MISC2>;
+} DDS_HEADER_DXT10 <read=read_DDS_HEADER_DXT10>;
+string read_DDS_HEADER_DXT10(DDS_HEADER_DXT10 &in) {
+    return EnumToString(in.dxgiFormat);
+}
+string read_DDS10_MISC(DDS10_MISC &in) {
+    local string out;
+    if (in.TEXTURECUBE) out += "TEXTURECUBE ";
+    return out;
+}
+string read_DDS10_MISC2(DDS10_MISC2 &in) {
+    return EnumToString(in.alpha);
+}
+
+DisplayFormatHex();
+LittleEndian();
+
+Assert(ReadString(0, 4) == "DDS ", "Bad sig!");
+
+SetBackColor(0xb0b0b0);
+char dwMagic[4];
+
+DDS_HEADER header;
+
+if (header.ddspf.dwFlags.FOURCC && header.ddspf.dwFourCC == "DX10") {
+    DDS_HEADER_DXT10 header10;
+}
+
+SetBackColor(0xffb0b0);
+if (header.dwFlags.LINEARSIZE) {
+    UBYTE bdata[header.dwPitchOrLinearSize];
+} else if (header.dwFlags.PITCH) {
+    struct {
+        UBYTE row[header.dwPitchOrLinearSize];
+    } bdata[header.dwHeight];
+}
+
+SetBackColor(0xb0ffb0);
+if (!FEof()) {
+    UBYTE bdata2[FileSize() - FTell()];
+}
