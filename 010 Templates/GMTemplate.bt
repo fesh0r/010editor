@@ -17,6 +17,8 @@ typedef int16  s2;
 typedef byte   s1;
 
 typedef struct {
+    SetBackColor(0xd8d8d8);
+
     char tag[4];
     u4 size;
 } HEAD <read=read_HEAD>;
@@ -30,6 +32,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } DATA <read=read_DATA,optimize=false>;
@@ -41,6 +44,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } GEN8 <read=read_GEN8,optimize=false>;
@@ -52,6 +56,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } OPTN <read=read_OPTN,optimize=false>;
@@ -63,6 +68,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } EXTN <read=read_EXTN,optimize=false>;
@@ -104,6 +110,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } AGRP <read=read_AGRP,optimize=false>;
@@ -115,6 +122,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } SPRT <read=read_SPRT,optimize=false>;
@@ -156,6 +164,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } PATH <read=read_PATH,optimize=false>;
@@ -197,6 +206,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } SHDR <read=read_SHDR,optimize=false>;
@@ -208,6 +218,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } FONT <read=read_FONT,optimize=false>;
@@ -219,6 +230,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } TMLN <read=read_TMLN,optimize=false>;
@@ -230,6 +242,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } OBJT <read=read_OBJT,optimize=false>;
@@ -241,6 +254,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } ROOM <read=read_ROOM,optimize=false>;
@@ -252,6 +266,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } DAFL <read=read_DAFL,optimize=false>;
@@ -263,6 +278,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } TPAG <read=read_TPAG,optimize=false>;
@@ -274,6 +290,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } CODE <read=read_CODE,optimize=false>;
@@ -285,6 +302,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } VARI <read=read_VARI,optimize=false>;
@@ -296,6 +314,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } FUNC <read=read_FUNC,optimize=false>;
@@ -343,6 +362,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } TXTR <read=read_TXTR,optimize=false>;
@@ -354,6 +374,7 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
+        SetBackColor(0xc0c0c0);
         u1 d[h.size];
     }
 } AUDO <read=read_AUDO,optimize=false>;
@@ -375,7 +396,6 @@ if (_tag != "FORM") {
     return -1;
 }
 
-SetBackColor(0xe0e0e0);
 HEAD h;
 
 _full_len = h.size;
