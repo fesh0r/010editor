@@ -25,7 +25,7 @@ typedef struct {
     if (FEof()) {
         return;
     }
-    local quad padding = FTell() & 3;
+    local quad padding = 4 - (FTell() & 3);
 
     if (padding) {
         u1 p[padding];
@@ -33,8 +33,8 @@ typedef struct {
 } PADDING4 <optimize=false,hidden=true>;
 
 string read_sig(u4 &in) {
-    string out;
-    string ver;
+    local string out;
+    local string ver;
     switch(in & 0xffff) {
         case 0x0901:
             ver = "fx_2_0";
@@ -60,7 +60,6 @@ typedef struct {
     u4 sig;
     u4 data_offset;
 } HEADER <read=read_HEADER>;
-
 string read_HEADER(HEADER &in) {
     return read_sig(in.sig);
 }
@@ -73,17 +72,9 @@ typedef struct {
         SetBackColor(0xc0ffc0);
         char n[size];
 
-        if (!FEof()) {
-            local quad padding = 4 - (FTell() & 3);
-
-            if (padding > 0  && padding < 4) {
-                SetBackColor(0xe0ffe0);
-                u1 p[padding] <hidden=true>;
-            }
-        }
+        PADDING4 p;
     }
 } D3DX_NAME <read=read_D3DX_NAME,optimize=false>;
-
 string read_D3DX_NAME(D3DX_NAME &in) {
     if (in.size) {
         return in.n;
@@ -111,7 +102,6 @@ typedef struct (int parent) {
 
     FSeek(_cur_offset);
 } D3DX_EFFECT_TYPEDEF <read=read_D3DX_EFFECT_TYPEDEF>;
-
 string read_D3DX_EFFECT_TYPEDEF(D3DX_EFFECT_TYPEDEF &in) {
     return read_D3DX_NAME(in.name);
 }
@@ -158,7 +148,6 @@ typedef struct {
 
     FSeek(_cur_offset);
 } D3DX_PARAMETER <read=read_D3DX_PARAMETER,optimize=false>;
-
 string read_D3DX_PARAMETER(D3DX_PARAMETER &in) {
     return read_D3DX_EFFECT_TYPEDEF(in.typedef_);
 }
@@ -199,7 +188,6 @@ typedef struct {
 
     FSeek(_cur_offset);
 } D3DX_PASS <read=read_D3DX_PASS,optimize=false>;
-
 string read_D3DX_PASS(D3DX_PASS &in) {
     return read_D3DX_NAME(in.name);
 }
@@ -226,7 +214,6 @@ typedef struct {
 
     FSeek(_cur_offset);
 } D3DX_TECHNIQUE <read=read_D3DX_TECHNIQUE,optimize=false>;
-
 string read_D3DX_TECHNIQUE(D3DX_TECHNIQUE &in) {
     return read_D3DX_NAME(in.name);
 }
