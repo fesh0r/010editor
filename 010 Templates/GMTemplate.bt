@@ -86,7 +86,11 @@ typedef struct {
             SetBackColor(0xc8c8ff);
             u4 offsets[file_cnt];
 
-            SOND_e d[file_cnt];
+            local int i;
+            for (i = 0; i < file_cnt; i++) {
+                FSeek(offsets[i]);
+                SOND_e d;
+            }
         }
     }
 } SOND <read=read_SOND,optimize=false>;
@@ -134,7 +138,11 @@ typedef struct {
             SetBackColor(0xc8c8ff);
             u4 offsets[file_cnt];
 
-            BGND_e data[file_cnt];
+            local int i;
+            for (i = 0; i < file_cnt; i++) {
+                FSeek(offsets[i]);
+                BGND_e d;
+            }
         }
     }
 } BGND <read=read_BGND,optimize=false>;
@@ -171,7 +179,11 @@ typedef struct {
             SetBackColor(0xc8c8ff);
             u4 offsets[file_cnt];
 
-            SCPT_e data[file_cnt];
+            local int i;
+            for (i = 0; i < file_cnt; i++) {
+                FSeek(offsets[i]);
+                SCPT_e d;
+            }
         }
     }
 } SCPT <read=read_SCPT,optimize=false>;
@@ -313,7 +325,11 @@ typedef struct {
             SetBackColor(0xc8c8ff);
             u4 offsets[file_cnt];
 
-            STRG_e d[file_cnt];
+            local int i;
+            for (i = 0; i < file_cnt; i++) {
+                FSeek(offsets[i]);
+                STRG_e d;
+            }
         }
     }
 } STRG <read=read_STRG,optimize=false>;
