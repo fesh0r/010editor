@@ -157,7 +157,7 @@ string read_PATH(PATH &in) {
 
 typedef struct {
     SetBackColor(0xb8b8ff);
-    u1 d[0x14];
+    u1 d[0x8];
 } SCPT_e;
 
 typedef struct {
@@ -171,7 +171,7 @@ typedef struct {
             SetBackColor(0xc8c8ff);
             u4 offsets[file_cnt];
 
-            BGND_e data[file_cnt];
+            SCPT_e data[file_cnt];
         }
     }
 } SCPT <read=read_SCPT,optimize=false>;
