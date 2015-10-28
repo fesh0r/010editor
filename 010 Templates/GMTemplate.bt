@@ -1,0 +1,468 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: GMTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: GameMaker data file template
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    char tag[4];
+    u4 size;
+} HEAD <read=read_HEAD>;
+string read_HEAD(HEAD &in) {
+    local string out;
+    SPrintf(out, "%s %Xh", in.tag, in.size);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} DATA <read=read_DATA,optimize=false>;
+string read_DATA(DATA &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} GEN8 <read=read_GEN8,optimize=false>;
+string read_GEN8(GEN8 &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} OPTN <read=read_OPTN,optimize=false>;
+string read_OPTN(OPTN &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} EXTN <read=read_EXTN,optimize=false>;
+string read_EXTN(EXTN &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    SetBackColor(0xb8b8ff);
+    u1 d[0x24];
+} SOND_e;
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+
+            SOND_e d[file_cnt];
+        }
+    }
+} SOND <read=read_SOND,optimize=false>;
+string read_SOND(SOND &in) {
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} AGRP <read=read_AGRP,optimize=false>;
+string read_AGRP(AGRP &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} SPRT <read=read_SPRT,optimize=false>;
+string read_SPRT(SPRT &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    SetBackColor(0xb8b8ff);
+    u1 d[0x14];
+} BGND_e;
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+
+            BGND_e data[file_cnt];
+        }
+    }
+} BGND <read=read_BGND,optimize=false>;
+string read_BGND(BGND &in) {
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} PATH <read=read_PATH,optimize=false>;
+string read_PATH(PATH &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    SetBackColor(0xb8b8ff);
+    u1 d[0x14];
+} SCPT_e;
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+
+            BGND_e data[file_cnt];
+        }
+    }
+} SCPT <read=read_SCPT,optimize=false>;
+string read_SCPT(SCPT &in) {
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} SHDR <read=read_SHDR,optimize=false>;
+string read_SHDR(SHDR &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} FONT <read=read_FONT,optimize=false>;
+string read_FONT(FONT &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} TMLN <read=read_TMLN,optimize=false>;
+string read_TMLN(TMLN &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} OBJT <read=read_OBJT,optimize=false>;
+string read_OBJT(OBJT &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} ROOM <read=read_ROOM,optimize=false>;
+string read_ROOM(ROOM &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} DAFL <read=read_DAFL,optimize=false>;
+string read_DAFL(DAFL &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} TPAG <read=read_TPAG,optimize=false>;
+string read_TPAG(TPAG &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} CODE <read=read_CODE,optimize=false>;
+string read_CODE(CODE &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} VARI <read=read_VARI,optimize=false>;
+string read_VARI(VARI &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} FUNC <read=read_FUNC,optimize=false>;
+string read_FUNC(FUNC &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    SetBackColor(0xb8b8ff);
+    u4 size;
+    
+    SetBackColor(0xa0a0ff);
+    char d[size + 1];
+} STRG_e <read=read_STRG_e,optimize=false>;
+string read_STRG_e(STRG_e &in) {
+    return in.d;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+
+            STRG_e d[file_cnt];
+        }
+    }
+} STRG <read=read_STRG,optimize=false>;
+string read_STRG(STRG &in) {
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} TXTR <read=read_TXTR,optimize=false>;
+string read_TXTR(TXTR &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        u1 d[h.size];
+    }
+} AUDO <read=read_AUDO,optimize=false>;
+string read_AUDO(AUDO &in) {
+    return read_HEAD(in.h);
+}
+
+local char _tag[4];
+local quad _full_len, _pos, _len;
+
+DisplayFormatHex();
+LittleEndian();
+
+ReadBytes(_tag, 0, 4);
+
+if (_tag != "FORM") {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+SetBackColor(0xe0e0e0);
+HEAD h;
+
+_full_len = h.size;
+_pos = FTell();
+
+while ((_pos < _full_len) && !FEof()) {
+    ReadBytes(_tag, _pos, 4);
+    _len = ReadUInt(_pos + 4);
+
+    switch(_tag) {
+        case "GEN8":
+            GEN8 d;
+            break;
+
+        case "OPTN":
+            OPTN d;
+            break;
+
+        case "EXTN":
+            EXTN d;
+            break;
+
+        case "SOND":
+            SOND d;
+            break;
+
+        case "AGRP":
+            AGRP d;
+            break;
+
+        case "SPRT":
+            SPRT d;
+            break;
+
+        case "BGND":
+            BGND d;
+            break;
+
+        case "PATH":
+            PATH d;
+            break;
+
+        case "SCPT":
+            SCPT d;
+            break;
+
+        case "SHDR":
+            SHDR d;
+            break;
+
+        case "FONT":
+            FONT d;
+            break;
+
+        case "TMLN":
+            TMLN d;
+            break;
+
+        case "OBJT":
+            OBJT d;
+            break;
+
+        case "ROOM":
+            ROOM d;
+            break;
+
+        case "DAFL":
+            DAFL d;
+            break;
+
+        case "TPAG":
+            TPAG d;
+            break;
+
+        case "CODE":
+            CODE d;
+            break;
+
+        case "VARI":
+            VARI d;
+            break;
+
+        case "FUNC":
+            FUNC d;
+            break;
+
+        case "STRG":
+            STRG d;
+            break;
+
+        case "TXTR":
+            TXTR d;
+            break;
+
+        case "AUDO":
+            AUDO d;
+            break;
+
+        default:
+            DATA d;
+            break;
+    }
+
+    _pos += 8 + _len;
+    FSeek(_pos);
+}
