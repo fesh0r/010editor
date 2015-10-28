@@ -1,0 +1,63 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: HRMTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Human Resource Machine resource.pak
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u4 hash;
+    u4 compressed;
+    u4 offset;
+    u4 size;
+
+    local quad o = FTell();
+    FSeek(offset);
+
+    if (compressed) {
+        SetBackColor(0xe0ffe0);
+        u4 compressed_size;
+        u4 uncompressed_size;
+    
+        SetBackColor(0xb0ffb0);
+        u1 data[compressed_size];
+    } else {
+        SetBackColor(0xb0b0ff);
+        u1 data[size];
+    }
+
+    FSeek(o);
+} FILE_ENTRY <read=read_FILE_ENTRY,optimize=false>;
+string read_FILE_ENTRY(FILE_ENTRY &in) {
+    local string out;
+    if (in.compressed) {
+        SPrintf(out, "%Xh+%Xh %Xh", in.offset, in.size, in.uncompressed_size);
+    } else {
+        SPrintf(out, "%Xh+%Xh", in.offset, in.size);
+    }
+    return out;
+}
+
+DisplayFormatHex();
+LittleEndian();
+
+local int i;
+
+SetBackColor(0xe0e0e0);
+u4 unknown;
+u4 file_count;
+
+SetBackColor(0xc0c0c0);
+FILE_ENTRY f[file_count];
