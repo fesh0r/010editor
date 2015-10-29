@@ -41,6 +41,24 @@ string read_DATA(DATA &in) {
 }
 
 typedef struct {
+    SetBackColor(0xffb8b8);
+    u4 o;
+
+    if (o) {
+        local quad _pos = FTell();
+        FSeek(o);
+        SetBackColor(0xffa0a0);
+        string s;
+        FSeek(_pos);
+    } else {
+        local string s = "";
+    }
+} STR <read=read_STR,optimize=false>;
+string read_STR(STR &in) {
+    return in.s;
+}
+
+typedef struct {
     HEAD h;
 
     if (h.size) {
@@ -735,7 +753,7 @@ typedef struct (int _size) {
 
     u4 size;
     
-    SetBackColor(0xa0a0ff);
+    SetBackColor(cNone);
     char d[size + 1];
 } STRG_e <read=read_STRG_e,optimize=false>;
 string read_STRG_e(STRG_e &in) {
