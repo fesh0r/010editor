@@ -379,28 +379,94 @@ string read_SCPT(SCPT &in) {
     return out;
 }
 
-typedef struct {
-    HEAD h;
+typedef struct (int _size) {
+    local int _s = _size;
 
-    if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
-    }
-} SHDR <read=read_SHDR,optimize=false>;
-string read_SHDR(SHDR &in) {
-    return read_HEAD(in.h);
+    SetBackColor(0xb8b8ff);
+    u1 d[_s];
+} SHDR_e <read=read_SHDR_e,optimize=false>;
+string read_SHDR_e(SHDR_e &in) {
+    local string out;
+    SPrintf(out, "%Xh", in._s);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
+    local int _end;
+    _end = FTell() + h.size;
+
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+
+            local int i, _size;
+            for (i = 0; i < file_cnt; i++) {
+                FSeek(offsets[i]);
+                if (i < file_cnt - 1) {
+                    _size = offsets[i + 1] - offsets[i];
+                } else {
+                    _size = _end - offsets[i];
+                }
+                SHDR_e d(_size);
+            }
+        }
+    }
+} SHDR <read=read_SHDR,optimize=false>;
+string read_SHDR(SHDR &in) {
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
+}
+
+typedef struct (int _size) {
+    local int _s = _size;
+
+    SetBackColor(0xb8b8ff);
+    u1 d[_s];
+} FONT_e <read=read_FONT_e,optimize=false>;
+string read_FONT_e(FONT_e &in) {
+    local string out;
+    SPrintf(out, "%Xh", in._s);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    local int _end;
+    _end = FTell() + h.size;
+
+    if (h.size) {
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+
+            local int i, _size;
+            for (i = 0; i < file_cnt; i++) {
+                FSeek(offsets[i]);
+                if (i < file_cnt - 1) {
+                    _size = offsets[i + 1] - offsets[i];
+                } else {
+                    _size = _end - offsets[i];
+                }
+                FONT_e d(_size);
+            }
+        }
     }
 } FONT <read=read_FONT,optimize=false>;
 string read_FONT(FONT &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct (int _size) {
