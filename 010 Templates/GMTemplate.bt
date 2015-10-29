@@ -67,7 +67,6 @@ string read_OPTN(OPTN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } EXTN_e <read=read_EXTN_e,optimize=false>;
 string read_EXTN_e(EXTN_e &in) {
@@ -98,6 +97,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 EXTN_e d(_size);
             }
         }
@@ -112,7 +112,6 @@ string read_EXTN(EXTN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } SOND_e <read=read_SOND_e,optimize=false>;
 string read_SOND_e(SOND_e &in) {
@@ -143,6 +142,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 SOND_e d(_size);
             }
         }
@@ -157,7 +157,6 @@ string read_SOND(SOND &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } AGRP_e <read=read_AGRP_e,optimize=false>;
 string read_AGRP_e(AGRP_e &in) {
@@ -188,6 +187,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 AGRP_e d(_size);
             }
         }
@@ -202,7 +202,6 @@ string read_AGRP(AGRP &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } SPRT_e <read=read_SPRT_e,optimize=false>;
 string read_SPRT_e(SPRT_e &in) {
@@ -233,6 +232,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 SPRT_e d(_size);
             }
         }
@@ -247,7 +247,6 @@ string read_SPRT(SPRT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } BGND_e <read=read_BGND_e,optimize=false>;
 string read_BGND_e(BGND_e &in) {
@@ -278,6 +277,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 BGND_e d(_size);
             }
         }
@@ -292,7 +292,6 @@ string read_BGND(BGND &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } PATH_e <read=read_PATH_e,optimize=false>;
 string read_PATH_e(PATH_e &in) {
@@ -323,6 +322,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 PATH_e d(_size);
             }
         }
@@ -337,7 +337,6 @@ string read_PATH(PATH &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } SCPT_e <read=read_SCPT_e,optimize=false>;
 string read_SCPT_e(SCPT_e &in) {
@@ -368,6 +367,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 SCPT_e d(_size);
             }
         }
@@ -382,7 +382,6 @@ string read_SCPT(SCPT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } SHDR_e <read=read_SHDR_e,optimize=false>;
 string read_SHDR_e(SHDR_e &in) {
@@ -413,6 +412,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 SHDR_e d(_size);
             }
         }
@@ -427,7 +427,6 @@ string read_SHDR(SHDR &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } FONT_e <read=read_FONT_e,optimize=false>;
 string read_FONT_e(FONT_e &in) {
@@ -458,6 +457,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 FONT_e d(_size);
             }
         }
@@ -472,7 +472,6 @@ string read_FONT(FONT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } TMLN_e <read=read_TMLN_e,optimize=false>;
 string read_TMLN_e(TMLN_e &in) {
@@ -503,6 +502,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 TMLN_e d(_size);
             }
         }
@@ -517,7 +517,6 @@ string read_TMLN(TMLN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } OBJT_e <read=read_OBJT_e,optimize=false>;
 string read_OBJT_e(OBJT_e &in) {
@@ -548,6 +547,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 OBJT_e d(_size);
             }
         }
@@ -562,7 +562,6 @@ string read_OBJT(OBJT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } ROOM_e <read=read_ROOM_e,optimize=false>;
 string read_ROOM_e(ROOM_e &in) {
@@ -593,6 +592,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 ROOM_e d(_size);
             }
         }
@@ -619,7 +619,6 @@ string read_DAFL(DAFL &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } TPAG_e <read=read_TPAG_e,optimize=false>;
 string read_TPAG_e(TPAG_e &in) {
@@ -650,6 +649,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 TPAG_e d(_size);
             }
         }
@@ -664,7 +664,6 @@ string read_TPAG(TPAG &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } CODE_e <read=read_CODE_e,optimize=false>;
 string read_CODE_e(CODE_e &in) {
@@ -695,6 +694,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 CODE_e d(_size);
             }
         }
@@ -733,7 +733,6 @@ string read_FUNC(FUNC &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u4 size;
     
     SetBackColor(0xa0a0ff);
@@ -765,6 +764,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 STRG_e d(_size);
             }
         }
@@ -779,7 +779,6 @@ string read_STRG(STRG &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } TXTR_e <read=read_TXTR_e,optimize=false>;
 string read_TXTR_e(TXTR_e &in) {
@@ -810,6 +809,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 TXTR_e d(_size);
             }
         }
@@ -824,7 +824,6 @@ string read_TXTR(TXTR &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    SetBackColor(0xb8b8ff);
     u1 d[_s];
 } AUDO_e <read=read_AUDO_e,optimize=false>;
 string read_AUDO_e(AUDO_e &in) {
@@ -855,6 +854,7 @@ typedef struct {
                 } else {
                     _size = _end - offsets[i];
                 }
+                SetBackColor(0xb8b8ff);
                 AUDO_e d(_size);
             }
         }
