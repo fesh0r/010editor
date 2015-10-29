@@ -130,12 +130,29 @@ string read_EXTN(EXTN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s == 0x24) {
+        STR s00;
+        u4 d04;
+        STR s08;
+        STR s0C;
+        u4 d10;
+        float d14;
+        u4 d18;
+        u4 d1C;
+        u4 d20;
+    } else {
+        Printf("bad SOND at %Xh %Xh != 24h\n", FTell(), _s);
+        u1 d[_s];
+    }
 } SOND_e <read=read_SOND_e,optimize=false>;
 string read_SOND_e(SOND_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    if (in._s == 0x24) {
+        return in.s00.s;
+    } else {
+        local string out;
+        SPrintf(out, "%Xh", in._s);
+        return out;
+    }
 }
 
 typedef struct {
@@ -175,12 +192,21 @@ string read_SOND(SOND &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s == 0x4) {
+        STR n;
+    } else {
+        Printf("bad AGRP at %Xh %Xh != 4h\n", FTell(), _s);
+        u1 d[_s];
+    }
 } AGRP_e <read=read_AGRP_e,optimize=false>;
 string read_AGRP_e(AGRP_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    if (in._s == 0x4) {
+        return in.n.s;
+    } else {
+        local string out;
+        SPrintf(out, "%Xh", in._s);
+        return out;
+    }
 }
 
 typedef struct {
@@ -220,12 +246,11 @@ string read_AGRP(AGRP &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    STR n00;
+    u1 d[_s - 4];
 } SPRT_e <read=read_SPRT_e,optimize=false>;
 string read_SPRT_e(SPRT_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    return in.n00.s;
 }
 
 typedef struct {
@@ -265,12 +290,25 @@ string read_SPRT(SPRT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s == 0x14) {
+        STR n00;
+        u4 d04;
+        u4 d08;
+        u4 d0C;
+        u4 o10;
+    } else {
+        Printf("bad BGND at %Xh %Xh != 14h\n", FTell(), _s);
+        u1 d[_s];
+    }
 } BGND_e <read=read_BGND_e,optimize=false>;
 string read_BGND_e(BGND_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    if (in._s == 0x14) {
+        return in.n00.s;
+    } else {
+        local string out;
+        SPrintf(out, "%Xh", in._s);
+        return out;
+    }
 }
 
 typedef struct {
@@ -355,12 +393,22 @@ string read_PATH(PATH &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s == 0x8) {
+        STR n00;
+        u4 d04;
+    } else {
+        Printf("bad SCPT at %Xh %Xh != 8h\n", FTell(), _s);
+        u1 d[_s];
+    }
 } SCPT_e <read=read_SCPT_e,optimize=false>;
 string read_SCPT_e(SCPT_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    if (in._s == 0x8) {
+        return in.n00.s;
+    } else {
+        local string out;
+        SPrintf(out, "%Xh", in._s);
+        return out;
+    }
 }
 
 typedef struct {
@@ -400,12 +448,47 @@ string read_SCPT(SCPT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s == 0x6c) {
+        STR n00;
+        u4 d04;
+        STR s08;
+        STR s0C;
+        STR s10;
+        STR s14;
+        STR s18;
+        STR s1C;
+        u4 d20;
+        u4 d24;
+        u4 d28;
+        STR s2C;
+        STR s30;
+        STR s34;
+        u4 d38;
+        u4 d3C;
+        u4 d40;
+        u4 d44;
+        u4 d48;
+        u4 d4C;
+        u4 d50;
+        u4 d54;
+        u4 d58;
+        u4 d5C;
+        u4 d60;
+        u4 d64;
+        u4 d68;
+    } else {
+        Printf("bad SHDR at %Xh %Xh != 6Ch\n", FTell(), _s);
+        u1 d[_s];
+    }
 } SHDR_e <read=read_SHDR_e,optimize=false>;
 string read_SHDR_e(SHDR_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    if (in._s == 0x6C) {
+        return in.n00.s;
+    } else {
+        local string out;
+        SPrintf(out, "%Xh", in._s);
+        return out;
+    }
 }
 
 typedef struct {
@@ -445,12 +528,13 @@ string read_SHDR(SHDR &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    STR n00;
+    STR n04;
+
+    u1 d[_s - 8];
 } FONT_e <read=read_FONT_e,optimize=false>;
 string read_FONT_e(FONT_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    return in.n00.s;
 }
 
 typedef struct {
@@ -535,12 +619,12 @@ string read_TMLN(TMLN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    STR n00;
+
+    u1 d[_s - 4];
 } OBJT_e <read=read_OBJT_e,optimize=false>;
 string read_OBJT_e(OBJT_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    return in.n00.s;
 }
 
 typedef struct {
@@ -580,12 +664,13 @@ string read_OBJT(OBJT &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    STR n00;
+    STR n04;
+
+    u1 d[_s - 8];
 } ROOM_e <read=read_ROOM_e,optimize=false>;
 string read_ROOM_e(ROOM_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    return in.n00.s;
 }
 
 typedef struct {
@@ -637,13 +722,8 @@ string read_DAFL(DAFL &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
-} TPAG_e <read=read_TPAG_e,optimize=false>;
-string read_TPAG_e(TPAG_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
-}
+    u1 d[0x16];
+} TPAG_e;
 
 typedef struct {
     HEAD h;
@@ -682,12 +762,16 @@ string read_TPAG(TPAG &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    STR n00;
+    u4 size;
+    
+    if (size) {
+        SetBackColor(0xa0a0ff);
+        u1 d[size];
+    }
 } CODE_e <read=read_CODE_e,optimize=false>;
 string read_CODE_e(CODE_e &in) {
-    local string out;
-    SPrintf(out, "%Xh", in._s);
-    return out;
+    return in.n00.s;
 }
 
 typedef struct {
