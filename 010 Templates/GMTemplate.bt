@@ -68,12 +68,19 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } EXTN <read=read_EXTN,optimize=false>;
 string read_EXTN(EXTN &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
@@ -110,24 +117,38 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } AGRP <read=read_AGRP,optimize=false>;
 string read_AGRP(AGRP &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } SPRT <read=read_SPRT,optimize=false>;
 string read_SPRT(SPRT &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
@@ -164,12 +185,19 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } PATH <read=read_PATH,optimize=false>;
 string read_PATH(PATH &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
@@ -230,36 +258,57 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } TMLN <read=read_TMLN,optimize=false>;
 string read_TMLN(TMLN &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } OBJT <read=read_OBJT,optimize=false>;
 string read_OBJT(OBJT &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } ROOM <read=read_ROOM,optimize=false>;
 string read_ROOM(ROOM &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
@@ -278,24 +327,38 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } TPAG <read=read_TPAG,optimize=false>;
 string read_TPAG(TPAG &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } CODE <read=read_CODE,optimize=false>;
 string read_CODE(CODE &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
@@ -362,24 +425,38 @@ typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } TXTR <read=read_TXTR,optimize=false>;
 string read_TXTR(TXTR &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        SetBackColor(0xe0e0ff);
+        u4 file_cnt <format=decimal>;
+
+        if (file_cnt) {
+            SetBackColor(0xc8c8ff);
+            u4 offsets[file_cnt];
+        }
     }
 } AUDO <read=read_AUDO,optimize=false>;
 string read_AUDO(AUDO &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in.file_cnt);
+    return out;
 }
 
 local char _tag[4];
