@@ -135,7 +135,7 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         if (_s > 0x24) {
-            Printf("long SOND at %Xh %Xh > 24h\n", FTell(), _s);
+//            Printf("long SOND at %Xh %Xh > 24h\n", FTell(), _s);
         }
         STR s00;
         u4 d04;
@@ -200,7 +200,7 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         if (_s > 0x4) {
-            Printf("long AGRP at %Xh %Xh > 4h\n", FTell(), _s);
+//            Printf("long AGRP at %Xh %Xh > 4h\n", FTell(), _s);
         }
         STR n;
     }
@@ -312,7 +312,7 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         if (_s > 0x14) {
-            Printf("long BGND at %Xh %Xh > 14h\n", FTell(), _s);
+//            Printf("long BGND at %Xh %Xh > 14h\n", FTell(), _s);
         }
         STR n00;
         u4 d04;
@@ -428,7 +428,7 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         if (_s > 0x8) {
-            Printf("long SCPT at %Xh %Xh > 8h\n", FTell(), _s);
+//            Printf("long SCPT at %Xh %Xh > 8h\n", FTell(), _s);
         }
         STR n00;
         u4 d04 <format=decimal>;
@@ -486,7 +486,7 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         if (_s > 0x6c) {
-            Printf("long SHDR at %Xh %Xh > 6Ch\n", FTell(), _s);
+//            Printf("long SHDR at %Xh %Xh > 6Ch\n", FTell(), _s);
         }
         STR n00;
         u4 d04;
@@ -793,7 +793,7 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         if (_s > 0x16) {
-            Printf("long TPAG at %Xh %Xh > 16h\n", FTell(), _s);
+//            Printf("long TPAG at %Xh %Xh > 16h\n", FTell(), _s);
         }
         u2 d00;
         u2 d02;
@@ -861,7 +861,7 @@ typedef struct (int _size) {
         if (_s < size + 8) {
             Printf("short CODE at %Xh %Xh < %Xh\n", FTell() - 8, _s, size + 8);
         } else if (_s > size + 8) {
-            Printf("long CODE at %Xh %Xh > %Xh\n", FTell() - 8, _s, size + 8);
+//            Printf("long CODE at %Xh %Xh > %Xh\n", FTell() - 8, _s, size + 8);
         }
 
         if (size) {
@@ -952,7 +952,7 @@ typedef struct (int _size) {
         if (_s < size + 5) {
             Printf("short STRG at %Xh %Xh < %Xh\n", FTell() - 4, _s, size + 5);
         } else if (_s > size + 5) {
-            Printf("long STRG at %Xh %Xh > %Xh\n", FTell() - 4, _s, size + 5);
+//            Printf("long STRG at %Xh %Xh > %Xh\n", FTell() - 4, _s, size + 5);
         }
 
         SetBackColor(cNone);
@@ -1088,7 +1088,7 @@ typedef struct (int _size) {
         if (_s < size + 4) {
             Printf("short AUDO at %Xh %Xh < %Xh\n", FTell() - 4, _s, size + 4);
         } else if (_s > size + 4) {
-            Printf("long AUDO at %Xh %Xh < %Xh\n", FTell() - 4, _s, size + 4);
+//            Printf("long AUDO at %Xh %Xh < %Xh\n", FTell() - 4, _s, size + 4);
         }
 
         if (size) {
