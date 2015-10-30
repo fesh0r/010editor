@@ -795,7 +795,17 @@ typedef struct (int _size) {
         if (_s > 0x16) {
             Printf("long TPAG at %Xh %Xh > 16h\n", FTell(), _s);
         }
-        u1 d[0x16];
+        u2 d00;
+        u2 d02;
+        u2 d04;
+        u2 d06;
+        u2 d08;
+        u2 d0A;
+        u2 d0C;
+        u2 d0E;
+        u2 d10;
+        u2 d12;
+        u2 d14;
     }
 } TPAG_e <read=read_TPAG_e,optimize=false>;
 string read_TPAG_e(TPAG_e &in) {
@@ -993,14 +1003,35 @@ string read_STRG(STRG &in) {
     return out;
 }
 
-typedef struct (int _size) {
+typedef struct (int _size, int _size2) {
     local int _s = _size;
+    local int _s2 = _size2;
 
-    u1 d[_s];
+    if (_s < 0x8) {
+        Printf("short TXTR at %Xh %Xh < 8h\n", FTell(), _s);
+        u1 d[_s];
+    } else {
+        u4 d00;
+        u4 o04;
+
+        if (_s2) {
+            local quad _pos = FTell();
+            FSeek(o04);
+
+            SetBackColor(0xa0a0ff);
+            u1 d[_s2];
+
+            FSeek(_pos);
+        }
+    }
 } TXTR_e <read=read_TXTR_e,optimize=false>;
 string read_TXTR_e(TXTR_e &in) {
     local string out;
-    SPrintf(out, "%Xh", in._s);
+    if (in._s < 0x8) {
+        SPrintf(out, "%Xh", in._s);
+    } else {
+        SPrintf(out, "%Xh %Xh", in._s, in._s2);
+    }
     return out;
 }
 
@@ -1018,16 +1049,23 @@ typedef struct {
             SetBackColor(0xc8c8ff);
             u4 offsets[file_cnt];
 
-            local int i, _size;
+            local u4 offsets2[file_cnt];
+
+            local int i, _size, _size2;
+            for (i = 0; i < file_cnt; i++) {
+                offsets2[i] = ReadInt(offsets[i] + 4);
+            }
             for (i = 0; i < file_cnt; i++) {
                 FSeek(offsets[i]);
                 if (i < file_cnt - 1) {
                     _size = offsets[i + 1] - offsets[i];
+                    _size2 = offsets2[i + 1] - offsets2[i];
                 } else {
                     _size = _end - offsets[i];
+                    _size2 = _end - offsets2[i];
                 }
                 SetBackColor(0xb8b8ff);
-                TXTR_e d(_size);
+                TXTR_e d(_size, _size2);
             }
         }
     }
@@ -1041,7 +1079,23 @@ string read_TXTR(TXTR &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s < 0x4) {
+        Printf("short AUDO at %Xh %Xh < 4h\n", FTell(), _s);
+        u1 d[_s];
+    } else {
+        u4 size;
+
+        if (_s < size + 4) {
+            Printf("short AUDO at %Xh %Xh < %Xh\n", FTell() - 4, _s, size + 4);
+        } else if (_s > size + 4) {
+            Printf("long AUDO at %Xh %Xh < %Xh\n", FTell() - 4, _s, size + 4);
+        }
+
+        if (size) {
+            SetBackColor(0xa0a0ff);
+            u1 d[size];
+        }
+    }
 } AUDO_e <read=read_AUDO_e,optimize=false>;
 string read_AUDO_e(AUDO_e &in) {
     local string out;
