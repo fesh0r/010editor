@@ -129,12 +129,12 @@ string read_GEN8(GEN8 &in) {
 }
 
 typedef struct {
-    STR s00;
-    STR s04;
+    STR name;
+    STR value;
 } OPTN_o <read=read_OPTN_o,optimize=false>;
 string read_OPTN_o(OPTN_o &in) {
     local string out;
-    SPrintf(out, "'%s'='%s'", in.s00.s, in.s04.s);
+    SPrintf(out, "'%s'='%s'", in.name.s, in.value.s);
     return out;
 }
 
@@ -160,10 +160,10 @@ typedef struct (int _size) {
         u4 d30;
         u4 d34;
         u4 d38;
-        u4 c3C <format=decimal>;
+        u4 option_count <format=decimal>;
 
-        if (c3C) {
-            OPTN_o c40[c3C];
+        if (option_count) {
+            OPTN_o option[option_count];
         }
     }
 } OPTN_e <read=read_OPTN_e,optimize=false>;
@@ -350,15 +350,15 @@ typedef struct (int _size) {
         if (_s > 0x24) {
 //            Printf("long SOND at %Xh %Xh > 24h\n", FTell(), _s);
         }
-        STR s00;
+        STR name;
         u4 d04;
-        STR s08;
-        STR s0C;
+        STR ext;
+        STR file;
         u4 d10;
         float d14;
         u4 d18;
         u4 d1C;
-        u4 d20;
+        s4 AUDO_index <format=decimal>;
     }
 } SOND_e <read=read_SOND_e,optimize=false>;
 string read_SOND_e(SOND_e &in) {
@@ -366,7 +366,7 @@ string read_SOND_e(SOND_e &in) {
     if (in._s < 0x24) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.s00.s);
+        SPrintf(out, "%Xh '%s' %d", in._s, in.name.s, in.audo_index);
     }
     return out;
 }
@@ -415,7 +415,7 @@ typedef struct (int _size) {
         if (_s > 0x4) {
 //            Printf("long AGRP at %Xh %Xh > 4h\n", FTell(), _s);
         }
-        STR n;
+        STR name;
     }
 } AGRP_e <read=read_AGRP_e,optimize=false>;
 string read_AGRP_e(AGRP_e &in) {
@@ -423,7 +423,7 @@ string read_AGRP_e(AGRP_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -469,7 +469,7 @@ typedef struct (int _size) {
         Printf("short SPRT at %Xh %Xh < 4h\n", FTell(), _s);
         u1 d[_s];
     } else {
-        STR n00;
+        STR name;
         u1 d[_s - 4];
     }
 } SPRT_e <read=read_SPRT_e,optimize=false>;
@@ -478,7 +478,7 @@ string read_SPRT_e(SPRT_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -527,11 +527,11 @@ typedef struct (int _size) {
         if (_s > 0x14) {
 //            Printf("long BGND at %Xh %Xh > 14h\n", FTell(), _s);
         }
-        STR n00;
+        STR name;
         u4 d04;
         u4 d08;
         u4 d0C;
-        u4 o10;
+        u4 TPAG_offset;
     }
 } BGND_e <read=read_BGND_e,optimize=false>;
 string read_BGND_e(BGND_e &in) {
@@ -539,7 +539,7 @@ string read_BGND_e(BGND_e &in) {
     if (in._s < 0x14) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -585,7 +585,7 @@ typedef struct (int _size) {
         Printf("short PATH at %Xh %Xh < 4h\n", FTell(), _s);
         u1 d[_s];
     } else {
-        STR n00;
+        STR name;
         u1 d[_s - 4];
     }
 } PATH_e <read=read_PATH_e,optimize=false>;
@@ -594,7 +594,7 @@ string read_PATH_e(PATH_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -643,8 +643,8 @@ typedef struct (int _size) {
         if (_s > 0x8) {
 //            Printf("long SCPT at %Xh %Xh > 8h\n", FTell(), _s);
         }
-        STR n00;
-        u4 d04 <format=decimal>;
+        STR name;
+        s4 index <format=decimal>;
     }
 } SCPT_e <read=read_SCPT_e,optimize=false>;
 string read_SCPT_e(SCPT_e &in) {
@@ -652,7 +652,7 @@ string read_SCPT_e(SCPT_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s' %d", in._s, in.name.s, in.index);
     }
     return out;
 }
@@ -701,7 +701,7 @@ typedef struct (int _size) {
         if (_s > 0x6c) {
 //            Printf("long SHDR at %Xh %Xh > 6Ch\n", FTell(), _s);
         }
-        STR n00;
+        STR name;
         u4 d04;
         STR s08;
         STR s0C;
@@ -735,7 +735,7 @@ string read_SHDR_e(SHDR_e &in) {
     if (in._s < 0x6C) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -781,7 +781,7 @@ typedef struct (int _size) {
         Printf("short FONT at %Xh %Xh < 8h\n", FTell(), _s);
         u1 d[_s];
     } else {
-        STR n00;
+        STR name;
         STR n04;
         u1 d[_s - 8];
     }
@@ -791,7 +791,7 @@ string read_FONT_e(FONT_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -882,7 +882,7 @@ typedef struct (int _size) {
         Printf("short OBJT at %Xh %Xh < 4h\n", FTell(), _s);
         u1 d[_s];
     } else {
-        STR n00;
+        STR name;
         u1 d[_s - 4];
     }
 } OBJT_e <read=read_OBJT_e,optimize=false>;
@@ -891,7 +891,7 @@ string read_OBJT_e(OBJT_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -937,7 +937,7 @@ typedef struct (int _size) {
         Printf("short ROOM at %Xh %Xh < 8h\n", FTell(), _s);
         u1 d[_s];
     } else {
-        STR n00;
+        STR name;
         STR n04;
         u1 d[_s - 8];
     }
@@ -947,7 +947,7 @@ string read_ROOM_e(ROOM_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
     }
     return out;
 }
@@ -1068,7 +1068,7 @@ typedef struct (int _size) {
         Printf("short CODE at %Xh %Xh < 8h\n", FTell(), _s);
         u1 d[_s];
     } else {
-        STR n00;
+        STR name;
         u4 size;
 
         if (_s < size + 8) {
@@ -1088,7 +1088,7 @@ string read_CODE_e(CODE_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in.size, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in.size, in.name.s);
     }
     return out;
 }
@@ -1128,13 +1128,13 @@ string read_CODE(CODE &in) {
 }
 
 typedef struct {
-    STR s00;
+    STR name;
     u4 d04;
-    u4 o08;
+    u4 CODE_offset;
 } VARI_e <read=read_VARI_e,optimize=false>;
 string read_VARI_e(VARI_e &in) {
     local string out;
-    SPrintf(out, "'%s'", in.s00.s);
+    SPrintf(out, "'%s'", in.name.s);
     return out;
 }
 
@@ -1158,13 +1158,13 @@ string read_VARI(VARI &in) {
 }
 
 typedef struct {
-    STR s00;
+    STR name;
     u4 d04;
-    u4 o08;
+    u4 CODE_offset;
 } FUNC_e <read=read_FUNC_e,optimize=false>;
 string read_FUNC_e(FUNC_e &in) {
     local string out;
-    SPrintf(out, "'%s'", in.s00.s);
+    SPrintf(out, "'%s'", in.name.s);
     return out;
 }
 
@@ -1261,11 +1261,11 @@ typedef struct (int _size, int _size2) {
         u1 d[_s];
     } else {
         u4 d00;
-        u4 o04;
+        u4 offset;
 
         if (_s2) {
             local quad _pos = FTell();
-            FSeek(o04);
+            FSeek(offset);
 
             SetBackColor(0xa0a0ff);
             u1 d[_s2];
