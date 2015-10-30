@@ -188,6 +188,83 @@ string read_OPTN(OPTN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
+    local int _end;
+    _end = FTell() + _s;
+
+    if (_s < 0x14) {
+        Printf("short EXTN_e3 at %Xh %Xh < 14h\n", FTell(), _s);
+        u1 d[_s];
+    } else {
+        STR s00;
+        u4 d04;
+        u4 d08;
+        u4 d0C;
+        STR s10;
+        u4 c14 <format=decimal>;
+        if (c14) {
+            u4 t18[c14];
+        }
+    }
+} EXTN_e3 <read=read_EXTN_e3,optimize=false>;
+string read_EXTN_e3(EXTN_e3 &in) {
+    local string out;
+    if (in._s < 0x14) {
+        SPrintf(out, "%Xh", in._s);
+    } else {
+        SPrintf(out, "%Xh '%s'", in._s, in.s00.s);
+    }
+    return out;
+}
+
+typedef struct (int _size) {
+    local int _s = _size;
+
+    local int _end;
+    _end = FTell() + _s;
+
+    if (_s < 0x14) {
+        Printf("short EXTN_e2 at %Xh %Xh < 14h\n", FTell(), _s);
+        u1 d[_s];
+    } else {
+        STR s00;
+        STR s04;
+        STR s08;
+        u4 d0C;
+        u4 c10 <format=decimal>;
+
+        if (c10) {
+            u4 o14[c10];
+
+            local int i, _size2;
+            for (i = 0; i < c10; i++) {
+                FSeek(o14[i]);
+                if (i < c10 - 1) {
+                    _size2 = o14[i + 1] - o14[i];
+                } else {
+                    _size2 = _end - o14[i];
+                }
+                SetBackColor(0xb8b8ff);
+                EXTN_e3 d(_size2);
+            }
+        }
+    }
+} EXTN_e2 <read=read_EXTN_e2,optimize=false>;
+string read_EXTN_e2(EXTN_e2 &in) {
+    local string out;
+    if (in._s < 0x14) {
+        SPrintf(out, "%Xh", in._s);
+    } else {
+        SPrintf(out, "%Xh '%s'", in._s, in.s00.s);
+    }
+    return out;
+}
+
+typedef struct (int _size) {
+    local int _s = _size;
+
+    local int _end;
+    _end = FTell() + _s;
+
     if (_s < 0x10) {
         Printf("short EXTN at %Xh %Xh < CCh\n", FTell(), _s);
         u1 d[_s];
@@ -195,7 +272,28 @@ typedef struct (int _size) {
         STR s00;
         STR s04;
         STR s08;
-        u4 c0C;
+        u4 c0C <format=decimal>;
+
+        if (c0C) {
+            u4 o10[c0C];
+
+            local int i, _size2;
+            for (i = 0; i < c0C; i++) {
+                FSeek(o10[i]);
+                if (i < c0C - 1) {
+                    _size2 = o10[i + 1] - o10[i];
+                } else {
+                    _size2 = _end - o10[i] - 16;
+                }
+                SetBackColor(0xb8b8ff);
+                EXTN_e2 d(_size2);
+            }
+        }
+
+        u4 e00;
+        u4 e04;
+        u4 e08;
+        u4 e0C;
     }
 } EXTN_e <read=read_EXTN_e,optimize=false>;
 string read_EXTN_e(EXTN_e &in) {
