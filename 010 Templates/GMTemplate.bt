@@ -1030,27 +1030,63 @@ string read_CODE(CODE &in) {
 }
 
 typedef struct {
-    HEAD h;
-
-    if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
-    }
-} VARI <read=read_VARI,optimize=false>;
-string read_VARI(VARI &in) {
-    return read_HEAD(in.h);
+    STR s00;
+    u4 d04;
+    u4 o08;
+} VARI_e <read=read_VARI_e,optimize=false>;
+string read_VARI_e(VARI_e &in) {
+    local string out;
+    SPrintf(out, "'%s'", in.s00.s);
+    return out;
 }
 
 typedef struct {
     HEAD h;
 
+    local int _cnt = h.size / 4 / 3;
+
     if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+        local int i;
+        for (i = 0; i < _cnt; i ++) {
+            SetBackColor(0xb8b8ff);
+            VARI_e d;
+        }
+    }
+} VARI <read=read_VARI,optimize=false>;
+string read_VARI(VARI &in) {
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in._cnt);
+    return out;
+}
+
+typedef struct {
+    STR s00;
+    u4 d04;
+    u4 o08;
+} FUNC_e <read=read_FUNC_e,optimize=false>;
+string read_FUNC_e(FUNC_e &in) {
+    local string out;
+    SPrintf(out, "'%s'", in.s00.s);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    local int _cnt = h.size / 4 / 3;
+
+    if (h.size) {
+        local int i;
+        for (i = 0; i < _cnt; i++) {
+            SetBackColor(0xb8b8ff);
+            FUNC_e d;
+        }
     }
 } FUNC <read=read_FUNC,optimize=false>;
 string read_FUNC(FUNC &in) {
-    return read_HEAD(in.h);
+    local string out;
+    SPrintf(out, "%s %Xh %d", in.h.tag, in.h.size, in._cnt);
+    return out;
 }
 
 typedef struct (int _size) {
