@@ -58,16 +58,60 @@ string read_STR(STR &in) {
     return in.s;
 }
 
-typedef struct {
-    HEAD h;
+typedef struct (int _size) {
+    local int _s = _size;
 
-    if (h.size) {
-        SetBackColor(0xc0c0c0);
-        u1 d[h.size];
+    if (_s < 0x84) {
+        Printf("short GEN8 at %Xh %Xh < 84h\n", FTell(), _s);
+        u1 d[_s];
+    } else {
+        u4 d00;
+        STR s04;
+        STR s08;
+        u4 d0C;
+        u4 d10;
+        u4 d14;
+        u4 d18;
+        u4 d1C;
+        u4 d20;
+        u4 d24;
+        STR s28;
+        u4 d2C;
+        u4 d30;
+        u4 d34;
+        u4 d38;
+        u4 d3C;
+        u4 d40;
+        u4 d44;
+        u4 d48;
+        u4 d4C;
+        u4 d50;
+        u4 d54;
+        u4 d58;
+        u4 d5C;
+        u4 d60;
+        STR s64;
+        u4 d68;
+        u4 d6C;
+        u4 d70;
+        u4 d74;
+        u4 d78;
+        u4 d7C;
+        u4 c80 <format=decimal>;
+
+        if (c80) {
+            u4 t84[c80];
+        }
     }
-} GEN8 <read=read_GEN8,optimize=false>;
-string read_GEN8(GEN8 &in) {
-    return read_HEAD(in.h);
+} GEN8_e <read=read_GEN8_e,optimize=false>;
+string read_GEN8_e(GEN8_e &in) {
+    local string out;
+    if (in._s < 0x84) {
+        SPrintf(out, "%Xh", in._s);
+    } else {
+        SPrintf(out, "%Xh %s", in._s, in.s04.s);
+    }
+    return out;
 }
 
 typedef struct {
@@ -75,7 +119,64 @@ typedef struct {
 
     if (h.size) {
         SetBackColor(0xc0c0c0);
+        GEN8_e d(h.size);
+    }
+} GEN8 <read=read_GEN8,optimize=false>;
+string read_GEN8(GEN8 &in) {
+    return read_HEAD(in.h);
+}
+
+typedef struct {
+    STR s00;
+    STR s04;
+} OPTN_o <read=read_OPTN_o,optimize=false>;
+string read_OPTN_o(OPTN_o &in) {
+    local string out;
+    SPrintf(out, "%s=%s", in.s00.s, in.s04.s);
+    return out;
+}
+
+typedef struct (int _size) {
+    local int _s = _size;
+
+    if (_s < 0x40) {
+        Printf("short OPTN at %Xh %Xh < 40h\n", FTell(), _s);
         u1 d[h.size];
+    } else {
+        u4 d00;
+        u4 d04;
+        u4 d08;
+        u4 d0C;
+        u4 d10;
+        u4 d14;
+        u4 d18;
+        u4 d1C;
+        u4 d20;
+        u4 d24;
+        u4 d28;
+        u4 d2C;
+        u4 d30;
+        u4 d34;
+        u4 d38;
+        u4 c3C <format=decimal>;
+
+        if (c3C) {
+            OPTN_o c40[c3C];
+        }
+    }
+} OPTN_e <read=read_OPTN_e,optimize=false>;
+string read_OPTN_e(OPTN_e &in) {
+    local string out;
+    SPrintf(out, "%Xh", in._s);
+    return out;
+}
+
+typedef struct {
+    HEAD h;
+
+    if (h.size) {
+        SetBackColor(0xc0c0c0);
+        OPTN_e d(h.size);
     }
 } OPTN <read=read_OPTN,optimize=false>;
 string read_OPTN(OPTN &in) {
@@ -85,11 +186,23 @@ string read_OPTN(OPTN &in) {
 typedef struct (int _size) {
     local int _s = _size;
 
-    u1 d[_s];
+    if (_s < 0x10) {
+        Printf("short EXTN at %Xh %Xh < CCh\n", FTell(), _s);
+        u1 d[_s];
+    } else {
+        STR s00;
+        STR s04;
+        STR s08;
+        u4 c0C;
+    }
 } EXTN_e <read=read_EXTN_e,optimize=false>;
 string read_EXTN_e(EXTN_e &in) {
     local string out;
-    SPrintf(out, "%Xh", in._s);
+    if (in._s < 0x10) {
+        SPrintf(out, "%Xh", in._s);
+    } else {
+        SPrintf(out, "%Xh %s", in._s, in.s04.s);
+    }
     return out;
 }
 
