@@ -990,7 +990,7 @@ string read_CODE_e(CODE_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in.size, in.n00.s);
     }
     return out;
 }
@@ -1145,7 +1145,7 @@ string read_TXTR_e(TXTR_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %Xh", in._s, in._s2);
+        SPrintf(out, "%Xh", in._s2);
     }
     return out;
 }
@@ -1214,7 +1214,11 @@ typedef struct (int _size) {
 } AUDO_e <read=read_AUDO_e,optimize=false>;
 string read_AUDO_e(AUDO_e &in) {
     local string out;
-    SPrintf(out, "%Xh", in._s);
+    if (in._s < 0x4) {
+        SPrintf(out, "%Xh", in._s);
+    } else {
+        SPrintf(out, "%Xh", in.size);
+    }
     return out;
 }
 
