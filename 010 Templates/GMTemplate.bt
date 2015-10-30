@@ -55,7 +55,9 @@ typedef struct {
     }
 } STR <read=read_STR,optimize=false>;
 string read_STR(STR &in) {
-    return in.s;
+    local string out;
+    SPrintf(out, "'%s'", in.s);
+    return out;
 }
 
 typedef struct (int _size) {
@@ -109,7 +111,7 @@ string read_GEN8_e(GEN8_e &in) {
     if (in._s < 0x84) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.s04.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.s04.s);
     }
     return out;
 }
@@ -132,7 +134,7 @@ typedef struct {
 } OPTN_o <read=read_OPTN_o,optimize=false>;
 string read_OPTN_o(OPTN_o &in) {
     local string out;
-    SPrintf(out, "%s=%s", in.s00.s, in.s04.s);
+    SPrintf(out, "'%s'='%s'", in.s00.s, in.s04.s);
     return out;
 }
 
@@ -201,7 +203,7 @@ string read_EXTN_e(EXTN_e &in) {
     if (in._s < 0x10) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.s04.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.s04.s);
     }
     return out;
 }
@@ -266,7 +268,7 @@ string read_SOND_e(SOND_e &in) {
     if (in._s < 0x24) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.s00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.s00.s);
     }
     return out;
 }
@@ -323,7 +325,7 @@ string read_AGRP_e(AGRP_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n.s);
     }
     return out;
 }
@@ -378,7 +380,7 @@ string read_SPRT_e(SPRT_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -439,7 +441,7 @@ string read_BGND_e(BGND_e &in) {
     if (in._s < 0x14) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -494,7 +496,7 @@ string read_PATH_e(PATH_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -552,7 +554,7 @@ string read_SCPT_e(SCPT_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -635,7 +637,7 @@ string read_SHDR_e(SHDR_e &in) {
     if (in._s < 0x6C) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -691,7 +693,7 @@ string read_FONT_e(FONT_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -791,7 +793,7 @@ string read_OBJT_e(OBJT_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -847,7 +849,7 @@ string read_ROOM_e(ROOM_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -988,7 +990,7 @@ string read_CODE_e(CODE_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh %s", in._s, in.n00.s);
+        SPrintf(out, "%Xh '%s'", in._s, in.n00.s);
     }
     return out;
 }
@@ -1077,7 +1079,7 @@ string read_STRG_e(STRG_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%s", in.d);
+        SPrintf(out, "'%s'", in.d);
     }
     return out;
 }
