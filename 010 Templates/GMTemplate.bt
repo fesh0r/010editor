@@ -600,6 +600,17 @@ string read_BGND(BGND &in) {
     return out;
 }
 
+typedef struct {
+    float d00;
+    float d04;
+    float d08;
+} PATH_i <read=read_PATH_i>;
+string read_PATH_i(PATH_i &in) {
+    local string out;
+    SPrintf(out, "%f %f %f", in.d00, in.d04, in.d08);
+    return out;
+}
+
 typedef struct (int _size) {
     local int _s = _size;
 
@@ -608,7 +619,13 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         STR name;
-        u1 d[_s - 4];
+        u4 d04;
+        u4 d08;
+        u4 d0C;
+        u4 c10 <format=decimal>;
+        if (c10) {
+            PATH_i d[c10];
+        }
     }
 } PATH_e <read=read_PATH_e,optimize=false>;
 string read_PATH_e(PATH_e &in) {
@@ -616,7 +633,7 @@ string read_PATH_e(PATH_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
+        SPrintf(out, "%Xh '%s' %d", in._s, in.name.s, in.c10);
     }
     return out;
 }
