@@ -72,7 +72,7 @@ typedef struct (int _size) {
         STR s08;
         u4 d0C;
         u4 d10;
-        u4 d14;
+        u4 game_id;
         u4 d18;
         u4 d1C;
         u4 d20;
@@ -90,7 +90,7 @@ typedef struct (int _size) {
         u4 d50;
         u4 d54;
         u4 d58;
-        u4 d5C;
+        time_t build_time;
         u4 d60;
         STR s64;
         u4 d68;
