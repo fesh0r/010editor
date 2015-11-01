@@ -471,7 +471,28 @@ typedef struct (int _size) {
         u1 d[_s];
     } else {
         STR name;
-        u1 d[_s - 4];
+        u4 full_width <format=decimal>;
+        u4 full_height <format=decimal>;
+        u4 d0C;
+        u4 actual_width <format=decimal>;
+        u4 actual_height <format=decimal>;
+        u4 d18;
+        u4 d1C;
+        u4 d20;
+        u4 d24;
+        u4 d28;
+        u4 d2C;
+        s4 origin_x <format=decimal>;
+        s4 origin_y <format=decimal>;
+        u4 TPAG_count <format=decimal>;
+
+        if (TPAG_count) {
+            u4 TPAG_offset[TPAG_count];
+        }
+
+        u4 e00;
+
+        u1 mask[_s - 0x40 - (TPAG_count * 4)];
     }
 } SPRT_e <read=read_SPRT_e,optimize=false>;
 string read_SPRT_e(SPRT_e &in) {
@@ -479,7 +500,7 @@ string read_SPRT_e(SPRT_e &in) {
     if (in._s < 0x4) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
+        SPrintf(out, "%Xh '%s' %dx%d", in._s, in.name.s, in.actual_width, in.actual_height);
     }
     return out;
 }
