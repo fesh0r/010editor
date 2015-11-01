@@ -191,7 +191,7 @@ typedef struct (int _size) {
     local int _end;
     _end = FTell() + _s;
 
-    if (_s < 0x14) {
+    if (_s < 0x4) {
         Printf("short EXTN_e3 at %Xh %Xh < 14h\n", FTell(), _s);
         u1 d[_s];
     } else {
@@ -289,11 +289,6 @@ typedef struct (int _size) {
                 EXTN_e2 d(_size2);
             }
         }
-
-        u4 e00;
-        u4 e04;
-        u4 e08;
-        u4 e0C;
     }
 } EXTN_e <read=read_EXTN_e,optimize=false>;
 string read_EXTN_e(EXTN_e &in) {
@@ -331,6 +326,12 @@ typedef struct {
                 SetBackColor(0xb8b8ff);
                 EXTN_e d(_size);
             }
+
+            SetBackColor(0xe0e0ff);
+            u4 e00;
+            u4 e04;
+            u4 e08;
+            u4 e0C;
         }
     }
 } EXTN <read=read_EXTN,optimize=false>;
