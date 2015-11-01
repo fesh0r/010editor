@@ -1268,7 +1268,7 @@ typedef struct (int _size, int _size2) {
             local quad _pos = FTell();
             FSeek(offset);
 
-            SetBackColor(0xa0a0ff);
+            SetBackColor(0xa0ffa0);
             u1 d[_s2];
 
             FSeek(_pos);
@@ -1342,7 +1342,7 @@ typedef struct (int _size) {
         }
 
         if (size) {
-            SetBackColor(0xa0a0ff);
+            SetBackColor(0xa0ffff);
             u1 d[size];
         }
     }
