@@ -813,6 +813,22 @@ string read_SHDR(SHDR &in) {
     return out;
 }
 
+typedef struct {
+    u2 d00;
+    u2 d02;
+    u2 d04;
+    u2 d06;
+    u2 d08;
+    u2 d0A;
+    u2 d0C;
+    u2 d0E;
+} FONT_i <read=read_FONT_i>;
+string read_FONT_i(FONT_i &in) {
+    local string out;
+    SPrintf(out, "%Xh", in.d00);
+    return out;
+}
+
 typedef struct (int _size) {
     local int _s = _size;
 
@@ -822,7 +838,25 @@ typedef struct (int _size) {
     } else {
         STR name;
         STR n04;
-        u1 d[_s - 8];
+        u4 d08;
+        u4 d0C;
+        u4 d10;
+        u4 d14;
+        u4 d18;
+        u4 TPAG_offset;
+        float d20;
+        float d24;
+        u4 char_cnt <format=decimal>;
+
+        if (char_cnt) {
+            u4 offsets[char_cnt];
+
+            local int i;
+            for (i = 0; i < char_cnt; i++) {
+                FSeek(offsets[i]);
+                FONT_i d;
+            }
+        }
     }
 } FONT_e <read=read_FONT_e,optimize=false>;
 string read_FONT_e(FONT_e &in) {
@@ -830,7 +864,7 @@ string read_FONT_e(FONT_e &in) {
     if (in._s < 0x8) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s'", in._s, in.name.s);
+        SPrintf(out, "%Xh '%s' %d", in._s, in.name.s, in.char_cnt);
     }
     return out;
 }
@@ -839,7 +873,7 @@ typedef struct {
     HEAD h;
 
     local int _end;
-    _end = FTell() + h.size;
+    _end = FTell() + h.size - 512;
 
     if (h.size) {
         SetBackColor(0xe0e0ff);
@@ -861,6 +895,10 @@ typedef struct {
                 FONT_e d(_size);
             }
         }
+
+        FSeek(_end);
+        SetBackColor(0xc8c8ff);
+        u2 chars[256];
     }
 } FONT <read=read_FONT,optimize=false>;
 string read_FONT(FONT &in) {
