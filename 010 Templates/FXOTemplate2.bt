@@ -82,8 +82,7 @@ typedef struct {
         u4 InterfaceVariableCount;
         u4 InterfaceVariableElementCount;
         u4 ClassInstanceElementCount;
-    }
-    else {
+    } else {
         local u4 GroupCount = 0;
         local u4 UnorderedAccessViewCount = 0;
         local u4 InterfaceVariableCount = 0;
@@ -113,18 +112,16 @@ typedef struct {
 DisplayFormatHex();
 LittleEndian();
 
-local u4 _sig;
+local u4 _sig, _ver;
 _sig = ReadUInt(0);
 
 if ((_sig & 0xffff0000) == 0xfeff0000) {
     LittleEndian();
-}
-else if ((_sig & 0xffff) == 0xfffe) {
+} else if ((_sig & 0xffff) == 0xfffe) {
     BigEndian();
     _sig = ReadUInt(0);
     Warning("BigEndian");
-}
-else {
+} else {
     Warning("Bad sig!");
     Printf("Bad sig!\n");
     return -1;
@@ -133,7 +130,7 @@ _ver = _sig & 0xffff;
 
 if (_ver < 0x1001) {
     Warning("Unsupported version!");
-    Printf("Unsupported version! %04X", _ver);
+    Printf("Unsupported version! %04X\n", _ver);
     return -1;
 }
 

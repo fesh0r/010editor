@@ -16,7 +16,6 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-
 typedef struct {
     local int v = 0;
     local int shift = 0;
@@ -27,29 +26,24 @@ typedef struct {
         shift += 7;
     } while (val & 0x80);
 } EncodedInt <read=read_EncodedInt,optimize=false>;
-
 string read_EncodedInt(EncodedInt &in) {
-    string out;
-  SPrintf(out, "%Xh", in.v);
+    local string out;
+    SPrintf(out, "%Xh", in.v);
     return out;
 }
-
 
 typedef struct {
     EncodedInt length;
     SetBackColor(0xc0c0c0);
     if (length.v) {
         char v[length.v];
-    }
-    else {
+    } else {
         local string v = "";
     }
 } EncodedStr <read=read_EncodedStr,optimize=false>;
-
 string read_EncodedStr(EncodedStr &in) {
     return in.v;
 }
-
 
 typedef struct {
     u4 Signature;
@@ -57,10 +51,9 @@ typedef struct {
     u1 Profile;
     u4 EffectKey;
 } HEADER <read=read_HEADER>;
-
 string read_HEADER(HEADER &in) {
-    string out;
-    string profile;
+    local string out;
+    local string profile;
     switch(in.Profile) {
         case 0:
             profile = "GL";
@@ -76,12 +69,10 @@ string read_HEADER(HEADER &in) {
     return out;
 }
 
-
 typedef struct {
     u1 p;
     u2 o;
 } CBParam;
-
 
 typedef struct {
     local int i;
@@ -94,7 +85,6 @@ typedef struct {
         CBParam cbp[pCount];
     }
 } ConstantBuffer <read=read_ConstantBuffer,optimize=false>;
-
 string read_ConstantBuffer(ConstantBuffer &in) {
     return in.name.v;
 }
@@ -104,7 +94,6 @@ typedef enum<u1> {
     TAM_Clamp,
     TAM_Mirror
 } TextureAddressMode;
-
 
 typedef struct {
     enum<u1> {
@@ -128,11 +117,9 @@ typedef struct {
     EncodedStr name;
     u1 parameter <format=decimal>;
 } Sampler <read=read_Sampler,optimize=false>;
-
 string read_Sampler(Sampler &in) {
     return in.name.v;
 }
-
 
 typedef struct {
     EncodedStr name;
@@ -154,11 +141,9 @@ typedef struct {
     u1 index <format=decimal>;
     u2 format;
 } Attribute <read=read_Attribute,optimize=false>;
-
 string read_Attribute(Attribute &in) {
     return in.name.v;
 }
-
 
 typedef struct {
     local int i;
@@ -184,12 +169,10 @@ typedef struct {
         Attribute a[aCount];
     }
 } Shader <read=read_Shader,optimize=false>;
-
 string read_Shader(Shader &in) {
     if (in.isVertex) {
         return "VS";
-    }
-    else {
+    } else {
         return "PS";
     }
 }
@@ -239,11 +222,9 @@ typedef struct {
         }
     }
 } Parameter <read=read_Parameter,optimize=false>;
-
 string read_Parameter(Parameter &in) {
     return in.name.v;
 }
-
 
 typedef enum<u1> {
     BF_Add,
@@ -252,7 +233,6 @@ typedef enum<u1> {
     BF_Max,
     BF_Min
 } BlendFunction;
-
 
 typedef enum<u1> {
     B_One,
@@ -270,7 +250,6 @@ typedef enum<u1> {
     B_SourceAlphaSaturation
 } Blend;
 
-
 typedef enum<u1> {
     SO_Keep,
     SO_Zero,
@@ -281,7 +260,6 @@ typedef enum<u1> {
     SO_DecrementSaturation,
     SO_Invert
 } StencilOperation;
-
 
 typedef enum<u1> {
     SCF_Always,
@@ -294,19 +272,16 @@ typedef enum<u1> {
     SCF_NotEqual
 } CompareFunction;
 
-
 typedef enum<u1> {
     CM_None,
     CM_CullClockwiseFace,
     CM_CullCounterClockwiseFace
 } CullMode;
 
-
 typedef enum<u1> {
     FM_Solid,
     FM_WireFrame
 } FillMode;
-
 
 typedef struct {
     EncodedStr name;
@@ -362,11 +337,9 @@ typedef struct {
         }
     }
 } Pass <read=read_Pass,optimize=false>;
-
 string read_Pass(Pass &in) {
     return in.name.v;
 }
-
 
 typedef struct {
     EncodedStr name;
@@ -377,11 +350,9 @@ typedef struct {
         Pass p[pCount];
     }
 } Technique <read=read_Technique,optimize=false>;
-
 string read_Technique(Technique &in) {
     return in.name.v;
 }
-
 
 DisplayFormatHex();
 LittleEndian();
@@ -393,13 +364,11 @@ local u4 _sig;
 _sig = ReadUInt(0);
 if (_sig == 0x5846474D) {
     LittleEndian();
-}
-else if (_sig == 0x4D474658) {
+} else if (_sig == 0x4D474658) {
     BigEndian();
     _sig = ReadUInt(0);
     Warning("BigEndian");
-}
-else {
+} else {
     SPrintf(out, "Bad sig! %04X", _sig);
     Warning(out);
     Printf("%s\n", out);

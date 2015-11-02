@@ -37,8 +37,7 @@ typedef struct {
     SetBackColor(0xc0c0c0);
     if (length.v) {
         char v[length.v];
-    }
-    else {
+    } else {
         local string v = "";
     }
 } EncodedStr <read=read_EncodedStr,optimize=false>;
@@ -172,8 +171,7 @@ typedef struct {
 string read_Shader(Shader &in) {
     if (in.isVertex) {
         return "VS";
-    }
-    else {
+    } else {
         return "PS";
     }
 }
@@ -362,13 +360,11 @@ local u4 _sig;
 _sig = ReadUInt(0);
 if (_sig == 0x5846474D) {
     LittleEndian();
-}
-else if (_sig == 0x4D474658) {
+} else if (_sig == 0x4D474658) {
     BigEndian();
     _sig = ReadUInt(0);
     Warning("BigEndian");
-}
-else {
+} else {
     SPrintf(out, "Bad sig! %04X", _sig);
     Warning(out);
     Printf("%s\n", out);
