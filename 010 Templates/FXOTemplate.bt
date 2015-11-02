@@ -53,204 +53,178 @@ string read_HEADER(HEADER &in) {
 }
 
 typedef struct {
-    local quad padding;
+    local quad _pos, _padding;
 
-    SetBackColor(0xc0c0ff);
+    u4 offset;
+
+    _pos = FTell();
+    FSeek(_data_start + offset);
+
+    SetBackColor(0xffffc0);
     u4 size;
 
     if (size) {
-        SetBackColor(0xc0ffc0);
+        SetBackColor(0xffffa0);
         char n[size];
 
-        padding = 4 - (FTell() & 3);
-        if (padding > 0 && padding < 4) {
-            u1 _p[padding] <hidden=true>;
+        _padding = 4 - (FTell() & 3);
+        if (_padding > 0 && padding < 4) {
+            SetBackColor(0xffffff);
+            u1 _p[_padding] <hidden=true>;
         }
+    } else {
+        local string n = "";
     }
+    FSeek(_pos);
 } D3DX_NAME <read=read_D3DX_NAME,optimize=false>;
 string read_D3DX_NAME(D3DX_NAME &in) {
-    if (in.size) {
-        return in.n;
-    } else {
-        return "";
-    }
+    local string out;
+    SPrintf(out, "'%s'", in.n);
+    return out;
 }
 
-typedef struct (int parent) {
+typedef struct {
+    local quad _pos;
+
+    u4 typedef_offset;
+    u4 value_offset;
+
+    _pos = FTell();
+    FSeek(_data_start + typedef_offset);
+
     SetBackColor(0xc0c0ff);
     u4 type;
     u4 class;
-    u4 name_offset;
-    u4 semantic_offset;
-    u4 element_count;
-
-    local quad _cur_offset = FTell();
-
-    FSeek(_data_start + name_offset);
     D3DX_NAME name;
-
-    FSeek(_data_start + semantic_offset);
     D3DX_NAME semantic;
+    u4 element_count <format=decimal>;
 
-    FSeek(_cur_offset);
-} D3DX_EFFECT_TYPEDEF <read=read_D3DX_EFFECT_TYPEDEF>;
-string read_D3DX_EFFECT_TYPEDEF(D3DX_EFFECT_TYPEDEF &in) {
-    return read_D3DX_NAME(in.name);
+    FSeek(_data_start + value_offset);
+
+    FSeek(_pos);
+} D3DX_EFFECT_VALUE <read=read_D3DX_EFFECT_VALUE,optimize=false>;
+string read_D3DX_EFFECT_VALUE(D3DX_EFFECT_VALUE &in) {
+    local string out;
+    SPrintf(out, "'%s'", in.name.n);
+    return out;
 }
 
 typedef struct {
-    SetBackColor(0xc0c0ff);
-
-} D3DX_EFFECT_VALUE;
-
-typedef struct {
-    u4 typedef_offset;
-    u4 value_offset;
-
-    local quad _cur_offset = FTell();
-
-    FSeek(_data_start + typedef_offset);
-    D3DX_EFFECT_TYPEDEF typedef_(false);
-
-    FSeek(_data_start + value_offset);
     D3DX_EFFECT_VALUE value;
-
-    FSeek(_cur_offset);
-} D3DX_PARAMETER_ANNOTATION;
-
-typedef struct {
-    local int i;
-
-    u4 typedef_offset;
-    u4 value_offset;
     u4 flags;
-    u4 annotation_count;
+    u4 annotation_count <format=decimal>;
 
-    for (i = 0; i < annotation_count; i++) {
-        D3DX_PARAMETER_ANNOTATION a;
+    if (annotation_count) {
+        D3DX_EFFECT_VALUE a[annotation_count];
     }
-
-    local quad _cur_offset = FTell();
-
-    FSeek(_data_start + typedef_offset);
-    D3DX_EFFECT_TYPEDEF typedef_(false);
-
-    FSeek(_data_start + value_offset);
-    D3DX_EFFECT_VALUE value;
-
-    FSeek(_cur_offset);
 } D3DX_PARAMETER <read=read_D3DX_PARAMETER,optimize=false>;
 string read_D3DX_PARAMETER(D3DX_PARAMETER &in) {
-    return read_D3DX_EFFECT_TYPEDEF(in.typedef_);
+    local string out;
+    SPrintf(out, "'%s'", in.value.name.n);
+    return out;
 }
 
 typedef struct {
     u4 operation;
-    u4 index;
-    u4 typedef_offset;
-    u4 value_offset;
-
-    local quad _cur_offset = FTell();
-
-    FSeek(_data_start + typedef_offset);
-    D3DX_EFFECT_TYPEDEF type(false);
-
-    FSeek(_cur_offset);
-} D3DX_STATE;
+    s4 index <format=decimal>;
+    D3DX_EFFECT_VALUE value;
+} D3DX_STATE <optimize=false>;
 
 typedef struct {
-    local int i;
-
-    u4 name_offset;
-    u4 annotation_count;
-    u4 state_count;
-
-    for (i = 0; i < annotation_count; i++) {
-        D3DX_PARAMETER_ANNOTATION a;
-    }
-
-    for (i = 0; i < state_count; i++) {
-        D3DX_STATE s;
-    }
-
-    local quad _cur_offset = FTell();
-
-    FSeek(_data_start + name_offset);
     D3DX_NAME name;
+    u4 annotation_count <format=decimal>;
+    u4 state_count <format=decimal>;
 
-    FSeek(_cur_offset);
+    if (annotation_count) {
+        D3DX_EFFECT_VALUE a[annotation_count];
+    }
+
+    if (state_count) {
+        D3DX_STATE s[state_count];
+    }
 } D3DX_PASS <read=read_D3DX_PASS,optimize=false>;
 string read_D3DX_PASS(D3DX_PASS &in) {
-    return read_D3DX_NAME(in.name);
+    local string out;
+    SPrintf(out, "'%s'", in.name.n);
+    return out;
 }
 
 typedef struct {
     local int i;
 
-    u4 name_offset;
-    u4 annotation_count;
-    u4 pass_count;
-
-    for (i = 0; i < annotation_count; i++) {
-        D3DX_PARAMETER_ANNOTATION a;
-    }
-
-    for (i = 0; i < pass_count; i++) {
-        D3DX_PASS p;
-    }
-
-    local quad _cur_offset = FTell();
-
-    FSeek(_data_start + name_offset);
     D3DX_NAME name;
+    u4 annotation_count <format=decimal>;
+    u4 pass_count <format=decimal>;
 
-    FSeek(_cur_offset);
+    if (annotation_count) {
+        D3DX_EFFECT_VALUE a[annotation_count];
+    }
+
+    if (pass_count) {
+        D3DX_PASS p[pass_count];
+    }
 } D3DX_TECHNIQUE <read=read_D3DX_TECHNIQUE,optimize=false>;
 string read_D3DX_TECHNIQUE(D3DX_TECHNIQUE &in) {
-    return read_D3DX_NAME(in.name);
+    local string out;
+    SPrintf(out, "'%s'", in.name.n);
+    return out;
 }
 
 typedef struct {
-    u4 offset;
-} D3DX_STRING;
+    s4 index <format=decimal>;
+    u4 size;
+    if (size) {
+        SetBackColor(0xb0ffb0);
+        u1 data[size];
+    }
+} D3DX_SMALL <optimize=false>;
 
 typedef struct {
-    u4 technique_index;
-    u4 index;
-    u4 element_index;
-    u4 state_index;
+    s4 technique_index <format=decimal>;
+    s4 index <format=decimal>;
+    s4 element_index <format=decimal>;
+    s4 state_index <format=decimal>;
     u4 usage;
     u4 size;
     if (size) {
+        SetBackColor(0xb0ffb0);
         u1 data[size];
     }
-} D3DX_RESOURCE;
+} D3DX_LARGE <optimize=false>;
 
 typedef struct {
-    local int i;
+    local int i, padding;
 
-    u4 parameter_count;
-    u4 technique_count;
-    u4 unknown;
-    u4 object_count;
+    u4 parameter_count <format=decimal>;
+    u4 technique_count <format=decimal>;
+    u4 unknown_count <format=decimal>;
+    u4 object_count <format=decimal>;
 
-    for (i = 0; i < parameter_count; i++) {
-        D3DX_PARAMETER p;
+    if (parameter_count) {
+        D3DX_PARAMETER p[parameter_count];
     }
 
-    for (i = 0; i < technique_count; i++) {
-        D3DX_TECHNIQUE t;
+    if (technique_count) {
+        D3DX_TECHNIQUE t[technique_count];
     }
 
-    u4 string_count;
-    u4 resource_count;
+    u4 small_count <format=decimal>;
+    u4 large_count <format=decimal>;
 
-    for (i = 0; i < string_count; i++) {
-        D3DX_STRING s;
+    if (small_count) {
+        SetBackColor(0xd0ffd0);
+        D3DX_SMALL s[small_count];
     }
 
-    for (i = 0; i < resource_count; i++) {
-        D3DX_RESOURCE r;
+    for (i = 0; i < large_count; i++) {
+        SetBackColor(0xd0ffd0);
+        D3DX_LARGE r;
+
+        padding = 4 - (FTell() & 3);
+        if (padding > 0 && padding < 4) {
+            SetBackColor(0xffffff);
+            u1 _p[padding] <hidden=true>;
+        }
     }
 } D3DX_EFFECT <optimize=false>;
 
@@ -280,7 +254,7 @@ if (_ver > 0x0901) {
 SetBackColor(0xc0c0c0);
 HEADER h;
 
-SetBackColor(0xe8e8e8);
+SetBackColor(0xf0f0f0);
 _data_start = FTell();
 if (h.data_offset) {
     u1 d[h.data_offset];
