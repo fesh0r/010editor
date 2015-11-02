@@ -20,18 +20,6 @@ typedef byte   s1;
 
 local quad _data_start;
 
-typedef struct {
-    SetBackColor(cNone);
-    if (FEof()) {
-        return;
-    }
-    local quad padding = 4 - (FTell() & 3);
-
-    if (padding) {
-        u1 p[padding];
-    }
-} PADDING4 <optimize=false,hidden=true>;
-
 string read_sig(u4 &in) {
     local string out;
     local string ver;
@@ -65,6 +53,8 @@ string read_HEADER(HEADER &in) {
 }
 
 typedef struct {
+    local quad padding;
+
     SetBackColor(0xc0c0ff);
     u4 size;
 
@@ -72,7 +62,10 @@ typedef struct {
         SetBackColor(0xc0ffc0);
         char n[size];
 
-        PADDING4 p;
+        padding = 4 - (FTell() & 3);
+        if (padding > 0 && padding < 4) {
+            u1 _p[padding] <hidden=true>;
+        }
     }
 } D3DX_NAME <read=read_D3DX_NAME,optimize=false>;
 string read_D3DX_NAME(D3DX_NAME &in) {
