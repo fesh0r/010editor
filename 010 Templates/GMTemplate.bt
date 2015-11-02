@@ -363,7 +363,7 @@ typedef struct (int _size) {
         u4 d10;
         float d14;
         u4 d18;
-        u4 d1C;
+        u4 AGRP_index <format=decimal>;
         s4 AUDO_index <format=decimal>;
     }
 } SOND_e <read=read_SOND_e,optimize=false>;
