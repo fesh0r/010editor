@@ -372,7 +372,7 @@ string read_SOND_e(SOND_e &in) {
     if (in._s < 0x24) {
         SPrintf(out, "%Xh", in._s);
     } else {
-        SPrintf(out, "%Xh '%s' %d", in._s, in.name.s, in.audo_index);
+        SPrintf(out, "%Xh '%s' %d", in._s, in.name.s, in.AUDO_index);
     }
     return out;
 }
