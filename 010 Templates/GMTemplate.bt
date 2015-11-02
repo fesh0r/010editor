@@ -302,6 +302,13 @@ string read_EXTN_e(EXTN_e &in) {
 }
 
 typedef struct {
+    u4 d00;
+    u4 d04;
+    u4 d08;
+    u4 d0C;
+} EXTN_i;
+
+typedef struct {
     HEAD h;
 
     local int _end;
@@ -327,11 +334,9 @@ typedef struct {
                 EXTN_e d(_size);
             }
 
-            SetBackColor(0xe0e0ff);
-            u4 e00;
-            u4 e04;
-            u4 e08;
-            u4 e0C;
+            FSeek(_end - 16 * file_cnt);
+            SetBackColor(0xc8c8ff);
+            EXTN_i e[file_cnt];
         }
     }
 } EXTN <read=read_EXTN,optimize=false>;
