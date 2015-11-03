@@ -89,6 +89,68 @@ string read_D3DX_NAME(D3DX_NAME &in) {
     return out;
 }
 
+typedef enum <u4> {
+    SYMTYPE_VOID,
+    SYMTYPE_BOOL,
+    SYMTYPE_INT,
+    SYMTYPE_FLOAT,
+    SYMTYPE_STRING,
+    SYMTYPE_TEXTURE,
+    SYMTYPE_TEXTURE1D,
+    SYMTYPE_TEXTURE2D,
+    SYMTYPE_TEXTURE3D,
+    SYMTYPE_TEXTURECUBE,
+    SYMTYPE_SAMPLER,
+    SYMTYPE_SAMPLER1D,
+    SYMTYPE_SAMPLER2D,
+    SYMTYPE_SAMPLER3D,
+    SYMTYPE_SAMPLERCUBE,
+    SYMTYPE_PIXELSHADER,
+    SYMTYPE_VERTEXSHADER,
+    SYMTYPE_PIXELFRAGMENT,
+    SYMTYPE_VERTEXFRAGMENT,
+    SYMTYPE_UNSUPPORTED
+} D3DX_SYMTYPE;
+
+typedef enum <u4> {
+    SYMCLASS_SCALAR,
+    SYMCLASS_VECTOR,
+    SYMCLASS_MATRIX_ROWS,
+    SYMCLASS_MATRIX_COLUMNS,
+    SYMCLASS_OBJECT,
+    SYMCLASS_STRUCT
+} D3DX_SYMCLASS;
+
+typedef enum <u4>
+{
+    SAMP_UNKNOWN0,
+    SAMP_UNKNOWN1,
+    SAMP_UNKNOWN2,
+    SAMP_UNKNOWN3,
+    SAMP_TEXTURE,
+    SAMP_ADDRESSU,
+    SAMP_ADDRESSV,
+    SAMP_ADDRESSW,
+    SAMP_BORDERCOLOR,
+    SAMP_MAGFILTER,
+    SAMP_MINFILTER,
+    SAMP_MIPFILTER,
+    SAMP_MIPMAPLODBIAS,
+    SAMP_MAXMIPLEVEL,
+    SAMP_MAXANISOTROPY,
+    SAMP_SRGBTEXTURE,
+    SAMP_ELEMENTINDEX,
+    SAMP_DMAPOFFSET
+} D3DX_EFFECT_SAMPLER;
+
+struct D3DX_EFFECT_VALUE;
+typedef struct {
+    D3DX_EFFECT_SAMPLER stype: 5;
+    u4 unknown: 27;
+    u4 unknown;
+    D3DX_EFFECT_VALUE value;
+} D3DX_VALUE_SAMPLER <optimize=false>;
+
 typedef struct {
     local quad _pos;
 
@@ -99,20 +161,61 @@ typedef struct {
     FSeek(_data_start + typedef_offset);
 
     SetBackColor(0xc0c0ff);
-    u4 type;
-    u4 class;
+    D3DX_SYMTYPE type;
+    D3DX_SYMCLASS class;
     D3DX_NAME name;
     SetBackColor(0xc0c0ff);
     D3DX_NAME semantic;
     SetBackColor(0xc0c0ff);
     u4 element_count <format=decimal>;
 
-    FSeek(_data_start + value_offset);
+    switch(class) {
+        case SYMCLASS_STRUCT:
+            Assert(false, "SYMCLASS_STRUCT not supported");
+            break;
+        case SYMCLASS_OBJECT:
+            if (type == SYMTYPE_SAMPLER || type == SYMTYPE_SAMPLER1D || type == SYMTYPE_SAMPLER2D || type == SYMTYPE_SAMPLER3D) {
+                FSeek(_data_start + value_offset);
+                SetBackColor(0x9898ff);
+                u4 state_count <format=decimal>;
+                if (state_count) {
+                    D3DX_VALUE_SAMPLER s[state_count];
+                }
+            } else {
+                local u4 object_count = 1;
+                if (element_count) {
+                    object_count = element_count;
+                }
+                FSeek(_data_start + value_offset);
+                SetBackColor(0x9898ff);
+                u4 v[object_count];
+            }
+            break;
+        default:
+            local u4 value_count = 1;
+            if (element_count) {
+                value_count = element_count;
+            }
+            u4 column_count <format=decimal>;
+            u4 row_count <format=decimal>;
+            if (column_count * row_count) {
+                FSeek(_data_start + value_offset);
+                SetBackColor(0x9898ff);
+                if (type == SYMTYPE_FLOAT) {
+                    float v[column_count * row_count * value_count];
+                } else {
+                    u4 v[column_count * row_count * value_count];
+                }
+            }
+            break;
+    }
 
     FSeek(_pos);
 } D3DX_EFFECT_VALUE <read=read_D3DX_EFFECT_VALUE,optimize=false>;
 string read_D3DX_EFFECT_VALUE(D3DX_EFFECT_VALUE &in) {
-    return read_D3DX_NAME(in.name);
+    local string out;
+    SPrintf(out, "%s %s %s", read_D3DX_NAME(in.name), EnumToString(in.class), EnumToString(in.type));
+    return out;
 }
 
 typedef struct {
@@ -128,8 +231,116 @@ string read_D3DX_PARAMETER(D3DX_PARAMETER &in) {
     return read_D3DX_EFFECT_VALUE(in.value);
 }
 
+typedef enum <u4> {
+    RS_ZENABLE,
+    RS_FILLMODE,
+    RS_SHADEMODE,
+    RS_ZWRITEENABLE,
+    RS_ALPHATESTENABLE,
+    RS_LASTPIXEL,
+    RS_SRCBLEND,
+    RS_DESTBLEND,
+    RS_CULLMODE,
+    RS_ZFUNC,
+    RS_ALPHAREF,
+    RS_ALPHAFUNC,
+    RS_DITHERENABLE,
+    RS_ALPHABLENDENABLE,
+    RS_FOGENABLE,
+    RS_SPECULARENABLE,
+    RS_FOGCOLOR,
+    RS_FOGTABLEMODE,
+    RS_FOGSTART,
+    RS_FOGEND,
+    RS_FOGDENSITY,
+    RS_RANGEFOGENABLE,
+    RS_STENCILENABLE,
+    RS_STENCILFAIL,
+    RS_STENCILZFAIL,
+    RS_STENCILPASS,
+    RS_STENCILFUNC,
+    RS_STENCILREF,
+    RS_STENCILMASK,
+    RS_STENCILWRITEMASK,
+    RS_TEXTUREFACTOR,
+    RS_WRAP0,
+    RS_WRAP1,
+    RS_WRAP2,
+    RS_WRAP3,
+    RS_WRAP4,
+    RS_WRAP5,
+    RS_WRAP6,
+    RS_WRAP7,
+    RS_WRAP8,
+    RS_WRAP9,
+    RS_WRAP10,
+    RS_WRAP11,
+    RS_WRAP12,
+    RS_WRAP13,
+    RS_WRAP14,
+    RS_WRAP15,
+    RS_CLIPPING,
+    RS_LIGHTING,
+    RS_AMBIENT,
+    RS_FOGVERTEXMODE,
+    RS_COLORVERTEX,
+    RS_LOCALVIEWER,
+    RS_NORMALIZENORMALS,
+    RS_DIFFUSEMATERIALSOURCE,
+    RS_SPECULARMATERIALSOURCE,
+    RS_AMBIENTMATERIALSOURCE,
+    RS_EMISSIVEMATERIALSOURCE,
+    RS_VERTEXBLEND,
+    RS_CLIPPLANEENABLE,
+    RS_POINTSIZE,
+    RS_POINTSIZE_MIN,
+    RS_POINTSPRITEENABLE,
+    RS_POINTSCALEENABLE,
+    RS_POINTSCALE_A,
+    RS_POINTSCALE_B,
+    RS_POINTSCALE_C,
+    RS_MULTISAMPLEANTIALIAS,
+    RS_MULTISAMPLEMASK,
+    RS_PATCHEDGESTYLE,
+    RS_DEBUGMONITORTOKEN,
+    RS_POINTSIZE_MAX,
+    RS_INDEXEDVERTEXBLENDENABLE,
+    RS_COLORWRITEENABLE,
+    RS_TWEENFACTOR,
+    RS_BLENDOP,
+    RS_POSITIONDEGREE,
+    RS_NORMALDEGREE,
+    RS_SCISSORTESTENABLE,
+    RS_SLOPESCALEDEPTHBIAS,
+    RS_ANTIALIASEDLINEENABLE,
+    RS_MINTESSELLATIONLEVEL,
+    RS_MAXTESSELLATIONLEVEL,
+    RS_ADAPTIVETESS_X,
+    RS_ADAPTIVETESS_Y,
+    RS_ADAPTIVETESS_Z,
+    RS_ADAPTIVETESS_W,
+    RS_ENABLEADAPTIVETESSELLATION,
+    RS_TWOSIDEDSTENCILMODE,
+    RS_CCW_STENCILFAIL,
+    RS_CCW_STENCILZFAIL,
+    RS_CCW_STENCILPASS,
+    RS_CCW_STENCILFUNC,
+    RS_COLORWRITEENABLE1,
+    RS_COLORWRITEENABLE2,
+    RS_COLORWRITEENABLE3,
+    RS_BLENDFACTOR,
+    RS_SRGBWRITEENABLE,
+    RS_DEPTHBIAS,
+    RS_SEPARATEALPHABLENDENABLE,
+    RS_SRCBLENDALPHA,
+    RS_DESTBLENDALPHA,
+    RS_BLENDOPALPHA,
+    RS_VERTEXSHADER = 146,
+    RS_PIXELSHADER = 147
+} D3DX_RENDERSTATE;
+
 typedef struct {
-    u4 operation;
+    D3DX_RENDERSTATE operation;
     s4 index <format=decimal>;
     D3DX_EFFECT_VALUE value;
 } D3DX_STATE <optimize=false>;
