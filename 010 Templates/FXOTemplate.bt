@@ -55,13 +55,13 @@ string read_HEADER(HEADER &in) {
 typedef struct {
     local quad _pos, _padding;
 
-    u4 offset;
+    u4 offset <hidden=true>;
 
     _pos = FTell();
     FSeek(_data_start + offset);
 
     SetBackColor(0xffffc0);
-    u4 size;
+    u4 size <hidden=true>;
 
     if (size) {
         SetBackColor(0xffff98);
@@ -154,8 +154,8 @@ typedef struct {
 typedef struct {
     local quad _pos;
 
-    u4 typedef_offset;
-    u4 value_offset;
+    u4 typedef_offset <hidden=true>;
+    u4 value_offset <hidden=true>;
 
     _pos = FTell();
     FSeek(_data_start + typedef_offset);
@@ -383,7 +383,7 @@ string read_D3DX_TECHNIQUE(D3DX_TECHNIQUE &in) {
 
 typedef struct {
     s4 index <format=decimal>;
-    u4 size;
+    u4 size <hidden=true>;
     if (size) {
         SetBackColor(0xb0ffb0);
         u1 data[size];
@@ -396,7 +396,7 @@ typedef struct {
     s4 element_index <format=decimal>;
     s4 state_index <format=decimal>;
     u4 usage;
-    u4 size;
+    u4 size <hidden=true>;
     if (size) {
         SetBackColor(0xb0ffb0);
         u1 data[size];
