@@ -171,7 +171,8 @@ typedef struct {
 
     switch(class) {
         case SYMCLASS_STRUCT:
-            Assert(false, "SYMCLASS_STRUCT not supported");
+            Warning("SYMCLASS_STRUCT not supported");
+            Printf("SYMCLASS_STRUCT not supported\n");
             break;
         case SYMCLASS_OBJECT:
             if (type == SYMTYPE_SAMPLER || type == SYMTYPE_SAMPLER1D || type == SYMTYPE_SAMPLER2D || type == SYMTYPE_SAMPLER3D) {
