@@ -64,13 +64,15 @@ typedef struct {
     u4 size;
 
     if (size) {
-        SetBackColor(0xffffa0);
+        SetBackColor(0xffff98);
         char n[size];
 
         _padding = 4 - (FTell() & 3);
         if (_padding > 0 && padding < 4) {
+            SetForeColor(cGray);
             SetBackColor(0xffffff);
             u1 _p[_padding] <hidden=true>;
+            SetForeColor(cBlack);
         }
     } else {
         local string n = "";
@@ -79,7 +81,11 @@ typedef struct {
 } D3DX_NAME <read=read_D3DX_NAME,optimize=false>;
 string read_D3DX_NAME(D3DX_NAME &in) {
     local string out;
-    SPrintf(out, "'%s'", in.n);
+    if (in.size) {
+        SPrintf(out, "'%s'", in.n);
+    } else {
+        out = "";
+    }
     return out;
 }
 
@@ -96,7 +102,9 @@ typedef struct {
     u4 type;
     u4 class;
     D3DX_NAME name;
+    SetBackColor(0xc0c0ff);
     D3DX_NAME semantic;
+    SetBackColor(0xc0c0ff);
     u4 element_count <format=decimal>;
 
     FSeek(_data_start + value_offset);
@@ -104,9 +112,7 @@ typedef struct {
     FSeek(_pos);
 } D3DX_EFFECT_VALUE <read=read_D3DX_EFFECT_VALUE,optimize=false>;
 string read_D3DX_EFFECT_VALUE(D3DX_EFFECT_VALUE &in) {
-    local string out;
-    SPrintf(out, "'%s'", in.name.n);
-    return out;
+    return read_D3DX_NAME(in.name);
 }
 
 typedef struct {
@@ -119,9 +125,7 @@ typedef struct {
     }
 } D3DX_PARAMETER <read=read_D3DX_PARAMETER,optimize=false>;
 string read_D3DX_PARAMETER(D3DX_PARAMETER &in) {
-    local string out;
-    SPrintf(out, "'%s'", in.value.name.n);
-    return out;
+    return read_D3DX_EFFECT_VALUE(in.value);
 }
 
 typedef struct {
@@ -144,9 +148,7 @@ typedef struct {
     }
 } D3DX_PASS <read=read_D3DX_PASS,optimize=false>;
 string read_D3DX_PASS(D3DX_PASS &in) {
-    local string out;
-    SPrintf(out, "'%s'", in.name.n);
-    return out;
+    return read_D3DX_NAME(in.name);
 }
 
 typedef struct {
@@ -165,9 +167,7 @@ typedef struct {
     }
 } D3DX_TECHNIQUE <read=read_D3DX_TECHNIQUE,optimize=false>;
 string read_D3DX_TECHNIQUE(D3DX_TECHNIQUE &in) {
-    local string out;
-    SPrintf(out, "'%s'", in.name.n);
-    return out;
+    return read_D3DX_NAME(in.name);
 }
 
 typedef struct {
@@ -222,8 +222,10 @@ typedef struct {
 
         padding = 4 - (FTell() & 3);
         if (padding > 0 && padding < 4) {
+            SetForeColor(cGray);
             SetBackColor(0xffffff);
             u1 _p[padding] <hidden=true>;
+            SetForeColor(cBlack);
         }
     }
 } D3DX_EFFECT <optimize=false>;
@@ -256,9 +258,7 @@ HEADER h;
 
 SetBackColor(0xf0f0f0);
 _data_start = FTell();
-if (h.data_offset) {
-    u1 d[h.data_offset];
-}
+FSeek(_data_start + h.data_offset);
 
 SetBackColor(0xffd0d0);
 D3DX_EFFECT e;
