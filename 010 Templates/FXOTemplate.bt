@@ -68,7 +68,7 @@ typedef struct {
         char n[size];
 
         _padding = 4 - (FTell() & 3);
-        if (_padding > 0 && padding < 4) {
+        if (_padding > 0 && _padding < 4) {
             SetForeColor(cGray);
             SetBackColor(0xffffff);
             u1 _p[_padding] <hidden=true>;
@@ -364,8 +364,6 @@ string read_D3DX_PASS(D3DX_PASS &in) {
 }
 
 typedef struct {
-    local int i;
-
     D3DX_NAME name;
     u4 annotation_count <format=decimal>;
     u4 pass_count <format=decimal>;
@@ -405,7 +403,7 @@ typedef struct {
 } D3DX_LARGE <optimize=false>;
 
 typedef struct {
-    local int i, padding;
+    local int i, _padding;
 
     u4 parameter_count <format=decimal>;
     u4 technique_count <format=decimal>;
@@ -432,11 +430,11 @@ typedef struct {
         SetBackColor(0xd0ffd0);
         D3DX_LARGE r;
 
-        padding = 4 - (FTell() & 3);
-        if (padding > 0 && padding < 4) {
+        _padding = 4 - (FTell() & 3);
+        if (_padding > 0 && _padding < 4) {
             SetForeColor(cGray);
             SetBackColor(0xffffff);
-            u1 _p[padding] <hidden=true>;
+            u1 _p[_padding] <hidden=true>;
             SetForeColor(cBlack);
         }
     }
