@@ -1,0 +1,436 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: ShaderTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse DX9 shader
+//--------------------------------------
+
+DisplayFormatHex();
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    u1 minor <format=decimal>;
+    u1 major <format=decimal>;
+    u2 type;
+} HEADER <read=read_HEADER>;
+string read_HEADER(HEADER &in) {
+    local string out;
+    if (in.type == 0xffff) {
+        SPrintf(out, "ps_%d_%d", in.major, in.minor);
+    } else if (in.type == 0xfffe) {
+        SPrintf(out, "vs_%d_%d", in.major, in.minor);
+    } else {
+        SPrintf(out, "%d_%d", in.major, in.minor);
+    }
+    return out;
+}
+
+typedef struct (quad _start) {
+    local quad _pos;
+
+    u4 offset <hidden=true>;
+
+    _pos = FTell();
+
+    FSeek(_start + offset);
+    SetBackColor(0xffff98);
+    string s;
+
+    FSeek(_pos);
+} NAME <read=read_NAME,optimize=false>;
+string read_NAME(NAME &in) {
+    return in.s;
+}
+
+typedef enum <u2> {
+    OPCODE_NOP = 0,
+    OPCODE_MOV,
+    OPCODE_ADD,
+    OPCODE_SUB,
+    OPCODE_MAD,
+    OPCODE_MUL,
+    OPCODE_RCP,
+    OPCODE_RSQ,
+    OPCODE_DP3,
+    OPCODE_DP4,
+    OPCODE_MIN,
+    OPCODE_MAX,
+    OPCODE_SLT,
+    OPCODE_SGE,
+    OPCODE_EXP,
+    OPCODE_LOG,
+    OPCODE_LIT,
+    OPCODE_DST,
+    OPCODE_LRP,
+    OPCODE_FRC,
+    OPCODE_M4x4,
+    OPCODE_M4x3,
+    OPCODE_M3x4,
+    OPCODE_M3x3,
+    OPCODE_M3x2,
+    OPCODE_CALL,
+    OPCODE_CALLNZ,
+    OPCODE_LOOP,
+    OPCODE_RET,
+    OPCODE_ENDLOOP,
+    OPCODE_LABEL,
+    OPCODE_DCL,
+    OPCODE_POW,
+    OPCODE_CRS,
+    OPCODE_SGN,
+    OPCODE_ABS,
+    OPCODE_NRM,
+    OPCODE_SINCOS,
+    OPCODE_REP,
+    OPCODE_ENDREP,
+    OPCODE_IF,
+    OPCODE_IFC,
+    OPCODE_ELSE,
+    OPCODE_ENDIF,
+    OPCODE_BREAK,
+    OPCODE_BREAKC,
+    OPCODE_MOVA,
+    OPCODE_DEFB,
+    OPCODE_DEFI,
+
+    OPCODE_TEXCOORD = 64,
+    OPCODE_TEXKILL,
+    OPCODE_TEX,
+    OPCODE_TEXBEM,
+    OPCODE_TEXBEML,
+    OPCODE_TEXREG2AR,
+    OPCODE_TEXREG2GB,
+    OPCODE_TEXM3x2PAD,
+    OPCODE_TEXM3x2TEX,
+    OPCODE_TEXM3x3PAD,
+    OPCODE_TEXM3x3TEX,
+    OPCODE_RESERVED0,
+    OPCODE_TEXM3x3SPEC,
+    OPCODE_TEXM3x3VSPEC,
+    OPCODE_EXPP,
+    OPCODE_LOGP,
+    OPCODE_CND,
+    OPCODE_DEF,
+    OPCODE_TEXREG2RGB,
+    OPCODE_TEXDP3TEX,
+    OPCODE_TEXM3x2DEPTH,
+    OPCODE_TEXDP3,
+    OPCODE_TEXM3x3,
+    OPCODE_TEXDEPTH,
+    OPCODE_CMP,
+    OPCODE_BEM,
+    OPCODE_DP2ADD,
+    OPCODE_DSX,
+    OPCODE_DSY,
+    OPCODE_TEXLDD,
+    OPCODE_SETP,
+    OPCODE_TEXLDL,
+    OPCODE_BREAKP,
+
+    OPCODE_PHASE = 0xFFFD,
+    OPCODE_COMMENT = 0xFFFE,
+    OPCODE_END = 0xFFFF,
+} OPCODE_TYPE;
+
+typedef enum <u2> {
+    RS_BOOL,
+    RS_INT4,
+    RS_FLOAT4,
+    RS_SAMPLER,
+} REG_SET;
+
+typedef enum <u2> {
+    CLASS_SCALAR,
+    CLASS_VECTOR,
+    CLASS_MATRIX_ROWS,
+    CLASS_MATRIX_COLUMNS,
+    CLASS_OBJECT,
+    CLASS_STRUCT,
+} TYPE_CLASS;
+
+typedef enum <u2> {
+    PT_VOID,
+    PT_BOOL,
+    PT_INT,
+    PT_FLOAT,
+    PT_STRING,
+    PT_TEXTURE,
+    PT_TEXTURE1D,
+    PT_TEXTURE2D,
+    PT_TEXTURE3D,
+    PT_TEXTURECUBE,
+    PT_SAMPLER,
+    PT_SAMPLER1D,
+    PT_SAMPLER2D,
+    PT_SAMPLER3D,
+    PT_SAMPLERCUBE,
+    PT_PIXELSHADER,
+    PT_VERTEXSHADER,
+    PT_PIXELFRAGMENT,
+    PT_VERTEXFRAGMENT,
+    PT_UNSUPPORTED,
+} TYPE;
+
+typedef struct (quad _start) {
+    local quad _pos;
+
+    u4 typeinfo_offset <hidden=true>;
+    u4 value_offset <hidden=true>;
+
+    _pos = FTell();
+
+    FSeek(_start + typeinfo_offset);
+
+    TYPE_CLASS type_class;
+    TYPE type;
+    u2 row_count <format=decimal>;
+    u2 column_count <format=decimal>;
+    u2 element_count <format=decimal>;
+    u2 member_count <format=decimal>;
+    u4 member_offset <hidden=true>;
+
+    FSeek(_pos);
+} CTAB_type <read=read_CTAB_type,optimize=false>;
+string read_CTAB_type(CTAB_type &in) {
+    local string out;
+    SPrintf(out, "%s %s", EnumToString(in.type_class), EnumToString(in.type));
+    return out;
+}
+
+typedef struct (quad _start) {
+    NAME name(_start);
+    REG_SET reg_set;
+    u2 reg_index <format=decimal>;
+    u2 reg_count <format=decimal>;
+    u2 unknown;
+    CTAB_type type(_start);
+} CTAB_constant <read=read_CTAB_constant,optimize=false>;
+string read_CTAB_constant(CTAB_constant &in) {
+    local string out;
+    SPrintf(out, "%s %s %d", in.name.s, EnumToString(in.reg_set), in.reg_count);
+    return out;
+}
+
+typedef struct (int _size) {
+    local quad _start, _end;
+    local int i;
+
+    char type[4];
+
+    _start = FTell();
+    _end = _start - 4 + _size * 4;
+
+    u4 constant_size;
+    NAME creator(_start);
+    u4 version;
+    u4 constant_count <format=decimal,hidden=true>;
+    u4 constant_offset <hidden=true>;
+    u4 flags;
+    NAME target(_start);
+
+    for (i = 0; i < constant_count; i++) {
+        FSeek(_start + constant_offset + 20 * i);
+        CTAB_constant v(_start);
+    }
+
+    FSeek(_end);
+} CTAB <read=read_CTAB,optimize=false>;
+string read_CTAB(CTAB &in) {
+    local string out;
+    SPrintf(out, "%s %d", in.target.s, in.constant_count);
+    return out;
+}
+
+struct TOKEN_COMMENT;
+struct TOKEN_END;
+struct TOKEN;
+typedef struct (int _size) {
+    local quad _start, _end;
+
+    char type[4];
+
+    _start = FTell();
+    _end = _start - 4 + _size * 4;
+
+    u4 version;
+
+    local u2 _opcode;
+    local int _found_end = false;
+    while ((FTell() < _end) && !_found_end) {
+        _opcode = ReadUInt() & 0xffff;
+        switch(_opcode) {
+            case OPCODE_COMMENT:
+                SetBackColor(0xc0c0ff);
+                TOKEN_COMMENT t;
+                break;
+            case OPCODE_END:
+                SetBackColor(0xc0c0c0);
+                TOKEN_END t;
+                _found_end = true;
+                break;
+            default:
+                SetBackColor(0xc0ffc0);
+                TOKEN t;
+                break;
+        }
+    }
+
+    FSeek(_end);
+} PRES;
+
+typedef struct (int _size) {
+    local quad _start, _end;
+
+    char type[4];
+
+    _start = FTell();
+    _end = _start - 4 + _size * 4;
+
+    FSeek(_end);
+} PRSI;
+
+typedef struct (int _size) {
+    local quad _start, _end;
+
+    char type[4];
+
+    _start = FTell();
+    _end = _start - 4 + _size * 4;
+
+    FSeek(_end);
+} CLIT;
+
+typedef struct (int _size) {
+    local quad _start, _end;
+
+    char type[4];
+
+    _start = FTell();
+    _end = _start - 4 + _size * 4;
+
+    FSeek(_end);
+} FXLC;
+
+typedef struct {
+    OPCODE_TYPE type;
+    u2 unknown: 8 <hidden=true>;
+    u2 size: 4 <hidden=true>;
+    u2 unknown: 4 <hidden=true>;
+
+    if (size) {
+        u4 data[size];
+    }
+} TOKEN <read=read_TOKEN,optimize=false>;
+string read_TOKEN(TOKEN &in) {
+    local string out;
+    SPrintf(out, "%s %Xh", EnumToString(in.type), in.size);
+    return out;
+}
+
+typedef struct {
+    OPCODE_TYPE type;
+    u2 unknown: 8 <hidden=true>;
+    u2 size: 4 <hidden=true>;
+    u2 unknown: 4 <hidden=true>;
+
+    if (size) {
+        u4 data[size];
+    }
+} TOKEN_END <read=read_TOKEN_END,optimize=false>;
+string read_TOKEN_END(TOKEN_END &in) {
+    local string out;
+    SPrintf(out, "%s %Xh", EnumToString(in.type), in.size);
+    return out;
+}
+
+typedef struct {
+    OPCODE_TYPE type;
+    u2 unknown: 8 <hidden=true>;
+    u2 size: 4 <hidden=true>;
+    u2 unknown: 4 <hidden=true>;
+
+    if (size) {
+        u4 data[size];
+    }
+} TOKEN_PHASE <read=read_TOKEN_PHASE,optimize=false>;
+string read_TOKEN_PHASE(TOKEN_PHASE &in) {
+    local string out;
+    SPrintf(out, "%s %Xh", EnumToString(in.type), in.size);
+    return out;
+}
+
+typedef struct {
+    OPCODE_TYPE type;
+    u2 size: 15 <hidden=true>;
+    u2 unknown: 1 <hidden=true>;
+
+    local char _subtype[4];
+    ReadBytes(_subtype, FTell(), 4);
+
+    if (size) {
+        if (_subtype == "CTAB") {
+            CTAB d(size);
+        } else if (_subtype == "PRES") {
+            PRES d(size);
+        } else if (_subtype == "PRSI") {
+            PRSI d(size);
+        } else if (_subtype == "CLIT") {
+            CLIT d(size);
+        } else if (_subtype == "FXLC") {
+            FXLC d(size);
+        } else {
+            u4 data[size];
+        }
+    }
+} TOKEN_COMMENT <read=read_TOKEN_COMMENT,optimize=false>;
+string read_TOKEN_COMMENT(TOKEN_COMMENT &in) {
+    local string out;
+    SPrintf(out, "%s %s %Xh", EnumToString(in.type), in._subtype, in.size);
+    return out;
+}
+
+LittleEndian();
+
+SetBackColor(0xc0c0c0);
+HEADER h;
+
+if (h.type != 0xffff && h.type != 0xfffe) {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+local u2 _opcode;
+local int _found_end = false;
+while (!FEof() && !_found_end) {
+    _opcode = ReadUInt() & 0xffff;
+    switch(_opcode) {
+        case OPCODE_COMMENT:
+            SetBackColor(0xc0c0ff);
+            TOKEN_COMMENT t;
+            break;
+        case OPCODE_END:
+            SetBackColor(0xc0c0c0);
+            TOKEN_END t;
+            _found_end = true;
+            break;
+        case OPCODE_PHASE:
+            SetBackColor(0xc0c0ff);
+            TOKEN_PHASE t;
+            break;
+        default:
+            SetBackColor(0xc0ffc0);
+            TOKEN t;
+            break;
+    }
+}
