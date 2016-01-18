@@ -12,25 +12,33 @@ BigEndian();
 typedef struct {
     SetBackColor( cLtBlue );
     char magic[16]; // 0-15
+    Assert(magic == "SQLite format 3\0");
     ushort page_size; // 16-17
     ubyte write_version; // 18
     ubyte read_version; // 19
     ubyte unused_page_space; // 20
     ubyte max_index_embed; // 21
+    Assert(max_index_embed == 64);
     ubyte min_index_embed; // 22
+    Assert(min_index_embed == 32);
     ubyte min_table_embed; // 23
+    Assert(min_table_embed == 32);
     uint change_count; // 24-27
-    uint reserved1; // 28-31
+    uint database_size; // 28-31
     uint freelist_trunk_page; // 32-35
     uint db_free_pages; // 36-39
-    uint schema_version; // 40-43
+    uint schema_cookie; // 40-43
     uint schema_file_format; // 44-47
+    Assert(schema_file_format >= 1 && schema_file_format <= 4);
     uint page_cache_size; // 48-51
     uint top_root_page; // 52-55
-    uint text_encoding; // 56-59
-    uint user_cookie; // 60-63
+    enum <uint> TEXT_ENCODING { UTF8=1, UTF16LE=2, UTF16BE=3 } text_encoding; // 56-59
+    uint user_version; // 60-63
     uint inc_vacuum; // 64-67
-    ubyte reserved2[32]; // 68-99
+    uint application_id; // 68-71
+    ubyte reserved[20]; // 72-91
+    uint version_valid_for; // 92-95
+    uint sqlite_version_number; // 96-99
 } DB_HEADER;
 
 DB_HEADER db_h;
