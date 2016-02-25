@@ -1,0 +1,130 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: SSDTemplate
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse BBC DFS SSD files
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+u4 ext18(u2 lo, u1 hi) {
+    local u4 out;
+    out = lo;
+    out |= (u4)hi << 16;
+    return out;
+}
+
+u4 ext10(u1 lo, u1 hi) {
+    local u2 out;
+    out = lo;
+    out |= (u2)hi << 8;
+    return out;
+}
+
+u4 ext18addr(u2 lo, u1 hi) {
+    local u4 out;
+    out = ext18(lo, hi);
+    if (hi == 0x3) {
+        out |= 0xff0000;
+    }
+    return out;
+}
+
+typedef struct {
+    char name[7];
+    char dir : 7;
+    u1 locked : 1;
+} FILE_NAME <read=read_FILE_NAME>;
+string read_FILE_NAME(FILE_NAME &in) {
+    local string out;
+    SPrintf(out, "%c.%s %s", in.dir, in.name, in.locked?"L":"");
+    return out;
+}
+
+typedef struct {
+    u2 load_lo;
+    u2 execute_lo;
+    u2 length_lo;
+    u1 start_hi : 2;
+    u1 load_hi : 2;
+    u1 length_hi : 2;
+    u1 execute_hi : 2;
+    u1 start_lo;
+} FILE_DETAILS <read=read_FILE_DETAILS>;
+string read_FILE_DETAILS(FILE_DETAILS &in) {
+    local string out;
+    SPrintf(out, "%06X %06X %06X %03X",
+        ext18addr(in.load_lo, in.load_hi), ext18addr(in.execute_lo, in.execute_hi),
+        ext18(in.length_lo, in.length_hi), ext10(in.start_lo, in.start_hi));
+    return out;
+}
+
+typedef struct {
+    char title1[8];
+    FILE_NAME fn[31];
+    char title2[4];
+    u1 cycle <format=hex>;
+    u1 count <format=hex>;
+    u1 sectors_hi : 2;
+    u1 nondfs : 2;
+    enum<u1> {O_NONE, O_LOAD, O_RUN, O_EXEC} opt4 : 2;
+    u1 unused : 2 <hidden=true>;
+    u1 sectors_lo;
+    FILE_DETAILS fd[31];
+} CATALOGUE <read=read_CATALOGUE>;
+string read_CATALOGUE(CATALOGUE &in) {
+    local string out;
+    SPrintf(out, "%s%s %d", in.title1, in.title2, in.count / 8);
+    return out;
+}
+
+typedef struct (int index) {
+    local quad _pos;
+    _pos = FTell();
+    
+    FSeek(index * 8 + 8);
+    SetBackColor(0xe0e0e0);
+    FILE_NAME n;
+
+    FSeek(index * 8 + 8 + 0x100);
+    SetBackColor(0xe0e0e0);
+    FILE_DETAILS d;
+
+    FSeek(_pos);
+
+    local u4 l;
+    l = ext18(d.length_lo, d.length_hi);
+
+    SetBackColor(0xc0ffc0);
+    u1 data[l];
+
+    SetBackColor(0xf0fff0);
+    if (l & 0xff) {
+        u1 padding[0x100 - l & 0xff] <hidden=true>;
+    }
+} FILE <read=read_FILE>;
+string read_FILE(FILE &in) {
+    return read_FILE_NAME(in.n);
+}
+
+local int i;
+
+DisplayFormatHex();
+LittleEndian();
+
+SetBackColor(0xc0c0c0);
+CATALOGUE c;
+
+for (i = 0; i < c.count / 8; i++) {
+    FSeek(ext10(c.fd[i].start_lo, c.fd[i].start_hi) * 0x100);
+    FILE f(i);
+}
