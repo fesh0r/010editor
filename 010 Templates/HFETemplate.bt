@@ -1,0 +1,121 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: HFETemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse HFE floppy image files
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef enum <u1> {
+    NO_B = 0x00,
+    YES_B = 0xff
+} BOOL;
+
+typedef enum <u1> {
+    YES_nB = 0x00,
+    NO_nB = 0xff
+} nBOOL;
+
+typedef enum <u1> {
+    IBMPC_DD_FLOPPYMODE = 0x00,
+    IBMPC_HD_FLOPPYMODE = 0x01,
+    ATARIST_DD_FLOPPYMODE = 0x02,
+    ATARIST_HD_FLOPPYMODE = 0x03,
+    AMIGA_DD_FLOPPYMODE = 0x04,
+    AMIGA_HD_FLOPPYMODE = 0x05,
+    CPC_DD_FLOPPYMODE = 0x06,
+    GENERIC_SHUGGART_DD_FLOPPYMODE = 0x07,
+    IBMPC_ED_FLOPPYMODE = 0x08,
+    MSX2_DD_FLOPPYMODE = 0x09,
+    C64_DD_FLOPPYMODE = 0x0A,
+    EMU_SHUGART_FLOPPYMODE = 0x0B,
+    S950_DD_FLOPPYMODE = 0x0C,
+    S950_HD_FLOPPYMODE = 0x0D,
+    DISABLE_FLOPPYMODE = 0xFE
+} FLOPPYMODE;
+
+typedef enum <u1> {
+    ISOIBM_MFM_ENCODING = 0x00,
+    AMIGA_MFM_ENCODING = 0x01,
+    ISOIBM_FM_ENCODING = 0x02,
+    EMU_FM_ENCODING = 0x03,
+    UNKNOWN_ENCODING = 0xff
+} ENCODING;
+
+typedef struct {
+    char HEADERSIGNATURE[8];
+    u1 formatrevision;
+    u1 number_of_track <format=decimal>;
+    u1 number_of_side <format=decimal>;
+    ENCODING track_encoding;
+    u2 bitRate <format=decimal>;
+    u2 floppyRPM <format=decimal>;
+    FLOPPYMODE floppyinterfacemode;
+    u1 dnu;
+    u2 track_list_offset;
+    BOOL write_allowed;
+    BOOL single_step;
+    nBOOL track0s0_altencoding;
+    ENCODING track0s0_encoding;
+    nBOOL track0s1_altencoding;
+    ENCODING track0s1_encoding;
+} picfileformatheader;
+
+typedef struct {
+    u2 offset;
+    u2 track_len;
+} pictrack;
+
+typedef struct (quad l) {
+    SetBackColor(0xc0ffc0);
+    u1 side0[l];
+    if (l < 0x100) {
+        SetBackColor(0xe0ffe0);
+        u1 side0p[0x100 - l] <hidden=true>;
+    }
+    
+    SetBackColor(0xffc0c0);
+    u1 side1[l];
+    if (l < 0x100) {
+        SetBackColor(0xffe0e0);
+        u1 side1p[0x100 - l] <hidden=true>;
+    }
+} block;
+
+typedef struct (quad l) {
+    local int i;
+    for (i = l; i > 0; i -= 0x200) {
+        if (i >= 0x200) {
+            block b(0x100);
+        } else {
+            block b(i / 2);
+        }
+    }
+} track;
+
+local int i;
+
+DisplayFormatHex();
+LittleEndian();
+
+SetBackColor(0xc0c0c0);
+picfileformatheader h;
+
+FSeek((quad)h.track_list_offset * 0x200);
+SetBackColor(0xc0c0ff);
+pictrack pt[h.number_of_track];
+
+for (i = 0; i < h.number_of_track; i++) {
+    FSeek((quad)pt[i].offset * 0x200);
+    track t(pt[i].track_len);
+}
