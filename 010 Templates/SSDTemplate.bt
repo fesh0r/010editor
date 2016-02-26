@@ -16,22 +16,22 @@ typedef int32  s4;
 typedef int16  s2;
 typedef byte   s1;
 
-u4 ext18(u2 lo, u1 hi) {
-    local u4 out;
+quad ext18(quad lo, quad hi) {
+    local quad out;
     out = lo;
-    out |= (u4)hi << 16;
+    out |= (quad)hi << 16;
     return out;
 }
 
-u4 ext10(u1 lo, u1 hi) {
-    local u2 out;
+quad ext10(quad lo, quad hi) {
+    local quad out;
     out = lo;
-    out |= (u2)hi << 8;
+    out |= (quad)hi << 8;
     return out;
 }
 
-u4 ext18addr(u2 lo, u1 hi) {
-    local u4 out;
+quad ext18addr(quad lo, quad hi) {
+    local quad out;
     out = ext18(lo, hi);
     if (hi == 0x3) {
         out |= 0xff0000;
