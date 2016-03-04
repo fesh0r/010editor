@@ -1,0 +1,57 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: FDITemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: FDI disk image parser
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef enum <u1> {
+    T_48 = 0, T_67, T_96, T_100, T_135, T_192
+} TPI;
+
+typedef struct {
+    char signature[25];
+    char nl0[2] <hidden=true>;
+    char creator[30];
+    char nl1[2] <hidden=true>;
+    char comment[80];
+    char eof[1] <hidden=true>;
+    u1 version_hi <format=decimal>;
+    u1 version_lo <format=decimal>;
+    u2 ltrack <format=decimal>;
+    u1 lhead <format=decimal>;
+    enum <u1> { D_8 = 0, D_5_25, D_3_5, D_3 } type;
+    u1 rotspeed <read=read_rotspeed>;
+    u1 flags_wp : 1;
+    u1 flags_idx : 1;
+    u1 flags_rev : 1;
+    u1 flags_res : 5 <hidden=true>;
+    TPI tpi;
+    TPI headwidth;
+    u2 res <hidden=true>;
+    u2 tracks[176];
+    u4 dataCRC;
+    u4 headerCRC;
+} HEADER;
+string read_rotspeed(u1 rotspeed) {
+    local string out;
+    SPrintf(out, "%d rpm", rotspeed+128);
+    return out;
+}
+
+DisplayFormatHex();
+BigEndian();
+
+SetBackColor(0xc0c0c0);
+HEADER h;
