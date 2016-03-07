@@ -83,7 +83,7 @@ typedef struct (quad l) {
         SetBackColor(0xe0ffe0);
         u1 side0p[0x100 - l] <hidden=true>;
     }
-    
+
     SetBackColor(0xffc0c0);
     u1 side1[l];
     if (l < 0x100) {
@@ -107,6 +107,14 @@ local int i;
 
 DisplayFormatHex();
 LittleEndian();
+
+local char _sig[8];
+ReadBytes(_sig, 0, 8);
+if (_sig != "HXCPICFE") {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
 
 SetBackColor(0xc0c0c0);
 picfileformatheader h;
