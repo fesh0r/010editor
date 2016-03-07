@@ -50,8 +50,131 @@ string read_rotspeed(u1 rotspeed) {
     return out;
 }
 
+typedef struct (quad _track, quad _head) {
+    local quad track, head;
+    local quad _pos;
+
+    track = _track;
+    head = _head;
+
+    _pos = FTell();
+
+    FSeek((_track * ((quad)h.lhead + 1) + _head) * 2 + 0x98);
+    SetBackColor(0xe0e0e0);
+    u2 type: 8;
+    u2 size: 8;
+
+    SetBackColor(0xc0ffff);
+    FSeek(_pos);
+} TRACK <read=read_TRACK>;
+string read_TRACK(TRACK &in) {
+    local string out;
+    SPrintf(out, "%d %d %x", in.track, in.head, in.type);
+    return out;
+}
+
+typedef struct (quad _track, quad _head) {
+    local quad track, head;
+    local quad _pos;
+
+    track = _track;
+    head = _head;
+
+    _pos = FTell();
+
+    FSeek((_track * ((quad)h.lhead + 1) + _head) * 2 + 0x98);
+    SetBackColor(0xe0e0e0);
+    u2 type: 8;
+    u2 size: 8;
+
+    SetBackColor(0xc0ffff);
+    FSeek(_pos);
+} TRACK_EMPTY <read=read_TRACK_EMPTY>;
+string read_TRACK_EMPTY(TRACK_EMPTY &in) {
+    local string out;
+    SPrintf(out, "%d %d", in.track, in.head);
+    return out;
+}
+
+typedef struct {
+    SetBackColor(0xb0e0b0);
+    BitfieldDisablePadding();
+    enum <u4> { C_NONE = 0, C_HUFF, C_RES1, C_RES2 } comp: 2;
+    u4 size: 22;
+    BitfieldEnablePadding();
+} PS_SIZE <read=read_PS_SIZE>;
+string read_PS_SIZE(PS_SIZE &in) {
+    local string out;
+    SPrintf(out, "%Xh %s", in.size, EnumToString(in.comp));
+    return out;
+}
+
+typedef struct (quad _track, quad _head) {
+    local quad track, head;
+    local quad _pos, _end;
+
+    track = _track;
+    head = _head;
+
+    _pos = FTell();
+
+    FSeek((_track * ((quad)h.lhead + 1) + _head) * 2 + 0x98);
+    SetBackColor(0xe0e0e0);
+    u2 type: 2 <hidden=true>;
+    u2 size: 14;
+
+    FSeek(_pos);
+    _end = _pos + size * 256;
+
+    SetBackColor(0xb0e0b0);
+    u4 numpulses;
+    PS_SIZE avg;
+    PS_SIZE min;
+    PS_SIZE max;
+    PS_SIZE idx;
+
+    SetBackColor(0xd0ffd0);
+    if (avg.size > 0) {
+        u1 davg[avg.size];
+    }
+    if (min.size > 0) {
+        u1 dmin[min.size];
+    }
+    if (max.size > 0) {
+        u1 dmax[max.size];
+    }
+    if (idx.size > 0) {
+        u1 didx[idx.size];
+    }
+
+    if (_end - FTell() > 0) {
+        SetBackColor(0xf0fff0);
+        u1 padding[_end - FTell()] <hidden=true>;
+    }
+} TRACK_PULSE <read=read_TRACK_PULSE>;
+string read_TRACK_PULSE(TRACK_PULSE &in) {
+    local string out;
+    SPrintf(out, "%d %d", in.track, in.head);
+    return out;
+}
+
+local int _t, _h, _type;
+
 DisplayFormatHex();
 BigEndian();
 
 SetBackColor(0xc0c0c0);
 HEADER h;
+
+for (_t = 0; _t <= h.ltrack; _t++) {
+    for (_h = 0; _h <= h.lhead; _h++) {
+        _type = h.tracks[_t * (h.lhead + 1) + _h] >> 8;
+        if (_type == 0) {
+            TRACK_EMPTY t(_t, _h);
+        } else if ((_type & 0xC0) == 0x80) {
+            TRACK_PULSE t(_t, _h);
+        } else {
+            TRACK t(_t, _h);
+        }
+    }
+}
