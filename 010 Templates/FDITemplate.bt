@@ -69,30 +69,7 @@ typedef struct (quad _track, quad _head) {
 } TRACK <read=read_TRACK>;
 string read_TRACK(TRACK &in) {
     local string out;
-    SPrintf(out, "%d %d %x", in.track, in.head, in.type);
-    return out;
-}
-
-typedef struct (quad _track, quad _head) {
-    local quad track, head;
-    local quad _pos;
-
-    track = _track;
-    head = _head;
-
-    _pos = FTell();
-
-    FSeek((_track * ((quad)h.lhead + 1) + _head) * 2 + 0x98);
-    SetBackColor(0xe0e0e0);
-    u2 type: 8;
-    u2 size: 8;
-
-    SetBackColor(0xc0ffff);
-    FSeek(_pos);
-} TRACK_EMPTY <read=read_TRACK_EMPTY>;
-string read_TRACK_EMPTY(TRACK_EMPTY &in) {
-    local string out;
-    SPrintf(out, "%d %d", in.track, in.head);
+    SPrintf(out, "%2d %d %x", in.track, in.head, in.type);
     return out;
 }
 
@@ -154,7 +131,7 @@ typedef struct (quad _track, quad _head) {
 } TRACK_PULSE <read=read_TRACK_PULSE>;
 string read_TRACK_PULSE(TRACK_PULSE &in) {
     local string out;
-    SPrintf(out, "%d %d", in.track, in.head);
+    SPrintf(out, "%2d %d", in.track, in.head);
     return out;
 }
 
@@ -163,6 +140,14 @@ local int _t, _h, _type;
 DisplayFormatHex();
 BigEndian();
 
+local char _sig[25];
+ReadBytes(_sig, 0, 25);
+if (_sig != "Formatted Disk Image file") {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
 SetBackColor(0xc0c0c0);
 HEADER h;
 
@@ -170,7 +155,6 @@ for (_t = 0; _t <= h.ltrack; _t++) {
     for (_h = 0; _h <= h.lhead; _h++) {
         _type = h.tracks[_t * (h.lhead + 1) + _h] >> 8;
         if (_type == 0) {
-            TRACK_EMPTY t(_t, _h);
         } else if ((_type & 0xC0) == 0x80) {
             TRACK_PULSE t(_t, _h);
         } else {
