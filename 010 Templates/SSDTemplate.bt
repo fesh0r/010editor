@@ -40,13 +40,36 @@ quad ext18addr(quad lo, quad hi) {
 }
 
 typedef struct {
-    char name[7];
+    char name0 : 7;
+    u1 hi0 : 1;
+    char name1 : 7;
+    u1 hi1 : 1;
+    char name2 : 7;
+    u1 hi2 : 1;
+    char name3 : 7;
+    u1 hi3 : 1;
+    char name4 : 7;
+    u1 hi4 : 1;
+    char name5 : 7;
+    u1 hi5 : 1;
+    char name6 : 7;
+    u1 hi6 : 1;
+
     char dir : 7;
     u1 locked : 1;
 } FILE_NAME <read=read_FILE_NAME>;
 string read_FILE_NAME(FILE_NAME &in) {
     local string out;
-    SPrintf(out, "%c.%s %s", in.dir, in.name, in.locked?"L":"");
+    local char name[7];
+    name[0] = in.name0;
+    name[1] = in.name1;
+    name[2] = in.name2;
+    name[3] = in.name3;
+    name[4] = in.name4;
+    name[5] = in.name5;
+    name[6] = in.name6;
+
+    SPrintf(out, "%c.%s%s", in.dir, name, in.locked?" L":"");
     return out;
 }
 
@@ -90,7 +113,7 @@ string read_CATALOGUE(CATALOGUE &in) {
 typedef struct (int index) {
     local quad _pos;
     _pos = FTell();
-    
+
     FSeek(index * 8 + 8);
     SetBackColor(0xe0e0e0);
     FILE_NAME n;
@@ -99,24 +122,30 @@ typedef struct (int index) {
     SetBackColor(0xe0e0e0);
     FILE_DETAILS d;
 
+    local u4 _start, _length;
+    _start = ext10(d.start_lo, d.start_hi) * 0x100;
+    _length = ext18(d.length_lo, d.length_hi);
+
     FSeek(_pos);
 
-    local u4 l;
-    l = ext18(d.length_lo, d.length_hi);
+    if (_length > 0 && _start < _size && (_start + _length) <= _size) {
+        SetBackColor(0xc0ffc0);
+        u1 data[_length];
 
-    SetBackColor(0xc0ffc0);
-    u1 data[l];
-
-    SetBackColor(0xf0fff0);
-    if (l & 0xff) {
-        u1 padding[0x100 - l & 0xff] <hidden=true>;
+        SetBackColor(0xf0fff0);
+        if (_length & 0xff) {
+            u1 padding[0x100 - _length & 0xff] <hidden=true>;
+        }
     }
-} FILE <read=read_FILE>;
+} FILE <read=read_FILE,optimize=false>;
 string read_FILE(FILE &in) {
     return read_FILE_NAME(in.n);
 }
 
 local int i;
+local quad _start, _length, _size;
+
+_size = FileSize();
 
 DisplayFormatHex();
 LittleEndian();
@@ -125,6 +154,11 @@ SetBackColor(0xc0c0c0);
 CATALOGUE c;
 
 for (i = 0; i < c.count / 8; i++) {
-    FSeek(ext10(c.fd[i].start_lo, c.fd[i].start_hi) * 0x100);
+    _start = ext10(c.fd[i].start_lo, c.fd[i].start_hi) * 0x100;
+    _length = ext18(c.fd[i].length_lo, c.fd[i].length_hi);
+
+    if (_start < _size) {
+        FSeek(_start);
+    }
     FILE f(i);
 }
