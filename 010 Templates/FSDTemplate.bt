@@ -1,0 +1,164 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: FSDTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse FSD file
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    local int date_y, release;
+
+    u1 date_y_h : 3;
+    u1 date_d : 5;
+    u1 date_y_l : 8;
+    u1 date_m : 4;
+    u1 creator : 4;
+    u1 release_l : 8;
+    u1 unknown : 6 <hidden=true>;
+    u1 release_h : 2;
+
+    date_y = (int)date_y_h << 8 | date_y_l;
+    release = (int)release_h << 8 | release_l;
+} CREATOR <read=read_CREATOR>;
+string read_CREATOR(CREATOR &in) {
+    local string out;
+    SPrintf(out, "%04d-%02d-%02d %d %d", in.date_y, in.date_m, in.date_d, in.creator, in.release);
+    return out;
+}
+
+typedef struct {
+    char sig[3];
+    CREATOR c;
+    string title;
+    u1 tracks <format=decimal>;
+} HEADER <read=read_HEADER>;
+string read_HEADER(HEADER &in) {
+    return in.title;
+}
+
+typedef enum <u1> {
+    E_OK = 0,
+    E_CRC = 0x0E,
+    E_DELETED = 0x20
+} ERROR;
+
+typedef struct (int t, int s) {
+    local int reported_size_actual, real_size_actual;
+
+    SetBackColor(0xe0ffe0);
+    u1 track_id <format=decimal>;
+    u1 head_id <format=decimal>;
+    u1 sector_id <format=decimal>;
+    u1 reported_size;
+    u1 real_size;
+    ERROR error_code;
+
+    reported_size_actual = 1 << (7 + (int)reported_size);
+    real_size_actual = 1 << (7 + (int)real_size);
+
+    SetBackColor(0xc0ffc0);
+    u1 d[real_size_actual];
+
+    if (error_code == 0) {
+        _good++;
+    } else {
+        if (error_code == 0x0e) {
+            _crc++;
+        } else if (error_code == 0x20) {
+            _deleted++;
+        } else {
+            _unknown++;
+        }
+    }
+
+    if (error_code != 0 || track_id != t || sector_id != s || head_id != 0 || reported_size != real_size) {
+        Printf("%d,%d %d,%d,%d %d %d %s\n", t, s, track_id, head_id, sector_id, reported_size, real_size, EnumToString(error_code));
+    }
+} SECTOR <read=read_SECTOR,optimize=false>;
+string read_SECTOR(SECTOR &in) {
+    local string out;
+    SPrintf(out, "%2d,%2d,%2d %d %d %s (%02X)", in.track_id, in.head_id, in.sector_id, in.reported_size_actual, in.real_size_actual, EnumToString(in.error_code), in.error_code);
+    return out;
+}
+
+typedef struct (int t, int s) {
+    SetBackColor(0xe0e0ff);
+    u1 track_id <format=decimal>;
+    u1 head_id <format=decimal>;
+    u1 sector_id <format=decimal>;
+    u1 reported_size;
+
+    _unreadable++;
+
+    Printf("%d,%d %02X %02X %02X %02X UNFORMATTED\n", t, s, track_id, head_id, sector_id, reported_size);
+} SECTOR_UNREADABLE <read=read_SECTOR_UNREADABLE,optimize=false>;
+string read_SECTOR_UNREADABLE(SECTOR_UNREADABLE &in) {
+    local string out;
+    SPrintf(out, "%02X %02X %02X %02X", in.track_id, in.head_id, in.sector_id, in.reported_size);
+    return out;
+}
+
+typedef struct (int t) {
+    local int _i;
+
+    SetBackColor(0xffe0e0);
+
+    u1 track <format=decimal>;
+    u1 sectors <format=decimal>;
+
+    if (sectors) {
+        enum <u1> { R_NO = 0, R_YES = 0xff } readable;
+
+        if (readable == 0xff) {
+            for (_i = 0; _i < sectors; _i++) {
+                SECTOR s(t, _i);
+            }
+        } else {
+            for (_i = 0; _i < sectors; _i++) {
+                SECTOR_UNREADABLE s(t, _i);
+            }
+        }
+    } else {
+        local u1 readable = 0;
+        _unformatted++;
+    }
+} TRACK <read=read_TRACK,optimize=false>;
+string read_TRACK(TRACK &in) {
+    local string out;
+    SPrintf(out, "%2d %2d%s", in.track, in.sectors, (in.readable == 0)?" *":"");
+    return out;
+}
+
+local int _i;
+local int _unformatted, _unreadable, _crc, _deleted, _unknown, _good;
+
+DisplayFormatHex();
+LittleEndian();
+
+local char _sig[3];
+ReadBytes(_sig, 0, 3);
+if (_sig != "FSD") {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+SetBackColor(0xc0c0c0);
+HEADER h;
+
+for (_i = 0; _i <= h.tracks; _i++) {
+    TRACK t(_i);
+}
+
+Printf("Good: %d\nCRC: %d\nDeleted: %d\nUnknown: %d\nUnreadable: %d\nUnformatted: %d\n", _good, _crc, _deleted, _unknown, _unreadable, _unformatted);
