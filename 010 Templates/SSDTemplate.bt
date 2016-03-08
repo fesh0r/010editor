@@ -128,14 +128,22 @@ typedef struct (int index) {
 
     FSeek(_pos);
 
-    if (_length > 0 && _start < _size && (_start + _length) <= _size) {
-        SetBackColor(0xc0ffc0);
-        u1 data[_length];
+    if (_length > 0 && _start < _size) {
+        if ((_start + _length) <= _size) {
+            SetBackColor(0xc0ffc0);
+            u1 data[_length];
 
-        SetBackColor(0xf0fff0);
-        if (_length & 0xff) {
-            u1 padding[0x100 - _length & 0xff] <hidden=true>;
+            if (_length & 0xff) {
+                SetBackColor(0xf0fff0);
+                u1 padding[0x100 - _length & 0xff] <hidden=true>;
+            }
+        } else {
+            SetBackColor(0xf0fff0);
+            u1 data[_size - _start] <hidden=true>;
         }
+    } else {
+        SetBackColor(0xc0c0c0);
+        u1 data[1] <hidden=true>;
     }
 } FILE <read=read_FILE,optimize=false>;
 string read_FILE(FILE &in) {
@@ -159,6 +167,8 @@ for (i = 0; i < c.count / 8; i++) {
 
     if (_start < _size) {
         FSeek(_start);
+    } else {
+        FSeek(0);
     }
     FILE f(i);
 }
