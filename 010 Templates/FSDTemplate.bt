@@ -64,14 +64,24 @@ typedef struct (int t, int s) {
     u1 real_size;
     ERROR error_code;
 
-    reported_size_actual = 1 << (7 + (int)reported_size);
+    if (reported_size > 8) {
+        reported_size_actual = 0;
+    } else {
+        reported_size_actual = 1 << (7 + (int)reported_size);
+    }
     real_size_actual = 1 << (7 + (int)real_size);
 
     SetBackColor(0xc0ffc0);
     u1 d[real_size_actual];
 
     if (error_code == 0) {
-        _good++;
+        if (track_id != t || sector_id != s || head_id != 0 || reported_size != real_size) {
+            _mismatch++;
+        } else if (real_size != 1) {
+            _nonstandard++;
+        } else {
+            _good++;
+        }
     } else {
         if (error_code == 0x0e) {
             _crc++;
@@ -141,7 +151,7 @@ string read_TRACK(TRACK &in) {
 }
 
 local int _i;
-local int _unformatted, _unreadable, _crc, _deleted, _unknown, _good;
+local int _unformatted, _unreadable, _crc, _deleted, _unknown, _good, _mismatch, _nonstandard;
 
 DisplayFormatHex();
 LittleEndian();
@@ -161,4 +171,4 @@ for (_i = 0; _i <= h.tracks; _i++) {
     TRACK t(_i);
 }
 
-Printf("Good: %d\nCRC: %d\nDeleted: %d\nUnknown: %d\nUnreadable: %d\nUnformatted: %d\n", _good, _crc, _deleted, _unknown, _unreadable, _unformatted);
+Printf("Standard: %d sectors\nNonstandard: %d sectors\nMismatched: %d sectors\nCRC: %d sectors\nDeleted: %d sectors\nUnknown: %d sectors\nUnreadable: %d sectors\nUnformatted: %d tracks\n", _good, _nonstandard, _mismatch, _crc, _deleted, _unknown, _unreadable, _unformatted);
