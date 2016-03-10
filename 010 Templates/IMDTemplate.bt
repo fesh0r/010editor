@@ -1,0 +1,124 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: IMDTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: Parse IMD floppy image
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+DisplayFormatHex();
+LittleEndian();
+
+typedef struct (int size, int sector) {
+    local int _sector = sector;
+    SetBackColor(0xe0ffe0);
+    enum <u1> {
+        S_NONE = 0,
+        S_NORM,
+        S_NORM_C,
+        S_DEL,
+        S_DEL_C,
+        S_ERR,
+        S_ERR_C,
+        S_DELERR,
+        S_DELERR_C
+    } data_type;
+
+    SetBackColor(0xc0ffc0);
+    switch (data_type) {
+        case S_NONE:
+            break;
+        case S_NORM:
+        case S_DEL:
+        case S_ERR:
+        case S_DELERR:
+            u1 d[size];
+            break;
+        case S_NORM_C:
+        case S_DEL_C:
+        case S_ERR_C:
+        case S_DELERR_C:
+            u1 d;
+            break;
+    }
+} SECTOR <read=read_SECTOR>;
+string read_SECTOR(SECTOR &in) {
+    local string out;
+    SPrintf(out, "%d %s", in._sector, EnumToString(in.data_type));
+    return out;
+}
+
+typedef struct {
+    local int _i;
+    local int sector_size;
+
+    enum <u1> {
+        M_FM_500 = 0,
+        M_FM_300,
+        M_FM_250,
+        M_MFM_500,
+        M_MFM_300,
+        M_MFM_250
+    } track_mode_code;
+    u1 physical_cylinder <format=decimal>;
+    u1 physical_head : 6 <format=decimal>;
+    u1 has_head_map : 1 <format=decimal>;
+    u1 has_cylinder_map : 1 <format=decimal>;
+    u1 number_of_sectors <format=decimal>;
+    u1 sector_size_code <format=decimal>;
+
+    sector_size = 1 << (7 + (int)sector_size_code);
+
+    if (number_of_sectors > 0) {
+        u1 sector_map[number_of_sectors] <format=decimal>;
+        if (has_cylinder_map != 0) {
+            u1 cylinder_map[number_of_sectors] <format=decimal>;
+        }
+        if (has_head_map != 0) {
+            u1 head_map[number_of_sectors] <format=decimal>;
+        }
+
+        for (_i = 0; _i < number_of_sectors; _i++) {
+            SECTOR s(sector_size, sector_map[_i]);
+        }
+    }
+} TRACK <read=read_TRACK,optimize=false>;
+string read_TRACK(TRACK &in) {
+    local string out;
+    SPrintf(out, "%2d,%2d %2d %d %s", in.physical_cylinder, in.physical_head, in.number_of_sectors, in.sector_size, EnumToString(in.track_mode_code));
+    return out;
+}
+
+typedef struct {
+    local quad _len;
+    local u1 _eof[1];
+    _eof[0] = 0x1A;
+    _len = FindFirst(_eof);
+    char sig[_len + 1];
+} HEADER;
+
+local char _sig[4];
+ReadBytes(_sig, 0, 4);
+if (_sig != "IMD ") {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+SetBackColor(0xc0c0c0);
+HEADER h;
+
+while (!FEof()) {
+    SetBackColor(0xffc0c0);
+    TRACK t;
+}
