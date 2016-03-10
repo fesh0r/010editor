@@ -122,7 +122,7 @@ string read_SECTOR_UNREADABLE(SECTOR_UNREADABLE &in) {
 typedef struct (int t) {
     local int _i;
 
-    SetBackColor(0xffe0e0);
+    SetBackColor(0xffc0c0);
 
     u1 track <format=decimal>;
     u1 sectors <format=decimal>;
