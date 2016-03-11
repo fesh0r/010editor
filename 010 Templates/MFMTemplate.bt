@@ -1,0 +1,81 @@
+//--------------------------------------
+//--- 010 Editor v6.0.3 Binary Template
+//
+// File: MFMTemplate.bt
+// Author: Andrew McRae
+// Revision: 0.1
+// Purpose: HxC MFM floppy image
+//--------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    char sig[7];
+    u2 tracks <format=decimal>;
+    u1 sides <format=decimal>;
+    u2 rpm <format=decimal>;
+    u2 bitrate <format=decimal>;
+    u1 iftype;
+    u4 track_offset;
+} MFMIMG <read=read_MFMIMG>;
+string read_MFMIMG(MFMIMG &in) {
+    local string out;
+    SPrintf(out, "%2d,%2d", h.tracks, h.sides);
+    return out;
+}
+
+typedef struct {
+    local quad _pos;
+
+    SetBackColor(0xe0ffe0);
+    u2 track <format=decimal>;
+    u1 side <format=decimal>;
+    u4 size <format=decimal>;
+    u4 offset;
+
+    if (size > 0 && offset > 0) {
+        _pos = FTell();
+        FSeek(offset);
+
+        SetBackColor(0xc0ffc0);
+        u1 d[size];
+
+        FSeek(_pos);
+    }
+} MFMTRACKIMG <read=read_MFMTRACKIMG,optimize=false>;
+string read_MFMTRACKIMG(MFMTRACKIMG &in) {
+    local string out;
+    SPrintf(out, "%2d,%2d", in.track, in.side);
+    return out;
+}
+
+local int _t, _h;
+
+DisplayFormatHex();
+LittleEndian();
+
+local char _sig[7];
+ReadBytes(_sig, 0, 7);
+if (_sig != "HXCMFM\0") {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+SetBackColor(0xc0c0c0);
+MFMIMG h;
+
+FSeek(h.track_offset);
+for (_t = 0; _t < h.tracks; _t++) {
+    for (_h = 0; _h < h.sides; _h++) {
+        SetBackColor(0xffc0c0);
+        MFMTRACKIMG t;
+    }
+}
