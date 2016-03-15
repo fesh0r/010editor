@@ -33,10 +33,10 @@ typedef struct {
     u1 lhead <format=decimal>;
     enum <u1> { D_8 = 0, D_5_25, D_3_5, D_3 } type;
     u1 rotspeed <read=read_rotspeed>;
-    u1 flags_wp : 1;
-    u1 flags_idx : 1;
-    u1 flags_rev : 1;
     u1 flags_res : 5 <hidden=true>;
+    u1 flags_rev : 1;
+    u1 flags_idx : 1;
+    u1 flags_wp : 1;
     TPI tpi;
     TPI headwidth;
     u2 res <hidden=true>;
