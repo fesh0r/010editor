@@ -86,6 +86,18 @@ string read_PS_SIZE(PS_SIZE &in) {
     return out;
 }
 
+typedef struct (quad _size) {
+    local quad _pos;
+    if (_size > 0) {
+        SetBackColor(0xd0ffd0);
+        u1 sign_ext : 1;
+        u1 low_bits : 7;
+        u1 bits : 1;
+        u1 high_bits : 7;
+        u1 d[_size - 2];
+    }
+} HUFF;
+
 typedef struct (quad _track, quad _head) {
     local quad track, head;
     local quad _pos, _end;
@@ -112,16 +124,32 @@ typedef struct (quad _track, quad _head) {
 
     SetBackColor(0xd0ffd0);
     if (avg.size > 0) {
-        u1 davg[avg.size];
+        if (avg.comp == C_HUFF) {
+            HUFF davg(avg.size);
+        } else {
+            u1 davg[avg.size];
+        }
     }
     if (min.size > 0) {
-        u1 dmin[min.size];
+        if (min.comp == C_HUFF) {
+            HUFF dmin(min.size);
+        } else {
+            u1 dmin[min.size];
+        }
     }
     if (max.size > 0) {
-        u1 dmax[max.size];
+        if (max.comp == C_HUFF) {
+            HUFF dmax(max.size);
+        } else {
+            u1 dmax[max.size];
+        }
     }
     if (idx.size > 0) {
-        u1 didx[idx.size];
+        if (idx.comp == C_HUFF) {
+            HUFF didx(idx.size);
+        } else {
+            u1 didx[idx.size];
+        }
     }
 
     if (_end - FTell() > 0) {
