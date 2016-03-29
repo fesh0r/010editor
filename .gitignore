@@ -1,3 +1,7 @@
 # editor backups
 *.bak
 *~
+
+# repository
+010\ Scripts/Repository/
+010\ Templates/Repository/
