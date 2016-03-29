@@ -30,7 +30,7 @@ typedef struct {
         SetBackColor(0xe0ffe0);
         u4 compressed_size;
         u4 uncompressed_size;
-    
+
         SetBackColor(0xb0ffb0);
         u1 data[compressed_size];
     } else {
