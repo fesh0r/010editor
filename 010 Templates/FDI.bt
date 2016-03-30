@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: FDITemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: FDI disk image parser
-//--------------------------------------
+//      File: FDI.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: FDI disk image parser
+//  Category: Drives
+// File Mask: *.fdi
+//  ID Bytes: 46 6F 72 6D 61 74 74 65 64 20 44 69 73 6B 20 49 6D 61 67 65 20 66 69 6C 65 0D 0A // Formatted Disk Image file
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2016-03-16 Andrew McRae: Merge changes
+//   0.1   2016-03-04 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

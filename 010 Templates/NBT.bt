@@ -1,11 +1,15 @@
-//--------------------------------------
-//--- 010 Editor v3.1.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: NBTTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Minecraft NBT file
-//--------------------------------------
+//      File: NBT.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: Minecraft NBT file
+//  Category: Misc
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2012-06-01 Andrew McRae: Initial revision
+//------------------------------------------------
 
 enum <ubyte> TAG_TYPE {
     TAG_End = 0,

@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v4.0.1 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: CAPTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: UEFI Cap firmware file
-//--------------------------------------
+//      File: CAP.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: UEFI Cap firmware file
+//  Category: Misc
+// File Mask: *.cap
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2012-08-30 Andrew McRae: Merge changes
+//   0.1   2012-08-24 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef ubyte UINT8;
 typedef byte INT8;

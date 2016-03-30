@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v3.0.5 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: SQLiteTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: SQLite data file
-//--------------------------------------
+//      File: SQLite.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: SQLite data file
+//  Category: Database
+// File Mask: *.sqlite,*.db
+//  ID Bytes: 53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00 // SQLite format 3
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2016-01-18 Andrew McRae: Updated header for repo
+//   0.1   2015-09-07 Andrew McRae: Initial revision
+//------------------------------------------------
 
 BigEndian();
 

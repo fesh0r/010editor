@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v3.1.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: XNBTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: XNA binary file
-//--------------------------------------
+//      File: XNB.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: XNA binary file
+//  Category: Archive
+// File Mask: *.xnb
+//  ID Bytes: 58 4E 42 // XNB
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2015-08-28 Andrew McRae: Merge changes
+//   0.1   2012-06-01 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

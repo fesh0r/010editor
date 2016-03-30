@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v6.0.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: DDSTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: DDS File parser
-//--------------------------------------
+//      File: DDS.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: DDS File parser
+//  Category: Image
+// File Mask: *.dds
+//  ID Bytes: 44 44 53 // DDS
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2015-09-07 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef struct {
     DWORD dwSize <hidden=true>;

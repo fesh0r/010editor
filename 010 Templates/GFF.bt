@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v3.0.6 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: GFFTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Aurora GFF file
-//--------------------------------------
+//      File: GFF.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: Aurora GFF file
+//  Category: Misc
+// File Mask: *.gff
+//  ID Bytes: 47 46 46 20 // GFF
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2012-06-01 Andrew McRae: Initial revision
+//------------------------------------------------
 
 // UNICODE support
 // Thanks to Graeme Sweet for pointing this out!

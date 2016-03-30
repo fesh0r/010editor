@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v3.2.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: LIBTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: MS lib file
-//--------------------------------------
+//      File: LIB.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: MS lib file
+//  Category: Programming
+// File Mask: *.lib
+//  ID Bytes: 21 3C 61 72 63 68 3E // !<arch>
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2015-09-07 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

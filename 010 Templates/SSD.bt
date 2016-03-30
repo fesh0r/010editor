@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: SSDTemplate
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse BBC DFS SSD files
-//--------------------------------------
+//      File: SSD.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: Parse BBC DFS SSD files
+//  Category: Drives
+// File Mask: *.ssd
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2016-03-09 Andrew McRae: Merge changes
+//   0.1   2016-02-25 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

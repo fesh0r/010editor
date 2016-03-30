@@ -1,11 +1,15 @@
-//--------------------------------------
-//--- 010 Editor v4.0.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: SIGTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: EFI signature list
-//--------------------------------------
+//      File: SIG.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: EFI signature list
+//  Category: Misc
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2012-08-30 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef ubyte UINT8;
 typedef byte INT8;

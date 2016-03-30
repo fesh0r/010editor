@@ -1,11 +1,16 @@
-//--------------------------------------
-//--- 010 Editor v5.0 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: MGFXTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: MonoGame Effect file
-//--------------------------------------
+//      File: FezFX.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: Fez MonoGame v5 Effect file
+//  Category: Programming
+// File Mask: *.fxo
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2015-01-21 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

@@ -1,11 +1,15 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: ShaderTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse DX9 shader
-//--------------------------------------
+//      File: Shader.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: Parse DX9 shader
+//  Category: Programming
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2015-11-04 Andrew McRae: Initial revision
+//------------------------------------------------
 
 DisplayFormatHex();
 

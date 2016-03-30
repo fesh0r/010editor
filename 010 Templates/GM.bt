@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: GMTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: GameMaker data file template
-//--------------------------------------
+//      File: GM.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: GameMaker data file template
+//  Category: Archive
+// File Mask: data.win
+//  ID Bytes: 46 4F 52 4D // FORM
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2015-11-02 Andrew McRae: Merge changes
+//   0.1   2015-10-28 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

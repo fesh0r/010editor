@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: HFETemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse HFE floppy image files
-//--------------------------------------
+//      File: HFE.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: Parse HFE floppy image files
+//  Category: Drives
+// File Mask: *.hfe
+//  ID Bytes: 48 58 43 50 49 43 46 45 // HXCPICFE
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2016-03-08 Andrew McRae: Merge changes
+//   0.1   2016-02-26 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

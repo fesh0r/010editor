@@ -1,11 +1,16 @@
-//--------------------------------------
-//--- 010 Editor v6.0.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: OVLTTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse Elite Dangerous compressed ovl texture block
-//--------------------------------------
+//      File: OVLT.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: Parse Elite Dangerous compressed ovl texture block
+//  Category: Image
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2015-08-03 Andrew McRae: Merge changes
+//   0.1   2015-08-01 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

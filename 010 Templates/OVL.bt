@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v6.0.1 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: OVLTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse Elite Dangerous ovl files
-//--------------------------------------
+//      File: OVL.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: Parse Elite Dangerous ovl files
+//  Category: Archive
+// File Mask: *.ovl
+//  ID Bytes: 46 52 45 53 // FRES
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2015-08-03 Andrew McRae: Merge changes
+//   0.1   2015-03-10 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

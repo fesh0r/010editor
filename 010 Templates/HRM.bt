@@ -1,11 +1,16 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: HRMTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Human Resource Machine resource.pak
-//--------------------------------------
+//      File: HRM.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: Human Resource Machine resource.pak
+//  Category: Image
+// File Mask: resource.pak
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2015-10-28 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

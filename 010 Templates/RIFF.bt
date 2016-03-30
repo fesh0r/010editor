@@ -1,11 +1,15 @@
-//--------------------------------------
-//--- 010 Editor v5.0 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: RIFFTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: scan for RIFF blocks
-//--------------------------------------
+//      File: RIFF.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: scan for RIFF blocks
+//  Category: Misc
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2014-01-24 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef struct {
     SetBackColor(0x8080ff);

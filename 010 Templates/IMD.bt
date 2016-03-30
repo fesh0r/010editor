@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: IMDTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse IMD floppy image
-//--------------------------------------
+//      File: IMD.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: Parse IMD floppy image
+//  Category: Drives
+// File Mask: *.imd
+//  ID Bytes: 49 4D 44 20 // IMD
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2016-03-11 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

@@ -1,11 +1,15 @@
-//--------------------------------------
-//--- 010 Editor v3.0.6 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: DFTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose:
-//--------------------------------------
+//      File: DF.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: DF File parser
+//  Category: Archive
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2012-06-01 Andrew McRae: Initial revision
+//------------------------------------------------
 
 string read_Filename(char &in) {
     return in;

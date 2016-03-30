@@ -1,11 +1,18 @@
-//--------------------------------------
-//--- 010 Editor v6.0.3 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: FSDTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: Parse FSD file
-//--------------------------------------
+//      File: FSD.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: Parse FSD file
+//  Category: Drives
+// File Mask: *.fsd
+//  ID Bytes: 46 53 44 // FSD
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2016-03-10 Andrew McRae: Merge changes
+//   0.1   2016-03-08 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;

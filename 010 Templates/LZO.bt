@@ -1,11 +1,15 @@
-//--------------------------------------
-//--- 010 Editor v3.0.6 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: LZOTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.5
-// Purpose: UE3 LZO file
-//--------------------------------------
+//      File: LZO.bt
+//    Author: Andrew McRae
+//   Version: 0.2
+//   Purpose: UE3 LZO file
+//  Category: Misc
+//   History: 
+//   0.2   2016-03-30 Andrew McRae: Updated header for repo
+//   0.1   2012-06-01 Andrew McRae: Initial revision
+//------------------------------------------------
 
 DisplayFormatHex();
 LittleEndian();

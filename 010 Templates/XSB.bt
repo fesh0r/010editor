@@ -1,11 +1,17 @@
-//--------------------------------------
-//--- 010 Editor v4.0.2 Binary Template
+//------------------------------------------------
+//--- 010 Editor v7.0 Binary Template
 //
-// File: XSBTemplate.bt
-// Author: Andrew McRae
-// Revision: 0.1
-// Purpose: XACT sound bank
-//--------------------------------------
+//      File: XSB.bt
+//    Author: Andrew McRae
+//   Version: 0.3
+//   Purpose: XACT sound bank
+//  Category: Audio
+// File Mask: *.xsb
+//   History: 
+//   0.3   2016-03-30 Andrew McRae: Updated header for repo
+//   0.2   2012-12-21 Andrew McRae: Merge changes
+//   0.1   2012-11-30 Andrew McRae: Initial revision
+//------------------------------------------------
 
 typedef uint64 u8;
 typedef uint32 u4;
