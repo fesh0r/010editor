@@ -111,12 +111,12 @@ typedef struct {
     SetBackColor(0xb0e0b0);
     BitfieldDisablePadding();
     enum <u4> { C_NONE = 0, C_HUFF, C_RES1, C_RES2 } comp: 2;
-    u4 size: 22;
+    u4 size: 22 <format=decimal>;
     BitfieldEnablePadding();
 } PS_SIZE <read=read_PS_SIZE>;
 string read_PS_SIZE(PS_SIZE &in) {
     local string out;
-    SPrintf(out, "%Xh %s", in.size, EnumToString(in.comp));
+    SPrintf(out, "%d %s", in.size, EnumToString(in.comp));
     return out;
 }
 
@@ -150,7 +150,7 @@ typedef struct (quad _track, quad _head) {
     _end = _pos + size * 256;
 
     SetBackColor(0xb0e0b0);
-    u4 numpulses;
+    u4 numpulses <format=decimal>;
     PS_SIZE avg;
     PS_SIZE min;
     PS_SIZE max;
