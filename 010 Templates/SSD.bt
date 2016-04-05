@@ -3,11 +3,12 @@
 //
 //      File: SSD.bt
 //    Author: Andrew McRae
-//   Version: 0.3
+//   Version: 0.4
 //   Purpose: Parse BBC DFS SSD files
 //  Category: Drives
 // File Mask: *.ssd
 //   History: 
+//   0.4   2016-04-05 Andrew McRae: Further handling of truncated images
 //   0.3   2016-03-30 Andrew McRae: Updated header for repo
 //   0.2   2016-03-09 Andrew McRae: Merge changes
 //   0.1   2016-02-25 Andrew McRae: Initial revision
@@ -128,7 +129,7 @@ typedef struct (int index) {
     SetBackColor(0xe0e0e0);
     FILE_DETAILS d;
 
-    local u4 _start, _length;
+    local u4 _start, _length, _padding;
     _start = ext10(d.start_lo, d.start_hi) * 0x100;
     _length = ext18(d.length_lo, d.length_hi);
 
@@ -140,8 +141,14 @@ typedef struct (int index) {
             u1 data[_length];
 
             if (_length & 0xff) {
-                SetBackColor(0xf0fff0);
-                u1 padding[0x100 - _length & 0xff] <hidden=true>;
+                _padding = 0x100 - _length & 0xff;
+                if (_start + _length + _padding > _size) {
+                    _padding = _size - _start - _length;
+                }
+                if (_padding > 0) {
+                    SetBackColor(0xf0fff0);
+                    u1 padding[_padding] <hidden=true>;
+                }
             }
         } else {
             SetBackColor(0xf0fff0);
@@ -172,8 +179,14 @@ for (i = 0; i < c.count / 8; i++) {
     _length = ext18(c.fd[i].length_lo, c.fd[i].length_hi);
 
     if (_start < _size) {
+        if (_start + _length > _size) {
+            Warning("file end > image size: %d > %d", _start + _length, _size);
+            Printf("file end > image size: %d > %d\n", _start + _length, _size);
+        }
         FSeek(_start);
     } else {
+        Warning("file start > image size: %d > %d", _start, _size);
+        Printf("file start > image size: %d > %d\n", _start, _size);
         FSeek(0);
     }
     FILE f(i);
