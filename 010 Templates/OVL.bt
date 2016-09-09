@@ -29,7 +29,8 @@ local u4 zlib_uncomp_length = 0;
 typedef struct {
     char sig[4];
 
-    u2 version <bgcolor=0xd8d8d8>;
+    u1 flags <bgcolor=0xd8d8d8>;
+    u1 version <bgcolor=0xd8d8d8>;
 
     u2 unknown06 <bgcolor=0xd8d8d8>;
     u4 unknown08 <bgcolor=0xd8d8d8>;
@@ -77,7 +78,8 @@ typedef struct {
     u4 zero88 <hidden=true,bgcolor=cNone>;
     u4 zero8C <hidden=true,bgcolor=cNone>;
 
-    Assert((version == 0x1200) || (version == 0x1300), "HEADER version not 0x1200 or 0x1300");
+    Assert((flags == 0) || (flags == 0x08), "HEADER flags not 0 or 0x08");
+    Assert((version == 0x12) || (version == 0x13), "HEADER version not 0x12 or 0x13");
     Assert(file_count2 == file_count, "HEADER file_count2 mismatch");
     Assert(file_count3 == file_count, "HEADER file_count3 mismatch");
     Assert((file_count == 0) || (type_names_length > 0), "HEADER type_names_length is 0");
@@ -112,6 +114,9 @@ typedef struct {
 
 typedef struct {
     u4 name_offset;
+    if (is64bit) {
+        u4 zero04 <hidden=true,bgcolor=cNone>;;
+    }
     u4 hash;
 
     u4 unknown08 <bgcolor=0xffd8d8>;
@@ -119,6 +124,9 @@ typedef struct {
     u4 count <format=decimal>;
 
     Assert(name_offset < h.names_length, "TYPE name_offset too high");
+    if (is64bit) {
+        Assert(zero04 == 0, "TYPE zero60");
+    }
 
     local quad o = FTell();
     FSeek(name_offset + full_names_offset);
@@ -401,6 +409,8 @@ local u4 full_names_offset = 0x90;
 SetBackColor(0xb0b0b0);
 HEADER h;
 
+local int is64bit = h.flags & 0x08;
+
 // skip main name table
 local u4 full_types_offset = h.names_length + full_names_offset;
 FSeek(full_types_offset);
@@ -416,8 +426,14 @@ if (h.file_count) {
 }
 
 // skip archive name table
-local u4 full_archive_names_offset = h.file_count * 0x0C + h.type_count * 0x14 + full_types_offset;
-local u4 full_archives_offset = h.archive_names_length + full_archive_names_offset;
+local u4 full_archive_names_offset;
+local u4 full_archives_offset;
+if (is64bit) {
+    full_archive_names_offset = h.file_count * 0x0C + h.type_count * 0x18 + full_types_offset;
+} else {
+    full_archive_names_offset = h.file_count * 0x0C + h.type_count * 0x14 + full_types_offset;
+}
+full_archives_offset = h.archive_names_length + full_archive_names_offset;
 FSeek(full_archives_offset);
 
 SetBackColor(0xb0b0ff);
