@@ -188,13 +188,13 @@ typedef struct {
 
     u4 unknown04 <bgcolor=0xd8d8ff>;
     u4 unknown08 <bgcolor=0xd8d8ff>;
-    u4 unknown0C <bgcolor=0xd8d8ff>;
-    u2 unknown10 <bgcolor=0xd8d8ff>;
-    u2 unknown12 <bgcolor=0xd8d8ff>;
+    u4 fh2_count <format=decimal>;
+    u2 fh3_count <format=decimal>;
+    u2 fh1_count <format=decimal>;
     u4 zero14 <bgcolor=0xd8d8ff>;
     u4 unknown18 <bgcolor=0xd8d8ff>;
-    u4 unknown1C <bgcolor=0xd8d8ff>;
-    u4 unknown20 <bgcolor=0xd8d8ff>;
+    u4 fh6_count <format=decimal>;
+    u4 fh5_count <format=decimal>;
     u4 zero24 <bgcolor=0xd8d8ff>;
     u4 unknown28 <bgcolor=0xd8d8ff>;
 
@@ -468,3 +468,11 @@ if (h.archive_count) {
 
 SetBackColor(0x909090);
 ZLIB z;
+
+if (h.archive_count) {
+    for (i = 0; i < h.archive_count; i++) {
+        Printf("\nname: %s, comp_size: %Xh, uncomp_size: %Xh\n", a.a[i].name, a.a[i].comp_size, a.a[i].uncomp_size);
+        Printf("header2_size: %Xh, data_size: %Xh\n", a.a[i].header2_size, a2.a2[i].data_size);
+        Printf("(%d, %d, %d, ?, %d, %d, ?)\n", a.a[i].fh1_count, a.a[i].fh2_count, a.a[i].fh3_count, a.a[i].fh5_count, a.a[i].fh6_count);
+    }
+}
