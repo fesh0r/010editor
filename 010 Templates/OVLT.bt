@@ -86,6 +86,7 @@ string read_FILE_HEAD5(FILE_HEAD5 &in) {
     SPrintf(out, "%Xh %Xh %Xh %Xh", in.file_hash, in.type_hash, in.unknown08, in.offset);
     return out;
 }
+
 typedef struct {
     u4 unknown00 <bgcolor=0xd8d8d8>;
     u4 offset1;
@@ -98,7 +99,17 @@ string read_FILE_HEAD6(FILE_HEAD6 &in) {
     return out;
 }
 
-typedef struct (int fh1_count, int fh2_count, int fh3_count, int fh4_count, int fh5_count, int fh6_count) {
+typedef struct {
+    u4 unknown00 <bgcolor=0xd8d8d8>;
+    u4 unknown04 <bgcolor=0xd8d8d8>;
+} FILE_HEAD7 <optimize=false,read=read_FILE_HEAD7>;
+string read_FILE_HEAD7(FILE_HEAD7 &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh", in.unknown00, in.unknown04);
+    return out;
+}
+
+typedef struct (int fh1_count, int fh2_count, int fh3_count, int fh4_count, int fh5_count, int fh6_count, int fh7_count) {
     if (fh1_count) {
         FILE_HEAD1 fh1[fh1_count];
     }
@@ -117,12 +128,13 @@ typedef struct (int fh1_count, int fh2_count, int fh3_count, int fh4_count, int 
     if (fh6_count) {
         FILE_HEAD6 fh6[fh6_count];
     }
+    if (fh7_count) {
+        FILE_HEAD7 fh7[fh7_count];
+    }
 
-    u8 zero68 <bgcolor=cNone>;
     u8 sig;
 
     Assert(sig == 0x010204083F7FBFFF, "HEADER signature not 0x010204083F7FBFFF");
-    Assert(zero68 == 0, "HEADER zero68");
 } HEADER;
 
 DisplayFormatHex();
@@ -146,12 +158,12 @@ data2_size = 0xaaac; // Earth/Data.ovl
 local int i;
 
 SetBackColor(0xb0b0b0);
-//HEADER h(1, 1, 4, 4, 4, 4); // StationIdents/Data.ovl
-//HEADER h(2, 2, 0, 0, 23, 104); // Astro.ovl
-HEADER h(1, 1, 1, 1, 1, 1); // Earth/Data.ovl
-//HEADER h(1, 1, 1, 0, 0, 0); // Earth/Data.ovs.textures_l0
-//HEADER h(2, 2, 5, 2, 5, 12); // Root_Final.ovl
-//HEADER h(4, 4, 3, 3, 5, 13); // FederationSymbol/Data.ovl
+//HEADER h(1, 1, 4, 4, 4, 4, 1); // StationIdents/Data.ovl
+//HEADER h(2, 2, 0, 0, 23, 104, 1); // Astro.ovl
+HEADER h(1, 1, 1, 1, 1, 1, 1); // Earth/Data.ovl
+//HEADER h(1, 1, 1, 0, 0, 0, 1); // Earth/Data.ovs.textures_l0
+//HEADER h(2, 2, 5, 2, 5, 12, 1); // Root_Final.ovl
+//HEADER h(4, 4, 3, 3, 5, 13, 1); // FederationSymbol/Data.ovl
 
 if (header2_size) {
     SetBackColor(0xffb0b0);
