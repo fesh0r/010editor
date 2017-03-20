@@ -1,0 +1,92 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: HD6.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Parse PS2 Level 5 data.hd6
+//  Category: Archive
+// File Mask: *.hd6
+//  ID Bytes: 48 44 36 00 // HD6
+//   History: 
+//------------------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    string n;
+} NAMEPART <read=read_NAMEPART,optimize=false>;
+
+string read_NAMEPART(NAMEPART &in) {
+    return in.n;
+}
+
+
+typedef struct {
+    NAMEPART nameparts[h.nameparts_count];
+} NAMEPARTS;
+
+
+typedef struct {
+    u8 name_id:18;
+    u8 offset:22;
+    u8 size:24;
+} FILE <read=read_FILE,optimize=true>;
+
+string read_FILE(FILE &in) {
+    local string out;
+    SPrintf(out, "%Xh %Xh %Xh", in.name_id, in.offset * 2048, in.size * 16);
+    return out;
+}
+
+
+typedef struct {
+    char sig[4];
+
+    u4 nameparts_offset;
+    u4 nameparts_size;
+    u4 nameparts_count <format=decimal>;
+    u4 zero0C <bgcolor=0xd8d8d8>;
+    u4 namelists_offset;
+    u4 namelists_size;
+    u4 zero1C <bgcolor=0xd8d8d8>;
+    u4 unknown20 <bgcolor=0xd8d8d8>;
+    u4 file_count <format=decimal>;
+    u4 file_offset;
+    u4 zero2C <bgcolor=0xd8d8d8>;
+    u4 header_size;
+
+    Assert(zero0C == 0, "HEADER zero0C");
+    Assert(zero1C == 0, "HEADER zero1C");
+    Assert(zero2C == 0, "HEADER zero2C");
+    Assert(unknown20 == 0x10, "HEADER unknown20 != 0x10");
+} HEADER;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+Assert(ReadString(0, 3) == "HD6", "Bad sig!");
+
+SetBackColor(0xb0b0b0);
+HEADER h;
+
+FSeek(h.nameparts_offset);
+SetBackColor(0xb0b0ff);
+NAMEPARTS nameparts;
+
+FSeek(h.namelists_offset);
+SetBackColor(0xb0ffff);
+u1 namelists[h.namelists_size];
+
+FSeek(h.file_offset);
+SetBackColor(0xffb0ff);
+FILE files[h.file_count];
