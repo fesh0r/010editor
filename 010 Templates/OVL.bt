@@ -27,90 +27,91 @@ local u4 zlib_length = 0;
 local u4 zlib_uncomp_length = 0;
 
 typedef struct {
-    char sig[4];
+    char sig[4];                        // 1575F48
 
-    u1 flags <bgcolor=0xd8d8d8>;
-    u1 version <bgcolor=0xd8d8d8>;
+    u1 flags;                           // 1575F4C
+    u1 version;                         // 1575F4D
 
-    u2 unknown06 <bgcolor=0xd8d8d8>;
-    u4 unknown08 <bgcolor=0xd8d8d8>;
-    u4 unknown0C <bgcolor=0xd8d8d8>;
+    u1 need_bswap;                      // 1575F4E
+    u1 unknown07 <bgcolor=0xd8d8d8>;    // 1575F4F
+    u4 flags2;                          // 1575F50
+    u4 unknown0C <bgcolor=0xd8d8d8>;    // 1575F54
 
-    u4 names_length;
+    u4 names_length;                    // 1575F58
 
-    u4 zero14 <bgcolor=0xd8d8d8>;
+    u4 unknown2_count <format=decimal>; // 1575F5C
+    u4 other_count <format=decimal>;    // 1575F60
+    u2 dir_count <format=decimal>;      // 1575F64
+    u2 type_count <format=decimal>;     // 1575F66
+    u4 file_count <format=decimal>;     // 1575F68
+    u4 file_count2 <format=decimal>;    // 1575F6C
+    u4 part_count <format=decimal>;     // 1575F70
+    u4 archive_count <format=decimal>;  // 1575F74
 
-    u4 other_count <format=decimal>;
-    u2 dir_count <format=decimal>;
-    u2 type_count <format=decimal>;
-    u4 file_count <format=decimal>;
-    u4 file_count2 <format=decimal>;
-    u4 part_count <format=decimal>;
-    u4 archive_count <format=decimal>;
+    u4 unknown30 <bgcolor=0xd8d8d8>;    // 1575F78
+    u4 unknown34 <bgcolor=0xd8d8d8>;    // 1575F7C
+    u4 unknown38 <bgcolor=0xd8d8d8>;    // 1575F80
+    u4 unknown3C <bgcolor=0xd8d8d8>;    // 1575F84
 
-    u4 unknown30 <bgcolor=0xd8d8d8>;
-    u4 unknown34 <bgcolor=0xd8d8d8>;
-    u4 unknown38 <bgcolor=0xd8d8d8>;
-    u4 unknown3C <bgcolor=0xd8d8d8>;
+    u4 unknown_count <format=decimal>;  // 1575F88
 
-    u4 unknown_count <format=decimal>;
+    u4 unknown44 <bgcolor=0xd8d8d8>;    // 1575F8C
+    u4 unknown48 <bgcolor=0xd8d8d8>;    // 1575F90
+    u4 unknown4C <bgcolor=0xd8d8d8>;    // 1575F94
 
-    u4 unknown44 <bgcolor=0xd8d8d8>;
-    u4 unknown48 <bgcolor=0xd8d8d8>;
-    u4 unknown4C <bgcolor=0xd8d8d8>;
-
-    u4 archive_names_length;
-    u4 file_count3 <format=decimal>;
-    u4 type_names_length;
-
-    u4 zero5C <bgcolor=0xd8d8d8>;
-
-    u4 zero60 <hidden=true,bgcolor=cNone>;
-    u4 zero64 <hidden=true,bgcolor=cNone>;
-    u4 zero68 <hidden=true,bgcolor=cNone>;
-    u4 zero6C <hidden=true,bgcolor=cNone>;
-    u4 zero70 <hidden=true,bgcolor=cNone>;
-    u4 zero74 <hidden=true,bgcolor=cNone>;
-    u4 zero78 <hidden=true,bgcolor=cNone>;
-    u4 zero7C <hidden=true,bgcolor=cNone>;
-    u4 zero80 <hidden=true,bgcolor=cNone>;
-    u4 zero84 <hidden=true,bgcolor=cNone>;
-    u4 zero88 <hidden=true,bgcolor=cNone>;
-    u4 zero8C <hidden=true,bgcolor=cNone>;
-
-    Assert((flags == 0) || (flags == 0x08), "HEADER flags not 0 or 0x08");
+    //Assert((flags == 0) || (flags == 0x08), "HEADER flags not 0 or 0x08");
     Assert((version == 0x12) || (version == 0x13), "HEADER version not 0x12 or 0x13");
     Assert(file_count2 == file_count, "HEADER file_count2 mismatch");
-    Assert(file_count3 == file_count, "HEADER file_count3 mismatch");
-    Assert((file_count == 0) || (type_names_length > 0), "HEADER type_names_length is 0");
     Assert((file_count == 0) || (names_length > 0), "HEADER names_length is 0");
-    Assert((archive_count == 0) || (archive_names_length > 0), "HEADER archive_names_length is 0");
     //Assert(dir_count == 0, "HEADER dir_count not 0");
     //Assert(part_count == 0, "HEADER part_count not 0");
     //Assert(other_count == 0, "HEADER other_count not 0");
     //Assert(archive_count == 1, "HEADER archive_count not 1");
+    Assert(unknown2_count == 0, "HEADER unknown2_count not 0");
     //Assert(!(dir_count != 0 && part_count != 0), "HEADER dir and part");
     Assert(!(dir_count != 0 && other_count != 0), "HEADER dir and other");
     Assert(!(part_count != 0 && other_count != 0), "HEADER part and other");
 
-    Assert(unknown08 == 0x00006094, "HEADER unknown08 not 0x00006094");
-
-    Assert(zero14 == 0, "HEADER zero14");
-    Assert(zero5C == 0, "HEADER zero5C");
-
-    Assert(zero60 == 0, "HEADER zero60");
-    Assert(zero64 == 0, "HEADER zero64");
-    Assert(zero68 == 0, "HEADER zero68");
-    Assert(zero6C == 0, "HEADER zero6C");
-    Assert(zero70 == 0, "HEADER zero70");
-    Assert(zero74 == 0, "HEADER zero74");
-    Assert(zero78 == 0, "HEADER zero78");
-    Assert(zero7C == 0, "HEADER zero7C");
-    Assert(zero80 == 0, "HEADER zero70");
-    Assert(zero84 == 0, "HEADER zero74");
-    Assert(zero88 == 0, "HEADER zero78");
-    Assert(zero8C == 0, "HEADER zero7C");
+    //Assert(flags2 == 0x00006094, "HEADER flags2 not 0x00006094");
 } HEADER;
+
+typedef struct {
+    u4 archive_names_length;
+    u4 file_count3 <format=decimal>;
+    u4 type_names_length;
+
+    u4 zero0C <hidden=true,bgcolor=cNone>;
+    u4 zero10 <hidden=true,bgcolor=cNone>;
+    u4 zero14 <hidden=true,bgcolor=cNone>;
+    u4 zero18 <hidden=true,bgcolor=cNone>;
+    u4 zero1C <hidden=true,bgcolor=cNone>;
+    u4 zero20 <hidden=true,bgcolor=cNone>;
+    u4 zero24 <hidden=true,bgcolor=cNone>;
+    u4 zero28 <hidden=true,bgcolor=cNone>;
+    u4 zero2C <hidden=true,bgcolor=cNone>;
+    u4 zero30 <hidden=true,bgcolor=cNone>;
+    u4 zero34 <hidden=true,bgcolor=cNone>;
+    u4 zero38 <hidden=true,bgcolor=cNone>;
+    u4 zero3C <hidden=true,bgcolor=cNone>;
+
+    Assert((h.archive_count == 0) || (archive_names_length > 0), "HEADER archive_names_length is 0");
+    Assert((h.file_count == 0) || (type_names_length > 0), "HEADER2 type_names_length is 0");
+    Assert(file_count3 == h.file_count, "HEADER2 file_count3 mismatch");
+
+    Assert(zero0C == 0, "HEADER2 zero0C");
+    Assert(zero10 == 0, "HEADER2 zero10");
+    Assert(zero14 == 0, "HEADER2 zero14");
+    Assert(zero18 == 0, "HEADER2 zero18");
+    Assert(zero1C == 0, "HEADER2 zero1C");
+    Assert(zero20 == 0, "HEADER2 zero20");
+    Assert(zero24 == 0, "HEADER2 zero24");
+    Assert(zero28 == 0, "HEADER2 zero28");
+    Assert(zero2C == 0, "HEADER2 zero2C");
+    Assert(zero30 == 0, "HEADER2 zero30");
+    Assert(zero34 == 0, "HEADER2 zero34");
+    Assert(zero38 == 0, "HEADER2 zero38");
+    Assert(zero3C == 0, "HEADER2 zero3C");
+} HEADER2;
 
 typedef struct {
     u4 name_offset;
@@ -119,7 +120,8 @@ typedef struct {
     }
     u4 hash;
 
-    u4 unknown08 <bgcolor=0xffd8d8>;
+    u2 unknown08 <bgcolor=0xffd8d8>;
+    u2 unknown0A <bgcolor=0xffd8d8>;
     u4 unknown0C <bgcolor=0xffd8d8>;
     u4 count <format=decimal>;
 
@@ -137,7 +139,7 @@ typedef struct {
 } TYPE <optimize=false,read=read_TYPE>;
 string read_TYPE(TYPE &in) {
     local string out;
-    SPrintf(out, "\"%s\" %08Xh %Xh %Xh %d", in.name, in.hash, in.unknown08, in.unknown0C, in.count);
+    SPrintf(out, "\"%s\" %08Xh %Xh %Xh %Xh %d", in.name, in.hash, in.unknown08, in.unknown0A, in.unknown0C, in.count);
     return out;
 }
 
@@ -206,7 +208,7 @@ typedef struct {
     u4 header2_size;
     u4 unknown40 <bgcolor=0xd8d8ff>;
 
-    Assert(name_offset < h.archive_names_length, "FILE name_offset too high");
+    Assert(name_offset < h2.archive_names_length, "FILE name_offset too high");
 
     local quad o = FTell();
     FSeek(name_offset + full_archive_names_offset);
@@ -408,6 +410,7 @@ local u4 full_names_offset = 0x90;
 
 SetBackColor(0xb0b0b0);
 HEADER h;
+HEADER2 h2;
 
 local int is64bit = h.flags & 0x08;
 
@@ -433,7 +436,7 @@ if (is64bit) {
 } else {
     full_archive_names_offset = h.file_count * 0x0C + h.type_count * 0x14 + full_types_offset;
 }
-full_archives_offset = h.archive_names_length + full_archive_names_offset;
+full_archives_offset = h2.archive_names_length + full_archive_names_offset;
 FSeek(full_archives_offset);
 
 SetBackColor(0xb0b0ff);
