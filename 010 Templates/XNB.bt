@@ -880,6 +880,10 @@ string ReaderType(string type) {
             out = "Array(Texture)";
             break;
 
+        case "Microsoft.Xna.Framework.Content.SongReader":
+            out = "Song";
+            break;
+
         default:
             out = type;
 /*
