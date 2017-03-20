@@ -254,6 +254,20 @@ string read_TextureData(XNB_TextureData &in) {
 }
 
 typedef struct {
+    u4 size:31;
+    u4 flag:1;
+    if (size) {
+        SetBackColor(0xc0ffff);
+        u1 data[size];
+    }
+} XNB_TextureDataVITA <read=read_TextureDataVITA,optimize=false>;
+string read_TextureDataVITA(XNB_TextureDataVITA &in) {
+    local string out;
+    SPrintf(out, "%d %d", in.size, in.flag);
+    return out;
+}
+
+typedef struct {
     EncodedInt readerIndex <read=EncIntReaderType>;
 
     if (global_version > 4) {
@@ -341,16 +355,27 @@ typedef struct {
             Depth15Stencil1_3
         } surface_format;
     }
-    u4 width <format=decimal>;
-    u4 height <format=decimal>;
-    u4 mipmap_levels <format=decimal>;
-    if (mipmap_levels > 0) {
-        XNB_TextureData d[mipmap_levels];
+
+    if (surface_format != 0x50) {
+        u4 width <format=decimal>;
+        u4 height <format=decimal>;
+        u4 mipmap_levels <format=decimal>;
+        if (mipmap_levels > 0) {
+            XNB_TextureData d[mipmap_levels];
+        }
+    } else {
+        local u4 width = 0;
+        local u4 height = 0;
+        XNB_TextureDataVITA d;
     }
 } XNB_Texture2D <read=read_Texture2D,optimize=false>;
 string read_Texture2D(XNB_Texture2D &in) {
     local string out;
-    SPrintf(out, "%dx%d", in.width, in.height);
+    if (in.surface_format != 0x50) {
+        SPrintf(out, "%dx%d", in.width, in.height);
+    } else {
+        SPrintf(out, "GXT");
+    }
     return out;
 }
 
