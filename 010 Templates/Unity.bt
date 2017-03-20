@@ -1,0 +1,209 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: Unity.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Parse unity asset file
+//  Category: Archive
+// File Mask: *.asset
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    SetBackColor(0xb0b0b0);
+    u4 metadataSize;
+    u4 fileSize;
+    u4 version <format=decimal>;
+    u4 dataOffset;
+    u1 endianess <format=decimal>;
+    local quad _padding;
+    _padding = 4 - (FTell() & 3);
+    if (_padding > 0 && _padding < 4) {
+        u1 padding[_padding] <fgcolor=cGray,hidden=true>;
+    }
+} SerializedFileHeader <read=read_SerializedFileHeader>;
+
+string read_SerializedFileHeader(SerializedFileHeader &in) {
+    local string out;
+    SPrintf(out, "%d %s", in.version, in.endianess?"BE":"LE");
+    return out;
+}
+
+
+typedef struct {
+    u4 hash1;
+    u4 hash2;
+    u4 hash3;
+    u4 hash4;
+} UnityHash128 <read=read_UnityHash128>;
+
+string read_UnityHash128 (UnityHash128 &in) {
+    local string out;
+    SPrintf(out, "%08X%08X%08X%08X", in.hash4, in.hash3, in.hash2, in.hash1);
+    return out;
+}
+
+
+typedef struct {
+    s4 classID <format=decimal>;
+
+    if (classID < 0) {
+        UnityHash128 scriptID;
+    }
+
+    UnityHash128 oldTypeHash;
+} BaseClass <read=read_BaseClass,optimize=false>;
+
+string read_BaseClass(BaseClass &in) {
+    local string out;
+    SPrintf(out, "%d", in.classID);
+    return out;
+}
+
+
+typedef struct {
+    string revision;
+    u4 attributes;
+    u1 embedded <format=decimal>;
+    u4 numBaseClasses <format=decimal>;
+    if (numBaseClasses > 0) {
+        BaseClass typeMap[numBaseClasses];
+    }
+} TypeTree <read=read_TypeTree,optimize=false>;
+
+string read_TypeTree(TypeTree &in) {
+    local string out;
+    SPrintf(out, "%d '%s'", in.numBaseClasses, in.revision);
+    return out;
+}
+
+
+typedef struct {
+    s8 objectID <format=decimal>;
+    u4 byteStart;
+    u4 byteSize;
+    s4 typeID <format=decimal>;
+    s2 classID <format=decimal>; 
+    s2 scriptTypeIndex<format=decimal>;
+    u1 stripped <format=decimal>;
+} ObjectInfo <read=read_ObjectInfo>;
+
+string read_ObjectInfo(ObjectInfo &in) {
+    local string out;
+    SPrintf(out, "%d %d 0x%X+0x%X", in.objectID, in.typeID, in.byteStart, in.byteSize);
+    return out;
+}
+
+
+typedef struct {
+    local int i, j;
+    local quad _padding;
+    u4 entries <format=decimal>;
+    for (i = 0; i < entries; i++) {
+        _padding = 4 - (FTell() & 3);
+        if (_padding > 0 && _padding < 4) {
+            for (j = 0; j < _padding; j++) {
+                u1 padding <fgcolor=cGray,hidden=true>;
+            }
+        }
+        ObjectInfo o;
+    }
+} ObjectInfoTable <read=read_ObjectInfoTable,optimize=false>;
+
+string read_ObjectInfoTable(ObjectInfoTable &in) {
+    local string out;
+    SPrintf(out, "%d", in.entries);
+    return out;
+}
+
+
+typedef struct {
+    s4 serializedFileIndex <format=decimal>;
+    s8 identifierInFile;
+} ObjectIdentifier;
+
+
+typedef struct {
+    local int i;
+    local quad _padding;
+    u4 entries <format=decimal>;
+    for (i = 0; i < entries; i++) {
+        ObjectIdentifier o;
+        _padding = 4 - (FTell() & 3);
+        if (_padding > 0 && _padding < 4) {
+            u1 padding[_padding] <fgcolor=cGray,hidden=true>;
+        }
+    }
+} ObjectIdentifierTable <read=read_ObjectIdentifierTable,optimize=false>;
+
+string read_ObjectIdentifierTable(ObjectIdentifierTable &in) {
+    local string out;
+    SPrintf(out, "%d", in.entries);
+    return out;
+}
+
+
+typedef struct {
+    string assetPath;
+    UnityHash128 guid;
+    s4 type <format=decimal>;
+    string filePath;
+} FileIdentifier <read=read_FileIdentifier,optimize=false>;
+
+string read_FileIdentifier(FileIdentifier &in) {
+    local string out;
+    SPrintf(out, "'%s'", in.filePath);
+    return out;
+}
+
+
+typedef struct {
+    local int i;
+    u4 entries <format=decimal>;
+    for (i = 0; i < entries; i++) {
+        FileIdentifier f;
+    }
+} FileIdentifierTable <read=read_FileIdentifierTable,optimize=false>;
+
+string read_FileIdentifierTable(FileIdentifierTable &in) {
+    local string out;
+    SPrintf(out, "%d", in.entries);
+    return out;
+}
+
+
+typedef struct {
+    SetBackColor(0xb0b0ff);
+    TypeTree typeTree;
+
+    SetBackColor(0xb0ffb0);
+    ObjectInfoTable objectInfoTable;
+
+    SetBackColor(0xffb0b0);
+    ObjectIdentifierTable objectIDTable;
+
+    SetBackColor(0xffffb0);
+    FileIdentifierTable externals;
+} SerializedFileMetadata;
+
+
+DisplayFormatHex();
+BigEndian();
+
+SerializedFileHeader h;
+
+LittleEndian();
+
+SerializedFileMetadata m;
