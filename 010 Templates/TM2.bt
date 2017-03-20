@@ -1,0 +1,73 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: TM2.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Parse PS2 TIM2 textures
+//  Category: Image
+// File Mask: *.tm2
+//  ID Bytes: 54 49 4D 32 // TIM2
+//   History: 
+//------------------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef enum <u1> {
+    TM2_FORMAT_UNKNOWN,
+    TM2_FORMAT_RGBA5551,
+    TM2_FORMAT_RGBA8880,
+    TM2_FORMAT_RGBA8888,
+    TM2_FORMAT_INDEX4,
+    TM2_FORMAT_INDEX8
+} TM2_FORMAT;
+
+
+typedef struct {
+    char sig[4];
+
+    u1 version <format=decimal>;
+    u1 format <format=decimal>;
+    u2 n_pictures <format=decimal>;
+
+    u1 padding[8] <hidden=true>;
+} TM2HEADER;
+
+
+typedef struct {
+    u4 total_size;
+    u4 clut_size;
+    u4 image_size;
+    u2 header_size;
+    u2 clut_colors <format=decimal>;
+    u1 pict_format <format=decimal>;
+    u1 n_mipmaps <format=decimal>;
+    TM2_FORMAT clut_type <format=decimal>;
+    TM2_FORMAT image_type <format=decimal>;
+    u2 image_width <format=decimal>;
+    u2 image_height <format=decimal>;
+    u8 gs_tex0;
+    u8 gs_tex1;
+    u4 gs_regs;
+    u4 gs_texclut;
+} TM2PICT;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+Assert(ReadString(0, 4) == "TIM2", "Bad sig!");
+
+SetBackColor(0xb0b0b0);
+TM2HEADER h;
+
+SetBackColor(0xffb0b0);
+TM2PICT p;
