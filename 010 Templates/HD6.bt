@@ -36,14 +36,45 @@ typedef struct {
 
 
 typedef struct {
-    u8 name_id:18;
+    local int v = 0;
+    local int shift = 0;
+    do {
+        u1 val;
+        v |= (val & 0x7F) << shift;
+        shift += 7;
+    } while (val & 0x80);
+} NP_OFFSET <read=read_NP_OFFSET,optimize=false>;
+
+string read_NP_OFFSET(NP_OFFSET &in) {
+    local string out;
+    SPrintf(out, "%d '%s'", in.v, nameparts.nameparts[in.v].n);
+    return out;
+}
+
+
+typedef struct {
+    u8 name_offset:18;
     u8 offset:22;
     u8 size:24;
-} FILE <read=read_FILE,optimize=true>;
+    local string name = "INVALID";
+    local quad _offset, _len;
+    if (name_offset < h.namelists_size) {
+        _offset = FTell();
+        SetBackColor(0xb0ffff);
+        FSeek(name_offset + h.namelists_offset);
+        name = "";
+        while (ReadByte() != 0) {
+            NP_OFFSET np;
+            name += nameparts.nameparts[np.v].n;
+        }
+        FSeek(_offset);
+        SetBackColor(0xffb0ff);
+    }
+} FILE <read=read_FILE,optimize=false>;
 
 string read_FILE(FILE &in) {
     local string out;
-    SPrintf(out, "%Xh %Xh %Xh", in.name_id, in.offset * 2048, in.size * 16);
+    SPrintf(out, "'%s' %Xh+%Xh", in.name, in.offset * 2048, in.size * 16);
     return out;
 }
 
@@ -54,17 +85,17 @@ typedef struct {
     u4 nameparts_offset;
     u4 nameparts_size;
     u4 nameparts_count <format=decimal>;
-    u4 zero0C <bgcolor=0xd8d8d8>;
+    u4 zero10;
     u4 namelists_offset;
     u4 namelists_size;
-    u4 zero1C <bgcolor=0xd8d8d8>;
-    u4 unknown20 <bgcolor=0xd8d8d8>;
+    u4 zero1C;
+    u4 unknown20;
     u4 file_count <format=decimal>;
     u4 file_offset;
-    u4 zero2C <bgcolor=0xd8d8d8>;
+    u4 zero2C;
     u4 header_size;
 
-    Assert(zero0C == 0, "HEADER zero0C");
+    Assert(zero10 == 0, "HEADER zero10");
     Assert(zero1C == 0, "HEADER zero1C");
     Assert(zero2C == 0, "HEADER zero2C");
     Assert(unknown20 == 0x10, "HEADER unknown20 != 0x10");
@@ -84,7 +115,7 @@ SetBackColor(0xb0b0ff);
 NAMEPARTS nameparts;
 
 FSeek(h.namelists_offset);
-SetBackColor(0xb0ffff);
+SetBackColor(0xd8ffff);
 u1 namelists[h.namelists_size];
 
 FSeek(h.file_offset);
