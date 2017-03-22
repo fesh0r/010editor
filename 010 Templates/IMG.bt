@@ -1,0 +1,82 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: IMG.bt
+//   Authors: Andrew McRae
+//   Version: 0.2
+//   Purpose: Parse PS2 Level 5 IMG files
+//  Category: Archive
+// File Mask: *.img
+//  ID Bytes: 49 4D 33 00 // IM3
+//   History: 
+//------------------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    char sig[4];
+
+    u4 image_offset;
+    u4 image_count <format=decimal>;
+    u4 zero0C;
+
+    Assert(zero0C == 0, "HEADER zero0C");
+} HEADER;
+
+
+typedef struct {
+    char name[32];
+    u4 header_size;
+    u4 offset;
+    u4 unknown28;
+    u4 unknown2C;
+    u4 unknown30;
+    u4 size;
+    u4 unknown38;
+    u4 zero3C;
+
+    local quad _offset;
+    if (_offset < FileSize() && size > 0) {
+        _offset = FTell();
+        FSeek(offset);
+        SetBackColor(0xffb0ff);
+        u1 data[size];
+        SetBackColor(0xb0ffff);
+        FSeek(_offset);
+    }
+
+    Assert(header_size == 0x40, "IMAGE header_size != 40h");
+    //Assert(unknown28 == 0x01, "IMAGE unknown28 != 1h");
+    //Assert(unknown2C == 0x0, "IMAGE unknown2C != 0h");
+    //Assert(unknown30 == 0x0, "IMAGE unknown30 != 0h");
+    //Assert(unknown38 == 0x05, "IMAGE unknown38 != 5h");
+    Assert(zero3C == 0x0, "IMAGE zero3C");
+} IMAGE <read=read_IMAGE,optimize=false>;
+
+string read_IMAGE(IMAGE &in) {
+    local string out;
+    SPrintf(out, "%04X %04X %04X %04X %04X '%s' %Xh+%Xh", in.unknown28, in.unknown2C, in.unknown30, in.unknown38, in.zero3C, in.name, in.offset, in.size);
+    return out;
+}
+
+
+DisplayFormatHex();
+LittleEndian();
+
+Assert(ReadString(0, 3) == "IM3", "Bad sig!");
+
+SetBackColor(0xb0b0b0);
+HEADER h;
+
+FSeek(h.image_offset);
+
+SetBackColor(0xb0ffff);
+IMAGE i[h.image_count];

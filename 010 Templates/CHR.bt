@@ -1,0 +1,57 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: CHR.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Parse PS2 Level 5 CHR files
+//  Category: Archive
+// File Mask: *.chr, *.pac, *.snd
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    local quad _start_offset;
+    _start_offset = FTell();
+    char name[64];
+
+    u4 header_size;
+    u4 file_size;
+    u4 next_offset;
+    u4 unknown4C;
+
+    if (file_size > 0) {
+        SetBackColor(0xffb0ff);
+        u1 data[file_size];
+    }
+
+    FSeek(_start_offset + next_offset);
+
+    Assert(header_size == 0x50, "FILE header_size != 50h");
+} FILE <read=read_FILE,optimize=false>;
+
+string read_FILE(FILE &in) {
+    local string out;
+    SPrintf(out, "'%s' %Xh+%Xh", in.name, in._start_offset+in.header_size, in.file_size);
+    return out;
+}
+
+
+DisplayFormatHex();
+LittleEndian();
+
+while (ReadByte() != 0) {
+    SetBackColor(0xb0ffff);
+    FILE f;
+}
