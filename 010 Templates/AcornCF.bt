@@ -1,0 +1,253 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: AcornCF.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Acorn CF
+//  Category: Executable
+// File Mask: 
+//  ID Bytes: C5 C6 CB C3
+//   History: 
+//------------------------------------------------
+
+LittleEndian();
+DisasmSetMode(DISASM_ARM_32);
+
+local uint64 chunk_name[2000];
+local int area_name[2000];
+local uint64 strt_offset;
+local int area_count;
+local int symbol_count;
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+string get_name(u4 o) {
+    return ReadString(strt_offset + o);
+}
+typedef uint32 o_name <read=Str("%d %s", this, get_name(this))>;
+
+typedef struct {
+    char chunkId[8];
+    u4 fileOffset;
+    u4 size;
+} CHUNK_ENTRY <read=Str("%s %d+%d", this.chunkId, this.fileOffset, this.size)>;
+
+typedef struct {
+    u4 chunkFileId <format=hex>;
+    u4 maxChunks;
+    u4 numChunks;
+    CHUNK_ENTRY c[numChunks];
+    if (maxChunks > numChunks) {
+        u4 p[(maxChunks - numChunks)*4] <bgcolor=0x808080>;
+    }
+} HEADER <read=Str("%d %d", this.maxChunks, this.numChunks)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    SetBackColor(0xc0ffff);
+    u1 d[ce.size];
+} c_TIME <read=this.chunk_id>;
+
+typedef struct {
+    local int64 entry_start = FTell();
+    u4 chunkIndex;
+    u4 entryLength;
+    u4 dataLength;
+    if (dataLength > 0) {
+        chunk_name[chunkIndex] = FTell();
+        local int name_length = ReadStringLength(FTell(), dataLength);
+        char name[name_length];
+        if (dataLength > name_length) {
+            u1 d[dataLength - name_length];
+        }
+    } else {
+        local string name = "";
+    }
+    if (dataLength+3*4 < entryLength) {
+        u1 p[entryLength - dataLength - 3*4] <bgcolor=0x808080>;
+    }
+} e_LIB_DIRY <read=Str("%s %d", this.name, this.chunkIndex)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    local int64 chunk_end = FTell() + ce.size;
+    local int count = 0;
+    while (FTell() < chunk_end) {
+        SetBackColor(0xc0c0ff);
+        e_LIB_DIRY e;
+        count++;
+    }
+} c_LIB_DIRY <read=Str("%s %d", this.chunk_id, this.count)>;
+
+typedef struct {
+    local int64 entry_start = FTell();
+    u4 chunkIndex;
+    u4 entryLength;
+    u4 dataLength;
+    local int symbol_length = ReadStringLength(FTell(), dataLength);
+    char symbol[symbol_length];
+    if (dataLength > symbol_length) {
+        u1 d[dataLength - symbol_length];
+    }
+    if (dataLength+3*4 < entryLength) {
+        u1 p[entryLength - dataLength - 3*4] <bgcolor=0x808080>;
+    }
+} e_OFL_SYMT <read=Str("%s %d", this.symbol, this.chunkIndex)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    local int64 chunk_end = FTell() + ce.size;
+    local int count = 0;
+    while (FTell() < chunk_end) {
+        SetBackColor(0xc0ffc0);
+        e_OFL_SYMT e;
+        count++;
+    }
+} c_OFL_SYMT <read=Str("%s %d", this.chunk_id, this.count)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    local int chunk_index = ci;
+    SetBackColor(0xffc0c0);
+    u1 d[ce.size];
+} c_LIB_DATA <read=Str("%s %s", this.chunk_id, ReadString(chunk_name[this.chunk_index]))>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    u4 d;
+} c_LIB_VRSN <read=Str("%s %d", this.chunk_id, this.d)>;
+
+typedef struct {
+    o_name name;
+    u1 al;
+    u1 at_abs : 1;
+    u1 at_code : 1;
+    u1 at_cmn_blk : 1;
+    u1 at_cmn_area : 1;
+    u1 at_noinit : 1;
+    u1 at_ro : 1;
+    u1 at_pi : 1;
+    u2 p <hidden=true>;
+    u4 size;
+    u4 numRels;
+    u4 base <format=hex>;
+} e_OBJ_HEAD_AREA <read=Str("%s %d %d", get_name(this.name), this.size, this.numRels)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    local int i;
+    local int64 chunk_end = FTell() + ce.size;
+    SetBackColor(0xffc0c0);
+    u4 objType <format=hex>;
+    u4 versionId;
+    u4 numAreas;
+    u4 numSymbols;
+    u4 entryArea;
+    u4 entryOffset <format=hex>;
+    e_OBJ_HEAD_AREA a[numAreas];
+    area_count = numAreas;
+    symbol_count = numSymbols;
+} c_OBJ_HEAD <read=Str("%s %d %d %d+%d", this.chunk_id, this.numAreas, this.numSymbols, this.entryArea, this.entryOffset)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    SetBackColor(0xffc0c0);
+    Opcode c[ce.size];
+} c_OBJ_AREA <read=this.chunk_id>;
+
+typedef struct {
+    o_name name;
+    u1 at_local : 1;
+    u1 at_global : 1;
+    u1 at_abs : 1;
+    u1 at_case : 1;
+    u1 p[3] <hidden=true>;
+    u4 value <format=hex>;
+    o_name area_name;
+} e_OBJ_SYMT <read=Str("%s %s", get_name(this.name), get_name(this.area_name))>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    local int i;
+    SetBackColor(0xffc0c0);
+    e_OBJ_SYMT s[symbol_count];
+} c_OBJ_SYMT <read=Str("%s %d", this.chunk_id, symbol_count)>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    SetBackColor(0xffc0c0);
+    u1 c[ce.size];
+} c_OBJ_STRT <read=this.chunk_id>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    SetBackColor(0xffc0c0);
+    u1 c[ce.size];
+} c_OBJ_IDFN <read=this.chunk_id>;
+
+typedef struct (int ci, CHUNK_ENTRY &ce) {
+    local char chunk_id[8] = ce.chunkId;
+    u1 c[ce.size];
+} c_unknown <read=Str("%s !!!", this.chunk_id)>;
+
+local u4 _sig;
+_sig = ReadUInt(0);
+if (_sig != 0xC3CBC6C5) {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+SetBackColor(0xc0c0c0);
+HEADER h;
+
+local int i;
+
+for (i = 0; i < h.numChunks; i++) {
+    FSeek(h.c[i].fileOffset);
+    switch (h.c[i].chunkId) {
+        case "LIB_TIME":
+        case "OFL_TIME":
+            c_TIME c(i, h.c[i]);
+            break;
+        case "LIB_DIRY":
+            c_LIB_DIRY c(i, h.c[i]);
+            break;
+        case "OFL_SYMT":
+            c_OFL_SYMT c(i, h.c[i]);
+            break;
+        case "LIB_DATA":
+            c_LIB_DATA c(i, h.c[i]);
+            break;
+        case "LIB_VRSN":
+            c_LIB_VRSN c(i, h.c[i]);
+            break;
+        case "OBJ_HEAD":
+            c_OBJ_HEAD c(i, h.c[i]);
+            break;
+        case "OBJ_AREA":
+            c_OBJ_AREA c(i, h.c[i]);
+            break;
+        case "OBJ_SYMT":
+            c_OBJ_SYMT c(i, h.c[i]);
+            break;
+        case "OBJ_STRT":
+            strt_offset = FTell();
+            c_OBJ_STRT c(i, h.c[i]);
+            break;
+        case "OBJ_IDFN":
+            c_OBJ_IDFN c(i, h.c[i]);
+            break;
+        default:
+            c_unknown c(i, h.c[i]);
+            break;
+    }
+}

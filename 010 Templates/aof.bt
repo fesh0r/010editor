@@ -1,0 +1,410 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: AOF.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Acorn Object File
+//  Category: Executable
+// File Mask: *.aof
+//  ID Bytes: 01 50 62 45 32
+//   History: 
+//------------------------------------------------
+
+LittleEndian();
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+typedef struct {
+    u1 l;
+    if (l) {
+        u1 s[l];
+    } else {
+        local string s = "";
+    }
+} pstr <read=this.s>;
+
+typedef struct {
+    local u4 _v = 0;
+    u1 t <format=hex>;
+    if ((t & 0x80) == 0) {
+        _v = ((u4)t & 0x7f);
+    } else if ((t & 0x40) == 0) {
+        u1 v[1] <format=hex>;
+        _v = (u4)v[0] | (((u4)t & 0x3F) << 8);
+    } else if ((t & 0x20) == 0) {
+        u1 v[3] <format=hex>;
+        _v = (u4)v[2] | ((u4)v[1] << 8) | ((u4)v[0] << 16) | (((u4)t & 0x1F) << 24);
+    } else if ((t & 0x1F) == 0) {
+        u1 v[4] <format=hex>;
+        _v = (u4)v[0] | ((u4)v[1] << 8) | ((u4)v[2] << 16) | ((u4)v[3] << 24);
+    } else {
+        Warning("Bad udisp!");
+        Printf("Bad udisp!\n");
+        return -1;
+    }
+} udisp <read=Str("%Xh", this._v)>;
+
+typedef udisp sdisp;
+
+typedef struct {
+    udisp l;
+    u1 v[l._v];
+} bytes;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    u4 sig <format=hex>;
+
+    if (sig != 0x32456250) {
+        Warning("Bad sig!");
+        Printf("Bad sig!\n");
+        return -1;
+    }
+
+    u1 t_packed : 1;
+    u1 t_case : 1;
+    u1 t_aligned : 1;
+    u1 t_language : 1;
+    u1 t_source : 1;
+    u1 t_deferred: 1;
+
+    if (t_packed) udisp length;
+    pstr name;
+    pstr time;
+    if (t_source) pstr source;
+    pstr info;
+    if (t_language) udisp language;
+
+    cur_module = name.s;
+} c_MODULE_HEADER <read=Str("MODULE_HEADER \"%s\"", this.name.s)>;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+} c_MODULE_END <read="MODULE_END">;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    Warning("FILE_END hit");
+    Printf("FILE_END hit\n");
+    return -1;
+} c_FILE_END <read="FILE_END">;
+
+typedef struct (int ca) {
+    local int _ca = ca;
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    u4 f_readonly : 1;
+    u4 f_pic : 1;
+    u4 f_shared : 1;
+    u4 f_code : 1;
+    u4 f_cmn_s : 1;
+    u4 f_cmn_d : 1;
+    u4 f_no_init : 1;
+    u4 f_no_reloc : 1;
+    u4 f_contig : 1;
+    u1 align;
+    udisp size;
+    pstr name;
+} c_AREA <read=read_AREA>;
+
+string read_AREA(c_AREA &in) {
+    local string out, type;
+    if (in.f_cmn_d) {
+        type = "COMMONDEF";
+    } else if (in.f_cmn_s) {
+        type = "COMMON";
+    } else if (in.f_code) {
+        type = "CODE";
+    } else {
+        type = "DATA";
+    }
+    SPrintf(out, "AREA %d %s \"%s\" %Xh", in._ca, type, in.name.s, in.size._v);
+    return out;
+}
+
+typedef enum <u1> {SYM_ABS, SYM_DATA, SYM_CODE, SYM_ABST=128, SYM_DATAT, SYM_CODET} SYM_TYPE;
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    SYM_TYPE type;
+    sdisp offset;
+    if (type == SYM_DATA || type == SYM_DATAT) udisp area;
+    pstr name;
+    if (type == SYM_ABST || type == SYM_DATAT || type == SYM_CODET) bytes typeinfo;
+    // Printf("%s %s\n", cur_module, read_SYMBOL(this));
+} c_SYMBOL <read=read_SYMBOL>;
+
+string read_SYMBOL(c_SYMBOL &in) {
+    local string out;
+    SPrintf(out, "SYMBOL %s \"%s\"", EnumToString(in.type), in.name.s);
+    switch (in.type) {
+        case SYM_ABS:
+        case SYM_ABST:
+        case SYM_CODE:
+        case SYM_CODET:
+            SPrintf(out, "%s %Xh", out, in.offset._v);
+            break;
+        case SYM_DATA:
+        case SYM_DATAT:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+    }
+    return out;
+}
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    udisp area;
+    udisp offset;
+} c_POS <read=Str("POS %d %Xh", this.area._v, this.offset._v)>;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    bytes data;
+} c_STORE <read=Str("DATA %d", this.data.l._v)>;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    udisp count;
+    bytes data;
+} c_REPEAT_STORE <read=Str("REPEAT_DATA %d x %d", this.count._v, this.data.l._v)>;
+
+typedef enum <u1> {M_CONST, M_AREA, M_SYMBOL=3, M_GCODE, M_LCODE, M_LEN, M_LAST} LINK_MODE;
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    sdisp ext_no;
+    LINK_MODE mode;
+    if (mode != M_GCODE) sdisp offset;
+    if (mode == M_AREA || mode == M_LEN || mode == M_LAST) udisp area;
+    if (mode == M_SYMBOL || mode == M_GCODE) {
+        pstr module;
+        pstr name;
+    }
+} c_LINK <read=read_LINK>;
+
+string read_LINK(c_LINK &in) {
+    local string out;
+    SPrintf(out, "LINK %d %s", in.ext_no._v, EnumToString(in.mode));
+    switch (in.mode) {
+        case M_CONST:
+            SPrintf(out, "%s %Xh", out, in.offset._v);
+            break;
+        case M_AREA:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+        case M_SYMBOL:
+            SPrintf(out, "%s \"%s\" \"%s\" %Xh", out, in.module.s, in.name.s, in.offset._v);
+            break;
+        case M_GCODE:
+            SPrintf(out, "%s \"%s\" \"%s\"", out, in.module.s, in.name.s);
+            break;
+        case M_LCODE:
+            SPrintf(out, "%s %Xh", out, in.offset._v);
+            break;
+        case M_LEN:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+        case M_LAST:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+    }
+    return out;
+}
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    u1 type;
+    pstr module;
+    pstr name;
+    bytes type_info;
+} c_CHECK <read=Str("CHECK \"%s\" \"%s\"", this.module.s, this.name.s)>;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    LINK_MODE mode;
+    if (mode != M_GCODE) sdisp offset;
+    if (mode == M_AREA || mode == M_LEN || mode == M_LAST) udisp area;
+    if (mode == M_SYMBOL || mode == M_GCODE) {
+        pstr module;
+        pstr name;
+    }
+} c_RELOC <read=read_RELOC>;
+
+string read_RELOC(c_RELOC &in) {
+    local string out;
+    SPrintf(out, "RELOC %s", EnumToString(in.mode));
+    switch (in.mode) {
+        case M_CONST:
+            SPrintf(out, "%s %Xh", out, in.offset._v);
+            break;
+        case M_AREA:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+        case M_SYMBOL:
+            SPrintf(out, "%s \"%s\" \"%s\" %Xh", out, in.module.s, in.name.s, in.offset._v);
+            break;
+        case M_GCODE:
+            SPrintf(out, "%s \"%s\" \"%s\"", out, in.module.s, in.name.s);
+            break;
+        case M_LCODE:
+            SPrintf(out, "%s %Xh", out, in.offset._v);
+            break;
+        case M_LEN:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+        case M_LAST:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+    }
+    return out;
+}
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+} c_NOP <read="NOP">;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    bytes v;
+} c_REPEAT_NOP <read="REPEAT_NOP">;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    pstr v;
+} c_COMMENT <read="COMMENT">;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    enum <u1> SB {SB_CONSTANT, SB_AREA, SB_SYMBOL=3} mode;
+    if (mode == SB_AREA) udisp area;
+    sdisp offset;
+    if (mode == SB_SYMBOL) {
+        pstr module;
+        pstr name;
+    }
+} c_DEFINE_SB <read=read_DEFINE_SB>;
+
+string read_DEFINE_SB (c_DEFINE_SB &in) {
+    local string out;
+    SPrintf(out, "DEFINE_SB %s", EnumToString(in.mode));
+    switch (in.mode) {
+        case SB_CONSTANT:
+            SPrintf(out, "%s %Xh", out, in.offset._v);
+            break;
+        case SB_AREA:
+            SPrintf(out, "%s %d %Xh", out, in.area._v, in.offset._v);
+            break;
+        case SB_SYMBOL:
+            SPrintf(out, "%s \"%s\" \"%s\" %Xh", out, in.module.s, in.name.s, in.offset._v);
+            break;
+    }
+    return out;
+}
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    udisp offset <format=hex>;
+} c_ENTRY <read=Str("ENTRY %Xh", this.offset._v)>;
+
+typedef struct {
+    SetBackColor(0xc0c0c0);
+    u1 cmd;
+    udisp offset <format=hex>;
+} c_HANDLER <read=Str("HANDLER %Xh", this.offset._v)>;
+
+local u4 _sig;
+_sig = ReadUInt(1);
+if (_sig != 0x32456250) {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+local u1 _cmd;
+local int cur_area = 0;
+local string cur_module = "";
+
+while (!FEof()) {
+    _cmd = ReadByte();
+    switch (_cmd) {
+        case 1:
+            cur_area = 0;
+            c_MODULE_HEADER c;
+            break;
+        case 2:
+            c_MODULE_END c;
+            break;
+        case 3:
+            c_FILE_END c;
+            break;
+        case 4:
+            cur_area++;
+            c_AREA c(cur_area);
+            break;
+        case 5:
+            c_SYMBOL c;
+            break;
+        case 6:
+            c_POS c;
+            break;
+        case 7:
+            c_STORE c;
+            break;
+        case 8:
+            c_REPEAT_STORE c;
+            break;
+        case 9:
+            c_LINK c;
+            break;
+        case 10:
+            c_CHECK c;
+            break;
+        case 11:
+            c_RELOC c;
+            break;
+        case 12:
+            c_NOP c;
+            break;
+        case 13:
+            c_REPEAT_NOP c;
+            break;
+        case 14:
+            c_COMMENT c;
+            break;
+        case 15:
+            c_DEFINE_SB c;
+            break;
+        case 16:
+            c_ENTRY c;
+            break;
+        case 17:
+            c_HANDLER c;
+            break;
+        default:
+            Warning("Unknown command: %u", _cmd);
+            Printf("Unknown command: %u\n", _cmd);
+            return -1;
+    }
+}

@@ -1,0 +1,223 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: RIF.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Acorn Relocatable Image File
+//  Category: Executable
+// File Mask: *.rif
+//  ID Bytes: 80 14 33 22
+//   History: 
+//------------------------------------------------
+
+LittleEndian();
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+typedef uint32 CARDINAL;
+typedef int32  INTEGER;
+typedef uint32 ADDRESS;
+
+local CARDINAL RelocMagic = 0x22331480;
+local CARDINAL ModuleEntrySize = 16;
+local CARDINAL MaxModules = 4096;
+local CARDINAL HeaderSize = 32 * 4;
+local CARDINAL MinImageSize = HeaderSize + 2*2 + 1*4 + (0*4)*7 + 4+0*4 + 16 + 0 + 0 + 0;
+local CARDINAL SpaceAlign = 16;
+
+CARDINAL RoundUp(CARDINAL N, CARDINAL Grain) {
+    return ((N + Grain - 1) / Grain) * Grain;
+}
+
+string ReadStringTable(CARDINAL offset) {
+    int l = ReadUByte(offset+h.StringTable);
+    string out = ReadString(offset+h.StringTable+1, l);
+    return out;
+}
+
+typedef struct (CARDINAL align) {
+    u1 l;
+    if (l) {
+        u1 s[l];
+    } else {
+        local string s = "";
+    }
+    local int p_size = RoundUp(l+1, align) - (l+1);
+    if (p_size) u1 p[p_size] <bgcolor=0x808080,hidden=true>;
+} pstr <read=this.s>;
+
+typedef enum <u1> {M_CONSTANT, M_CODE, M_PURE, M_READ, M_WRITE, M_UNINIT, M_SYMCODE, M_SYMDATA} RELOC_MODE;
+
+typedef struct (RELOC_MODE _m) {
+    local RELOC_MODE mode = _m;
+    u4 d <format=hex>;
+} RELOC_WORD <read=DoReloc(this.mode, this.d)>;
+
+typedef struct (RELOC_MODE _m) {
+    local RELOC_MODE mode = _m;
+    u4 o <format=hex>;
+    local u4 d = ReadUInt(o);
+} RELOC_WORD_OFFSET <read=DoReloc(this.mode, this.d)>;
+
+typedef struct {
+    CARDINAL Magic <format=hex>;
+    RELOC_WORD EntryPoint(1);
+    CARDINAL ModuleTableEntries;
+    CARDINAL LinkTableEntries;
+    CARDINAL CodeItemRelocs;
+    CARDINAL PureSectionRelocs;
+    CARDINAL ReadSectionRelocs;
+    CARDINAL WriteSectionRelocs;
+    CARDINAL UninitSectionRelocs;
+    CARDINAL SymbolicCodeRelocs;
+    CARDINAL SymbolicDataRelocs;
+    CARDINAL StringTableSize <format=hex>;
+    CARDINAL PureSectionSize <format=hex>;
+    CARDINAL ReadSectionSize <format=hex>;
+    CARDINAL WriteSectionSize <format=hex>;
+    CARDINAL UninitSectionSize <format=hex>;
+    CARDINAL ReservedField[16];
+
+    local CARDINAL ModuleTableRelocSize = RoundUp(ModuleTableEntries, 2) * 2;
+    local CARDINAL LinkTableRelocSize = RoundUp(LinkTableEntries, 8) / 2;
+    local CARDINAL RelocWordsSize =
+        4 * (CodeItemRelocs + PureSectionRelocs + ReadSectionRelocs + WriteSectionRelocs +
+        UninitSectionRelocs + SymbolicCodeRelocs + SymbolicDataRelocs);
+    local CARDINAL PrefixSize =
+        HeaderSize + ModuleTableRelocSize + LinkTableRelocSize + RelocWordsSize + StringTableSize;
+    local CARDINAL ModuleTableSize = ModuleTableEntries * 16;
+    local CARDINAL StringTable = PrefixSize - StringTableSize;
+    local CARDINAL ImageModuleTable = PrefixSize;
+    local CARDINAL PureSectionImageSize = RoundUp(PureSectionSize, SpaceAlign);
+    local CARDINAL ReadSectionImageSize =
+        RoundUp(ReadSectionSize + LinkTableEntries * 4, SpaceAlign);
+    local CARDINAL WriteSectionImageSize = RoundUp(WriteSectionSize, SpaceAlign);
+    local CARDINAL LinkTable =
+        PrefixSize + ModuleTableSize + PureSectionImageSize + ReadSectionSize;
+    local CARDINAL ImageSize =
+        PrefixSize + ModuleTableSize + PureSectionImageSize + ReadSectionImageSize +
+        WriteSectionImageSize;
+    if (FileSize() != ImageSize) {
+        Waring("ImageSize incorrect!");
+        Printf("ImageSize incorrect!\n");
+        return -1;
+    }
+} HEADER;
+
+typedef struct {
+    RELOC_MODE e : 4;
+} RELOC_ENTRY <read=EnumToString(this.e)>;
+
+typedef struct (CARDINAL size, CARDINAL total_size, CARDINAL align) {
+    BitfieldDisablePadding();
+    if (size) RELOC_ENTRY r[size] <optimize=false>;
+    BitfieldEnablePadding();
+    local int p_size = RoundUp(size/2, align) - size/2;
+    if (p_size) u1 p[p_size] <bgcolor=0x808080,hidden=true>;
+} RELOC_TABLE;
+
+string DoReloc(RELOC_MODE mode, CARDINAL value) {
+    switch (mode) {
+        case 1:
+            return Str("%s %d %Xh", EnumToString(mode), value & 0xffff, value>>16);
+        case 6:
+        case 7:
+            return Str("%s \"%s\" \"%s\"", EnumToString(mode), ReadStringTable((value>>16)*4), ReadStringTable((value & 0xffff)*4));
+        default:
+            return Str("%s %Xh", EnumToString(mode), value);
+    }
+}
+
+typedef struct (CARDINAL size, CARDINAL align) {
+    local int end_pos = FTell() + size;
+    while (FTell() < end_pos) {
+        pstr s(align);
+    }
+} STRING_TABLE;
+
+typedef struct (int i) {
+    local int offset = i*4;
+    RELOC_WORD StaticBase(ModuleTableReloc.r[offset+0].e);
+    RELOC_WORD LinkBase(ModuleTableReloc.r[offset+1].e);
+    RELOC_WORD CodeBase(ModuleTableReloc.r[offset+2].e);
+    RELOC_WORD NextModule(ModuleTableReloc.r[offset+3].e);
+} MODULE_ENTRY;
+
+typedef struct (CARDINAL size) {
+    local int i;
+    for (i=0; i<size; i++) MODULE_ENTRY m(i);
+} MODULE_TABLE;
+
+typedef struct (CARDINAL size) {
+    local int i;
+    SetBackColor(0xc0ffff);
+    for (i=0; i<size; i++) RELOC_WORD d(LinkTableReloc.r[i].e);
+} LINK_TABLE;
+
+typedef struct (CARDINAL size, CARDINAL align) {
+    if (size) u1 d[size];
+    local int p_size = RoundUp(size, align) - size;
+    if (p_size) u1 p[p_size] <bgcolor=0x808080,hidden=true>;
+} SECTION;
+
+typedef struct (CARDINAL read_size, CARDINAL link_entries, CARDINAL align) {
+    if (read_size) u1 d[read_size];
+    if (link_entries) LINK_TABLE LinkTable(link_entries);
+    local int total_size = read_size + link_entries*4;
+    local int p_size = RoundUp(total_size, align) - total_size;
+    if (p_size) u1 p[p_size] <bgcolor=0x808080,hidden=true>;
+} READ_SECTION;
+
+local u4 _sig;
+_sig = ReadUInt(0);
+if (_sig != RelocMagic) {
+    Warning("Bad sig!");
+    Printf("Bad sig!\n");
+    return -1;
+}
+
+SetBackColor(0xc0c0c0);
+HEADER h;
+
+SetBackColor(0xc0c0ff);
+RELOC_TABLE ModuleTableReloc(h.ModuleTableEntries * 4, h.ModuleTableRelocSize, 4);
+RELOC_TABLE LinkTableReloc(h.LinkTableEntries, h.LinkTableRelocSize, 4);
+RELOC_WORD_OFFSET CodeItemRelocWords(1)[h.CodeItemRelocs] <optimize=false>;
+RELOC_WORD_OFFSET PureSectionRelocWords(2)[h.PureSectionRelocs] <optimize=false>;
+RELOC_WORD_OFFSET ReadSectionRelocWords(3)[h.ReadSectionRelocs] <optimize=false>;
+RELOC_WORD_OFFSET WriteSectionRelocWords(4)[h.WriteSectionRelocs] <optimize=false>;
+RELOC_WORD_OFFSET UninitSectionRelocWords(5)[h.UninitSectionRelocs] <optimize=false>;
+RELOC_WORD_OFFSET SymbolicCodeRelocWords(6)[h.SymbolicCodeRelocs] <optimize=false>;
+RELOC_WORD_OFFSET SymbolicDataRelocWords(7)[h.SymbolicDataRelocs] <optimize=false>;
+
+if (FTell() != h.StringTable) {
+    Warning("StringTable offset error!");
+    Printf("StringTable offset error!\n");
+    return -1;
+}
+SetBackColor(0xffc0c0);
+STRING_TABLE StringTable(h.StringTableSize, 4);
+
+if (FTell() != h.ImageModuleTable) {
+    Warning("ImageModuleTable offset error!");
+    Printf("ImageModuleTable offset error!\n");
+    return -1;
+}
+SetBackColor(0xc0ffc0);
+MODULE_TABLE ModuleTable(h.ModuleTableEntries);
+
+SetBackColor(0x00c0c0);
+SECTION PureSection(h.PureSectionSize, SpaceAlign);
+
+SetBackColor(0xc000c0);
+READ_SECTION ReadSection(h.ReadSectionSize, h.LinkTableEntries, SpaceAlign);
+
+SetBackColor(0xc0c000);
+SECTION WriteSection(h.WriteSectionSize, SpaceAlign);
