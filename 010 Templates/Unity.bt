@@ -95,7 +95,7 @@ typedef struct {
     u4 byteStart;
     u4 byteSize;
     s4 typeID <format=decimal>;
-    s2 classID <format=decimal>; 
+    s2 classID <format=decimal>;
     s2 scriptTypeIndex<format=decimal>;
     u1 stripped <format=decimal>;
 } ObjectInfo <read=read_ObjectInfo>;
