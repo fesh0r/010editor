@@ -1,0 +1,204 @@
+//------------------------------------------------
+//--- 010 Editor v7.0.2 Binary Template
+//
+//      File: MDS.bt
+//   Authors: Andrew McRae
+//   Version: 0.1
+//   Purpose: Parse Level 5 MDS files
+//  Category: CAD
+// File Mask: *.mds
+//  ID Bytes: 20 4D 44 53 //  MDS
+//   History:
+//------------------------------------------------
+
+typedef uint64 u8;
+typedef uint32 u4;
+typedef uint16 u2;
+typedef ubyte  u1;
+typedef int64  s8;
+typedef int32  s4;
+typedef int16  s2;
+typedef byte   s1;
+
+
+typedef struct {
+    char sig[4];
+
+    u4 unknown04;
+    u4 unknown08;
+
+    u4 unknown2_count <format=decimal>;
+    u4 zero10;
+    u4 unknown2_size;
+    u4 unknown2_offset;
+
+    u4 zero1C;
+
+    u4 mdt_count <format=decimal>;
+    u4 mdt_offset;
+
+    u4 zero28;
+
+    u4 material_count <format=decimal>;
+    u4 material_size;
+    u4 material_offset;
+
+    u4 names_offset;
+    u4 names_size;
+
+    u4 zero40;
+    u4 zero44;
+    u4 zero48;
+    u4 zero4C;
+
+    Assert(sig == " MDS", "HEADER sig != ' MDS'");
+    Assert(unknown2_size == 0xA0, "HEADER unknown2_size != A0h");
+    Assert(material_size == 0x60, "HEADER material_size != 60h");
+
+    Assert(unknown04 == 0xC8, "HEADER unknown04 != C8h");
+    Assert(unknown08 == 0x50, "HEADER unknown08 != 50h");
+    Assert(zero10 == 0, "HEADER zero10");
+    Assert(zero1C == 0, "HEADER zero1C");
+    Assert(zero28 == 0, "HEADER zero28");
+    Assert(zero40 == 0, "HEADER zero40");
+    Assert(zero44 == 0, "HEADER zero44");
+    Assert(zero48 == 0, "HEADER zero48");
+    Assert(zero4C == 0, "HEADER zero4C");
+} HEADER;
+
+
+typedef struct {
+    float m[4];
+} MF <read=read_MF>;
+
+string read_MF(MF &in) {
+    local string out;
+    SPrintf(out, "%f, %f, %f, %f", in.m[0], in.m[1], in.m[2], in.m[3]);
+    return out;
+}
+
+
+typedef struct {
+    MF mf[3];
+    u4 name_offset;
+    u4 texture_offset;
+
+    u4 zero38;
+    u4 zero3C;
+    u4 unknown40;
+    u4 unknown44;
+    u4 unknown48;
+    u4 unknown4C;
+    u4 unknown50;
+    u4 zero54;
+    u4 zero58;
+    u4 zero5C;
+
+    local quad _offset;
+    _offset = FTell();
+    SetBackColor(0xffb0ff);
+    if (name_offset > 0) {
+        FSeek(h.names_offset + name_offset);
+        string name;
+    } else {
+        local string name = "";
+    }
+    if (texture_offset > 0) {
+        FSeek(h.names_offset + texture_offset);
+        string texture;
+    } else {
+        local string texture = "";
+    }
+    FSeek(_offset);
+    SetBackColor(0xffffb0);
+
+    Assert(zero38 == 0, "MATERIAL zero38");
+    Assert(zero3C == 0, "MATERIAL zero3C");
+    Assert(zero54 == 0, "MATERIAL zero54");
+    Assert(zero58 == 0, "MATERIAL zero58");
+    Assert(zero5C == 0, "MATERIAL zero5C");
+} MATERIAL <read=read_MATERIAL,optimize=false>;
+
+string read_MATERIAL(MATERIAL &in) {
+    local string out;
+    SPrintf(out, "'%s' '%s'", in.name, in.texture);
+    return out;
+}
+
+
+typedef struct {
+    u4 name_offset;
+
+    u4 zero04;
+    u4 zero08;
+    s4 unknown0C;
+    s4 unknown10;
+    u4 unknown14;
+    u4 unknown18;
+    u4 unknown1C;
+
+    MF mf8[8];
+
+    local quad _offset;
+    if (name_offset > 0) {
+        _offset = FTell();
+        FSeek(h.names_offset + name_offset);
+        SetBackColor(0xffb0ff);
+        string name;
+        FSeek(_offset);
+        SetBackColor(0xffffb0);
+    } else {
+        local string name = "";
+    }
+
+    Assert(zero04 == 0, "MATERIAL zero04");
+    Assert(zero08 == 0, "MATERIAL zero08");
+} UNKNOWN2 <read=read_UNKNOWN2,optimize=false>;
+
+string read_UNKNOWN2(UNKNOWN2 &in) {
+    return in.name;
+}
+
+
+typedef struct {
+    char sig[4];
+
+    u4 unknown04;
+    u4 unknown08;
+    u4 mdt_size;
+
+    u1 data[mdt_size - 0x10];
+
+    Assert(sig == " MDT", "Unknown MDT sig");
+} MDT <optimize=false>;
+
+
+DisplayFormatHex();
+LittleEndian();
+
+Assert(ReadString(0,4) == " MDS", "Bad sig!");
+
+SetBackColor(0xb0b0b0);
+HEADER h;
+
+FSeek(h.names_offset);
+SetBackColor(0xffd0ff);
+u1 n[h.names_size];
+
+FSeek(h.unknown2_offset);
+SetBackColor(0xffb0b0);
+if (h.unknown2_count > 0) {
+    UNKNOWN2 unk2[h.unknown2_count];
+}
+
+FSeek(h.material_offset);
+SetBackColor(0xffffb0);
+if (h.material_count > 0) {
+    MATERIAL mat[h.material_count];
+}
+
+FSeek(h.mdt_offset);
+SetBackColor(0xb0ffff);
+if (h.mdt_count > 0) {
+    MDT m[h.mdt_count];
+}
