@@ -117,7 +117,7 @@ LittleEndian();
 
 local char _sig[8];
 ReadBytes(_sig, 0, 8);
-if (_sig != "HXCPICFE") {
+if (_sig != "HXCPICFE" && _sig != "HXCHFEV3") {
     Warning("Bad sig!");
     Printf("Bad sig!\n");
     return -1;
