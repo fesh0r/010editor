@@ -140,18 +140,20 @@ typedef struct {
     global_version = version;
 
     if (global_version >= 5) {
-        enum <u1> GraphicsProfile { REACH = 0, HIDEF = 1 } graphics_profile : 7;
+        enum <u1> GraphicsProfile { REACH = 0, HIDEF = 1 } graphics_profile : 6;
     }
     else if (global_version >= 3) {
-        u1 unused : 7 <hidden=true>;
+        u1 unused : 6 <hidden=true>;
     }
 
     if (global_version >= 3) {
-        u1 compressed : 1;
+        u1 compressedLz4 : 1;
+        u1 compressedLzx : 1;
     }
     else {
         u1 unused <hidden=true>;
-        local u1 compressed = 0;
+        local u1 compressedLz4 = 0;
+        local u1 compressedLzx = 0;
     }
 
     u4 size;
@@ -1000,12 +1002,22 @@ if (sig[3] != 'w' && sig[3] != 'x') {
 SetBackColor(0xe0e0e0);
 XNB_Header h;
 
-if (h.compressed) {
+if (h.compressedLzx) {
     SetBackColor(0xffb0ff);
     LZX_Stream d(h.size - sizeof(h));
 
-    //Printf("Compressed file!\n");
-    Warning("Compressed file!");
+    //Printf("Compressed LZX file!\n");
+    Warning("Compressed LZX file!");
+    return;
+}
+
+if (h.compressedLz4) {
+    SetBackColor(0xffb0ff);
+    //LZX_Stream d(h.size - sizeof(h));
+    u1 d(h.size - sizeof(h));
+
+    //Printf("Compressed LZ4 file!\n");
+    Warning("Compressed LZ4 file!");
     return;
 }
 
